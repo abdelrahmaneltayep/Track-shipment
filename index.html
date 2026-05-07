@@ -1,0 +1,1334 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>تفاصيل الطلب #ORD-5847291 — متجر البيلا</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700&display=swap" rel="stylesheet" />
+  <style>
+    /* ─── Design Tokens ─────────────────────────────────────────── */
+    :root {
+      --salla-teal:    #1C4854;
+      --salla-teal-lt: #E8F4F7;
+      --salla-green:   #1A8F5A;
+      --salla-blue:    #2563EB;
+      --salla-amber:   #F5A623;
+      --salla-red:     #DC2626;
+      --salla-grey:    #F7F8FA;
+      --salla-text:    #1A202C;
+      --salla-muted:   #6B7280;
+      --border:        #E2E8F0;
+      --card-radius:   12px;
+      --card-shadow:   0 2px 12px rgba(0,0,0,0.08);
+      --spacing:       8px;
+    }
+
+    /* ─── Reset & Base ──────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Tajawal', sans-serif;
+      font-size: 14px;
+      line-height: 1.6;
+      color: var(--salla-text);
+      background: var(--salla-grey);
+      direction: rtl;
+    }
+
+    /* ─── Header ────────────────────────────────────────────────── */
+    .site-header {
+      background: var(--salla-teal);
+      color: #fff;
+      padding: 0 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 60px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.18);
+    }
+
+    .site-logo {
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .site-logo-icon {
+      width: 34px;
+      height: 34px;
+      background: rgba(255,255,255,0.18);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+    }
+
+    .site-nav {
+      display: flex;
+      gap: 4px;
+      list-style: none;
+    }
+
+    .site-nav a {
+      color: rgba(255,255,255,0.85);
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 500;
+      padding: 6px 12px;
+      border-radius: 6px;
+      transition: background 0.2s, color 0.2s;
+    }
+
+    .site-nav a:hover { background: rgba(255,255,255,0.12); color: #fff; }
+
+    /* ─── Page Layout ───────────────────────────────────────────── */
+    .page-wrap {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 28px 20px 60px;
+    }
+
+    .page-title {
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--salla-teal);
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .page-title span { font-size: 14px; color: var(--salla-muted); font-weight: 400; }
+
+    /* ─── Card Base ─────────────────────────────────────────────── */
+    .card {
+      background: #fff;
+      border-radius: var(--card-radius);
+      box-shadow: var(--card-shadow);
+      border: 1px solid var(--border);
+      padding: 20px 24px;
+      margin-bottom: 20px;
+    }
+
+    .card-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--salla-teal);
+      margin-bottom: 16px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* ─── Order Summary ─────────────────────────────────────────── */
+    .order-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px 28px;
+      margin-bottom: 16px;
+    }
+
+    .order-meta-item { display: flex; flex-direction: column; gap: 2px; }
+    .order-meta-label { font-size: 11px; color: var(--salla-muted); font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px; }
+    .order-meta-value { font-size: 14px; font-weight: 600; color: var(--salla-text); }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .badge-mada { background: #EEF2FF; color: #4338CA; }
+
+    .order-items { display: flex; flex-direction: column; gap: 10px; }
+
+    .order-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 12px;
+      background: var(--salla-grey);
+      border-radius: 8px;
+      border: 1px solid var(--border);
+    }
+
+    .item-img {
+      width: 44px;
+      height: 44px;
+      border-radius: 8px;
+      background: linear-gradient(135deg, #E8F4F7, #C5E1EC);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      flex-shrink: 0;
+    }
+
+    .item-info { flex: 1; min-width: 0; }
+    .item-name { font-size: 14px; font-weight: 600; color: var(--salla-text); }
+    .item-qty { font-size: 12px; color: var(--salla-muted); margin-top: 2px; }
+    .item-price { font-size: 15px; font-weight: 700; color: var(--salla-teal); white-space: nowrap; }
+
+    .order-total {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 14px;
+      padding-top: 14px;
+      border-top: 1px solid var(--border);
+    }
+
+    .order-total-label { font-size: 15px; font-weight: 600; color: var(--salla-text); }
+    .order-total-value { font-size: 18px; font-weight: 700; color: var(--salla-teal); }
+
+    /* ─── Tracking Widget ───────────────────────────────────────── */
+    #tracking-widget {
+      background: #fff;
+      border-radius: var(--card-radius);
+      box-shadow: var(--card-shadow);
+      border: 1px solid var(--border);
+      margin-bottom: 20px;
+      overflow: hidden;
+      transition: all 0.3s ease;
+    }
+
+    /* Zone A — Widget Header */
+    .widget-header {
+      background: linear-gradient(135deg, var(--salla-teal) 0%, #2a6b7c 100%);
+      color: #fff;
+      padding: 16px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .carrier-block { display: flex; align-items: center; gap: 10px; }
+
+    .carrier-logo {
+      background: rgba(255,255,255,0.18);
+      border: 1px solid rgba(255,255,255,0.25);
+      border-radius: 8px;
+      padding: 6px 14px;
+      font-size: 15px;
+      font-weight: 700;
+      color: #fff;
+      letter-spacing: 0.5px;
+    }
+
+    .tracking-num {
+      font-family: 'Courier New', monospace;
+      font-size: 13px;
+      color: rgba(255,255,255,0.8);
+      background: rgba(0,0,0,0.15);
+      padding: 3px 10px;
+      border-radius: 5px;
+      direction: ltr;
+    }
+
+    .header-right { display: flex; flex-direction: column; align-items: flex-start; gap: 5px; }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 4px 14px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 700;
+      transition: all 0.4s ease;
+    }
+
+    .status-badge.transit  { background: #DBEAFE; color: #1D4ED8; }
+    .status-badge.delivered { background: #D1FAE5; color: #065F46; }
+    .status-badge.preparing { background: #FEF3C7; color: #92400E; }
+    .status-badge.shipped  { background: #EDE9FE; color: #5B21B6; }
+    .status-badge.received { background: #F3F4F6; color: #374151; }
+
+    .last-update { font-size: 12px; color: rgba(255,255,255,0.7); }
+
+    /* Zone B — Stepper */
+    .stepper-section { padding: 28px 24px 20px; }
+
+    .stepper {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      position: relative;
+    }
+
+    .step {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      flex: 1;
+      position: relative;
+    }
+
+    .step:not(:last-child)::after {
+      content: '';
+      position: absolute;
+      top: 19px;
+      right: -50%;
+      width: 100%;
+      height: 2px;
+      background: var(--border);
+      z-index: 0;
+      transition: background 0.5s ease;
+    }
+
+    .step.completed:not(:last-child)::after { background: var(--salla-teal); }
+    .step.current:not(:last-child)::after { background: linear-gradient(to left, var(--border), var(--salla-teal)); }
+
+    /* RTL: connector goes from right edge to center */
+    html[dir="rtl"] .step:not(:last-child)::after {
+      right: auto;
+      left: -50%;
+    }
+
+    .step-circle {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      font-weight: 700;
+      border: 2px solid var(--border);
+      background: #fff;
+      color: var(--salla-muted);
+      position: relative;
+      z-index: 1;
+      transition: all 0.5s ease;
+    }
+
+    .step.completed .step-circle {
+      background: var(--salla-teal);
+      border-color: var(--salla-teal);
+      color: #fff;
+    }
+
+    .step.current .step-circle {
+      background: var(--salla-blue);
+      border-color: var(--salla-blue);
+      color: #fff;
+      animation: pulse-step 2s infinite;
+    }
+
+    .step.delivered-state .step-circle {
+      background: var(--salla-green);
+      border-color: var(--salla-green);
+      color: #fff;
+    }
+
+    @keyframes pulse-step {
+      0%   { box-shadow: 0 0 0 0 rgba(37,99,235,0.5); }
+      50%  { box-shadow: 0 0 0 10px rgba(37,99,235,0); }
+      100% { box-shadow: 0 0 0 0 rgba(37,99,235,0); }
+    }
+
+    .step-label {
+      margin-top: 8px;
+      font-size: 11.5px;
+      font-weight: 500;
+      color: var(--salla-muted);
+      text-align: center;
+      line-height: 1.3;
+      max-width: 80px;
+      transition: color 0.4s;
+    }
+
+    .step.completed .step-label { color: var(--salla-teal); font-weight: 600; }
+    .step.current .step-label { color: var(--salla-blue); font-weight: 700; }
+    .step.delivered-state .step-label { color: var(--salla-green); font-weight: 700; }
+
+    .eta-bar {
+      margin-top: 20px;
+      text-align: center;
+      padding: 10px 16px;
+      background: var(--salla-teal-lt);
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--salla-teal);
+      border: 1px solid #C5E1EC;
+      transition: all 0.4s;
+    }
+
+    .eta-bar.delivered-eta {
+      background: #D1FAE5;
+      border-color: #6EE7B7;
+      color: var(--salla-green);
+    }
+
+    /* Zone C — Last Event */
+    .last-event {
+      margin: 0 24px 20px;
+      padding: 14px 16px;
+      background: var(--salla-teal-lt);
+      border-radius: 10px;
+      border-right: 4px solid var(--salla-teal);
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      transition: all 0.4s;
+    }
+
+    .last-event.delivered-event {
+      background: #D1FAE5;
+      border-right-color: var(--salla-green);
+    }
+
+    .last-event-icon { font-size: 26px; flex-shrink: 0; margin-top: 1px; }
+
+    .last-event-body { flex: 1; }
+    .last-event-title { font-size: 15px; font-weight: 700; color: var(--salla-teal); margin-bottom: 3px; }
+    .last-event-sub { font-size: 12px; color: var(--salla-muted); direction: ltr; text-align: right; }
+    .last-event-time { font-size: 12px; color: var(--salla-muted); margin-top: 5px; }
+
+    /* ─── Delivered / Success state ─────────────────────────────── */
+    .success-banner {
+      display: none;
+      margin: 0 24px 20px;
+      padding: 20px;
+      background: linear-gradient(135deg, #D1FAE5, #A7F3D0);
+      border-radius: 10px;
+      text-align: center;
+      border: 1px solid #6EE7B7;
+    }
+
+    .success-banner.visible { display: block; }
+
+    .success-banner-text {
+      font-size: 16px;
+      font-weight: 700;
+      color: #065F46;
+      margin-bottom: 14px;
+    }
+
+    .star-rating {
+      display: flex;
+      gap: 6px;
+      justify-content: center;
+      margin-top: 10px;
+    }
+
+    .star {
+      font-size: 28px;
+      cursor: pointer;
+      color: #D1D5DB;
+      transition: color 0.18s, transform 0.18s;
+      user-select: none;
+    }
+
+    .star:hover, .star.active { color: var(--salla-amber); transform: scale(1.15); }
+
+    .star-label {
+      font-size: 13px;
+      color: #065F46;
+      margin-bottom: 6px;
+      font-weight: 600;
+    }
+
+    /* ─── Fallback States ───────────────────────────────────────── */
+    .fallback-section {
+      display: none;
+      margin: 0 24px 20px;
+      padding: 20px;
+      border-radius: 10px;
+      text-align: center;
+    }
+
+    .fallback-section.visible { display: block; }
+
+    .fallback-section.no-tracking {
+      background: #FFFBEB;
+      border: 1px solid #FDE68A;
+    }
+
+    .fallback-section.error-tracking {
+      background: #FEF2F2;
+      border: 1px solid #FECACA;
+    }
+
+    .fallback-icon {
+      font-size: 40px;
+      margin-bottom: 10px;
+    }
+
+    .fallback-icon.pulsing { animation: pulse-amber 2s infinite; }
+
+    @keyframes pulse-amber {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+
+    .fallback-title {
+      font-size: 16px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .fallback-title.amber { color: #92400E; }
+    .fallback-title.red   { color: #991B1B; }
+
+    .fallback-body { font-size: 13px; color: var(--salla-muted); line-height: 1.7; }
+
+    .fallback-meta {
+      margin-top: 10px;
+      padding: 8px 14px;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 500;
+    }
+
+    .fallback-meta.amber { background: #FEF3C7; color: #92400E; }
+    .fallback-meta.red   { background: #FEE2E2; color: #991B1B; }
+
+    .btn-refresh {
+      margin-top: 12px;
+      padding: 9px 24px;
+      background: var(--salla-red);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-family: 'Tajawal', sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .btn-refresh:hover { background: #B91C1C; }
+
+    /* Zone E — Event Log */
+    .event-log-section { padding: 0 24px 20px; }
+
+    .event-log-toggle {
+      width: 100%;
+      background: none;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 12px 16px;
+      font-family: 'Tajawal', sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--salla-teal);
+      cursor: pointer;
+      text-align: right;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      transition: background 0.2s;
+    }
+
+    .event-log-toggle:hover { background: var(--salla-teal-lt); }
+
+    .event-log-toggle .arrow {
+      display: inline-block;
+      transition: transform 0.3s ease;
+      font-size: 12px;
+    }
+
+    .event-log-toggle.open .arrow { transform: rotate(180deg); }
+
+    .event-log-body {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.45s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .event-log-body.open { max-height: 500px; }
+
+    .event-timeline {
+      padding: 16px 8px 0;
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+
+    .timeline-item {
+      display: flex;
+      gap: 14px;
+      padding-bottom: 18px;
+      position: relative;
+    }
+
+    .timeline-item:not(:last-child)::before {
+      content: '';
+      position: absolute;
+      right: 19px;
+      top: 24px;
+      bottom: 0;
+      width: 2px;
+      background: var(--border);
+    }
+
+    html[dir="rtl"] .timeline-item:not(:last-child)::before {
+      right: 19px;
+      left: auto;
+    }
+
+    .timeline-dot {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: var(--salla-teal);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-size: 10px;
+      flex-shrink: 0;
+      position: relative;
+      z-index: 1;
+      margin-top: 1px;
+    }
+
+    .timeline-content { flex: 1; padding-top: 0; }
+    .timeline-title { font-size: 13px; font-weight: 600; color: var(--salla-text); }
+    .timeline-time { font-size: 11px; color: var(--salla-muted); margin-top: 2px; }
+
+    /* ─── Demo Controls ─────────────────────────────────────────── */
+    .demo-controls {
+      background: #fff;
+      border-radius: var(--card-radius);
+      box-shadow: var(--card-shadow);
+      border: 1px solid var(--border);
+      padding: 16px 24px;
+      margin-bottom: 20px;
+    }
+
+    .demo-controls-title {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--salla-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      margin-bottom: 12px;
+    }
+
+    .demo-btn-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .demo-btn {
+      padding: 8px 16px;
+      border-radius: 20px;
+      border: 2px solid var(--border);
+      background: #fff;
+      font-family: 'Tajawal', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--salla-muted);
+      cursor: pointer;
+      transition: all 0.2s;
+      white-space: nowrap;
+    }
+
+    .demo-btn:hover { border-color: var(--salla-teal); color: var(--salla-teal); background: var(--salla-teal-lt); }
+
+    .demo-btn.active {
+      background: var(--salla-teal);
+      border-color: var(--salla-teal);
+      color: #fff;
+    }
+
+    .demo-btn.active.delivered-btn {
+      background: var(--salla-green);
+      border-color: var(--salla-green);
+    }
+
+    .fallback-divider {
+      margin: 12px 0 10px;
+      font-size: 12px;
+      color: var(--salla-muted);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+    }
+
+    .fallback-btn { border-radius: 6px; }
+    .fallback-btn.active { background: var(--salla-amber); border-color: var(--salla-amber); color: #fff; }
+    .fallback-btn.active.err { background: var(--salla-red); border-color: var(--salla-red); }
+
+    /* ─── Address Card ──────────────────────────────────────────── */
+    .address-card .address-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 6px 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .address-card .address-row:last-child { border-bottom: none; }
+
+    .address-icon { font-size: 16px; margin-top: 2px; flex-shrink: 0; }
+    .address-label { font-size: 12px; color: var(--salla-muted); margin-bottom: 1px; }
+    .address-value { font-size: 14px; font-weight: 500; }
+
+    /* ─── Confetti Canvas ───────────────────────────────────────── */
+    #confetti-canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 9999;
+      display: none;
+    }
+
+    /* ─── Mobile ────────────────────────────────────────────────── */
+    @media (max-width: 600px) {
+      .page-wrap { padding: 16px 12px 40px; }
+      .site-nav { gap: 0; }
+      .site-nav a { padding: 6px 8px; font-size: 12px; }
+
+      .stepper {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0;
+      }
+
+      .step {
+        flex-direction: row;
+        align-items: flex-start;
+        gap: 14px;
+        flex: none;
+        width: 100%;
+        padding-bottom: 18px;
+        position: relative;
+      }
+
+      .step:not(:last-child)::after {
+        content: '';
+        position: absolute;
+        top: 40px;
+        right: 18px;
+        left: auto;
+        width: 2px;
+        height: calc(100% - 20px);
+        background: var(--border);
+      }
+
+      .step.completed:not(:last-child)::after { background: var(--salla-teal); }
+      .step.current:not(:last-child)::after { background: linear-gradient(to bottom, var(--salla-teal), var(--border)); }
+
+      .step-circle { flex-shrink: 0; }
+
+      .step-label {
+        text-align: right;
+        max-width: none;
+        padding-top: 10px;
+      }
+
+      .widget-header { flex-direction: column; align-items: flex-start; }
+      .header-right { align-items: flex-start; }
+
+      .demo-btn { font-size: 12px; padding: 7px 12px; }
+
+      .order-meta { gap: 8px 16px; }
+    }
+
+    /* ─── Utility ───────────────────────────────────────────────── */
+    .hidden { display: none !important; }
+
+    .dot-pulse {
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      animation: dot-blink 1.4s infinite;
+    }
+
+    .dot-pulse.blue { background: var(--salla-blue); }
+    .dot-pulse.green { background: var(--salla-green); }
+
+    @keyframes dot-blink {
+      0%, 80%, 100% { opacity: 1; }
+      40% { opacity: 0.2; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ══ Site Header ════════════════════════════════════════════════ -->
+<header class="site-header">
+  <div class="site-logo">
+    <div class="site-logo-icon">✦</div>
+    متجر البيلا
+  </div>
+  <nav>
+    <ul class="site-nav">
+      <li><a href="#">طلباتي</a></li>
+      <li><a href="#">حسابي</a></li>
+      <li><a href="#">تسجيل الخروج</a></li>
+    </ul>
+  </nav>
+</header>
+
+<!-- ══ Canvas for Confetti ════════════════════════════════════════ -->
+<canvas id="confetti-canvas"></canvas>
+
+<!-- ══ Main Content ═══════════════════════════════════════════════ -->
+<div class="page-wrap">
+
+  <div class="page-title">
+    تفاصيل الطلب
+    <span>#ORD-5847291</span>
+  </div>
+
+  <!-- ── Order Summary ─────────────────────────────────────────── -->
+  <div class="card">
+    <div class="card-title">📋 ملخص الطلب</div>
+
+    <div class="order-meta">
+      <div class="order-meta-item">
+        <span class="order-meta-label">رقم الطلب</span>
+        <span class="order-meta-value" style="direction:ltr;text-align:right">#ORD-5847291</span>
+      </div>
+      <div class="order-meta-item">
+        <span class="order-meta-label">تاريخ الطلب</span>
+        <span class="order-meta-value">٣ مايو ٢٠٢٦</span>
+      </div>
+      <div class="order-meta-item">
+        <span class="order-meta-label">طريقة الدفع</span>
+        <span class="order-meta-value"><span class="badge badge-mada">Mada • مدى</span></span>
+      </div>
+      <div class="order-meta-item">
+        <span class="order-meta-label">عدد المنتجات</span>
+        <span class="order-meta-value">٢ منتج</span>
+      </div>
+    </div>
+
+    <div class="order-items">
+      <div class="order-item">
+        <div class="item-img">🌸</div>
+        <div class="item-info">
+          <div class="item-name">عطر رويال مسك</div>
+          <div class="item-qty">الكمية: ١</div>
+        </div>
+        <div class="item-price">١٩٥٫٠٠ ريال</div>
+      </div>
+      <div class="order-item">
+        <div class="item-img">🎁</div>
+        <div class="item-info">
+          <div class="item-name">علبة هدايا فاخرة</div>
+          <div class="item-qty">الكمية: ١</div>
+        </div>
+        <div class="item-price">٥٠٫٠٠ ريال</div>
+      </div>
+    </div>
+
+    <div class="order-total">
+      <span class="order-total-label">المجموع الكلي</span>
+      <span class="order-total-value">٢٤٥٫٠٠ ريال</span>
+    </div>
+  </div>
+
+  <!-- ── Demo Controls ─────────────────────────────────────────── -->
+  <div class="demo-controls">
+    <div class="demo-controls-title">🎛 تبديل الحالة — عرض توضيحي</div>
+    <div class="demo-btn-row" id="status-btns">
+      <button class="demo-btn" onclick="setState(1)">١ — تم الاستلام</button>
+      <button class="demo-btn" onclick="setState(2)">٢ — جارٍ التجهيز</button>
+      <button class="demo-btn" onclick="setState(3)">٣ — تم الشحن</button>
+      <button class="demo-btn active" onclick="setState(4)">٤ — في الطريق</button>
+      <button class="demo-btn delivered-btn" onclick="setState(5)">٥ — تم التوصيل 🎉</button>
+    </div>
+    <div class="fallback-divider">حالات الاستثناء</div>
+    <div class="demo-btn-row">
+      <button class="demo-btn fallback-btn" onclick="showFallback('no-tracking')">لا يوجد تتبع بعد</button>
+      <button class="demo-btn fallback-btn err" onclick="showFallback('error')">خطأ في التتبع</button>
+      <button class="demo-btn fallback-btn" onclick="clearFallback()">إخفاء الاستثناء</button>
+    </div>
+  </div>
+
+  <!-- ══ Tracking Widget ════════════════════════════════════════ -->
+  <div id="tracking-widget">
+
+    <!-- Zone A — Header -->
+    <div class="widget-header">
+      <div class="carrier-block">
+        <div class="carrier-logo">أرامكس</div>
+        <div class="tracking-num">1234567890AR</div>
+      </div>
+      <div class="header-right">
+        <div id="status-badge" class="status-badge transit">
+          <span class="dot-pulse blue" id="status-dot"></span>
+          <span id="status-badge-text">في الطريق إليك</span>
+        </div>
+        <div class="last-update" id="last-update">آخر تحديث: منذ ١٢ دقيقة</div>
+      </div>
+    </div>
+
+    <!-- Fallback: No Tracking -->
+    <div class="fallback-section no-tracking" id="fallback-no-tracking">
+      <div class="fallback-icon pulsing">🕐</div>
+      <div class="fallback-title amber">جارٍ تجهيز شحنتك 🚚</div>
+      <p class="fallback-body">تم إصدار بوليصة الشحن. سيبدأ التتبع بمجرد استلام شركة الشحن للطلب.</p>
+      <div class="fallback-meta amber">موعد الاستلام المتوقع: ٨ مايو ٢٠٢٦</div>
+    </div>
+
+    <!-- Fallback: Error -->
+    <div class="fallback-section error-tracking" id="fallback-error">
+      <div class="fallback-icon">⚠️</div>
+      <div class="fallback-title red">نواجه تأخراً في الحصول على تحديثات الشحنة</div>
+      <p class="fallback-body">نحن نتابع مع شركة الشحن. يرجى المحاولة مرة أخرى خلال ٣٠ دقيقة.</p>
+      <div class="fallback-meta red">آخر حالة معروفة: تم الشحن — ٥ مايو ٢٠٢٦</div>
+      <button class="btn-refresh" onclick="simulateRefresh(this)">🔄 تحديث الآن</button>
+    </div>
+
+    <!-- Zone B — Stepper (hidden during fallback) -->
+    <div class="stepper-section" id="stepper-section">
+      <div class="stepper" id="stepper">
+        <div class="step completed" data-step="1">
+          <div class="step-circle" id="sc1">✓</div>
+          <div class="step-label">تم استلام<br>الطلب</div>
+        </div>
+        <div class="step completed" data-step="2">
+          <div class="step-circle" id="sc2">✓</div>
+          <div class="step-label">جارٍ<br>التجهيز</div>
+        </div>
+        <div class="step completed" data-step="3">
+          <div class="step-circle" id="sc3">✓</div>
+          <div class="step-label">تم<br>الشحن</div>
+        </div>
+        <div class="step current" data-step="4">
+          <div class="step-circle" id="sc4">◉</div>
+          <div class="step-label">في<br>الطريق</div>
+        </div>
+        <div class="step" data-step="5">
+          <div class="step-circle" id="sc5">○</div>
+          <div class="step-label">تم<br>التوصيل</div>
+        </div>
+      </div>
+
+      <div class="eta-bar" id="eta-bar">
+        📅 التوصيل المتوقع: الأربعاء، ٨ مايو ٢٠٢٦
+      </div>
+    </div>
+
+    <!-- Zone C — Last Event (hidden during fallback) -->
+    <div class="last-event" id="last-event">
+      <div class="last-event-icon" id="last-event-icon">📦</div>
+      <div class="last-event-body">
+        <div class="last-event-title" id="last-event-title">الشحنة في مركز التوزيع - الرياض</div>
+        <div class="last-event-sub" id="last-event-sub">Distribution Center — Riyadh Hub</div>
+        <div class="last-event-time" id="last-event-time">٧ مايو ٢٠٢٦، ٩:١٥ ص</div>
+      </div>
+    </div>
+
+    <!-- Zone D — Success Banner (delivered state only) -->
+    <div class="success-banner" id="success-banner">
+      <div class="success-banner-text">وصلت طلبيتك بنجاح 🎉</div>
+      <p style="font-size:14px;color:#065F46;margin-bottom:14px;">نأمل أن تكون راضياً عن تجربتك مع متجر البيلا</p>
+      <div class="star-label">قيّم تجربتك</div>
+      <div class="star-rating" id="star-rating">
+        <span class="star" data-val="5" onclick="rateStar(5)">★</span>
+        <span class="star" data-val="4" onclick="rateStar(4)">★</span>
+        <span class="star" data-val="3" onclick="rateStar(3)">★</span>
+        <span class="star" data-val="2" onclick="rateStar(2)">★</span>
+        <span class="star" data-val="1" onclick="rateStar(1)">★</span>
+      </div>
+    </div>
+
+    <!-- Zone E — Event Log -->
+    <div class="event-log-section">
+      <button class="event-log-toggle" id="log-toggle" onclick="toggleLog()">
+        <span>📋 سجل الشحنة التفصيلي</span>
+        <span class="arrow">▼</span>
+      </button>
+      <div class="event-log-body" id="log-body">
+        <div class="event-timeline">
+          <div class="timeline-item">
+            <div class="timeline-dot">✓</div>
+            <div class="timeline-content">
+              <div class="timeline-title">الشحنة في مركز التوزيع - الرياض</div>
+              <div class="timeline-time">مايو ٧، ٩:١٥ ص</div>
+            </div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-dot">✓</div>
+            <div class="timeline-content">
+              <div class="timeline-title">تم التسليم لسائق التوصيل</div>
+              <div class="timeline-time">مايو ٦، ١١:٣٠ م</div>
+            </div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-dot">✓</div>
+            <div class="timeline-content">
+              <div class="timeline-title">وصول المستودع الإقليمي - جدة</div>
+              <div class="timeline-time">مايو ٥، ٣:٤٥ م</div>
+            </div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-dot">✓</div>
+            <div class="timeline-content">
+              <div class="timeline-title">تم إصدار بوليصة الشحن</div>
+              <div class="timeline-time">مايو ٤، ٨:٠٠ ص</div>
+            </div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-dot">✓</div>
+            <div class="timeline-content">
+              <div class="timeline-title">تم تأكيد الطلب</div>
+              <div class="timeline-time">مايو ٣، ٢:٣٠ م</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div><!-- /#tracking-widget -->
+
+  <!-- ── Delivery Address ──────────────────────────────────────── -->
+  <div class="card address-card">
+    <div class="card-title">📍 عنوان التوصيل</div>
+    <div class="address-row">
+      <div class="address-icon">👤</div>
+      <div>
+        <div class="address-label">الاسم</div>
+        <div class="address-value">سارة محمد العتيبي</div>
+      </div>
+    </div>
+    <div class="address-row">
+      <div class="address-icon">🏠</div>
+      <div>
+        <div class="address-label">العنوان</div>
+        <div class="address-value">حي النخيل، شارع الأمير سلطان، الرياض، المملكة العربية السعودية</div>
+      </div>
+    </div>
+    <div class="address-row">
+      <div class="address-icon">📱</div>
+      <div>
+        <div class="address-label">رقم الجوال</div>
+        <div class="address-value" style="direction:ltr;text-align:right">+966 55 123 4567</div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /.page-wrap -->
+
+<script>
+  /* ── State Definitions ──────────────────────────────────────── */
+  const STATES = {
+    1: {
+      badgeClass: 'received',
+      badgeText: 'تم استلام الطلب',
+      dotClass: 'blue',
+      lastUpdate: 'آخر تحديث: منذ ٤ ساعات',
+      etaText: '📅 التوصيل المتوقع: الجمعة، ١٠ مايو ٢٠٢٦',
+      eventIcon: '🧾',
+      eventTitle: 'تم تأكيد الطلب وبدء المعالجة',
+      eventSub: 'Order Confirmed — Processing Started',
+      eventTime: '٣ مايو ٢٠٢٦، ٢:٣٠ م',
+    },
+    2: {
+      badgeClass: 'preparing',
+      badgeText: 'جارٍ التجهيز',
+      dotClass: 'blue',
+      lastUpdate: 'آخر تحديث: منذ ٣ ساعات',
+      etaText: '📅 التوصيل المتوقع: الجمعة، ١٠ مايو ٢٠٢٦',
+      eventIcon: '🏭',
+      eventTitle: 'جارٍ تجهيز وتغليف الطلب في المستودع',
+      eventSub: 'Warehouse — Packing in Progress',
+      eventTime: '٤ مايو ٢٠٢٦، ٨:٠٠ ص',
+    },
+    3: {
+      badgeClass: 'shipped',
+      badgeText: 'تم الشحن',
+      dotClass: 'blue',
+      lastUpdate: 'آخر تحديث: منذ ساعة',
+      etaText: '📅 التوصيل المتوقع: الخميس، ٩ مايو ٢٠٢٦',
+      eventIcon: '✈️',
+      eventTitle: 'تم إصدار بوليصة الشحن وتسليم الطلب للناقل',
+      eventSub: 'Shipment Dispatched — In Carrier Custody',
+      eventTime: '٥ مايو ٢٠٢٦، ٣:٤٥ م',
+    },
+    4: {
+      badgeClass: 'transit',
+      badgeText: 'في الطريق إليك',
+      dotClass: 'blue',
+      lastUpdate: 'آخر تحديث: منذ ١٢ دقيقة',
+      etaText: '📅 التوصيل المتوقع: الأربعاء، ٨ مايو ٢٠٢٦',
+      eventIcon: '📦',
+      eventTitle: 'الشحنة في مركز التوزيع - الرياض',
+      eventSub: 'Distribution Center — Riyadh Hub',
+      eventTime: '٧ مايو ٢٠٢٦، ٩:١٥ ص',
+    },
+    5: {
+      badgeClass: 'delivered',
+      badgeText: 'تم التوصيل',
+      dotClass: 'green',
+      lastUpdate: 'تم التوصيل بنجاح ✓',
+      etaText: '✅ تم التوصيل: الأربعاء، ٨ مايو ٢٠٢٦، ١١:٤٢ ص',
+      eventIcon: '🏠',
+      eventTitle: 'تم توصيل الطلب بنجاح',
+      eventSub: 'Successfully Delivered to Recipient',
+      eventTime: '٨ مايو ٢٠٢٦، ١١:٤٢ ص',
+    },
+  };
+
+  const STEP_ICONS_NORMAL    = ['✓', '✓', '✓', '◉', '○'];
+  const STEP_ICONS_DELIVERED = ['✓', '✓', '✓', '✓', '✓'];
+
+  let currentState = 4;
+  let currentFallback = null;
+
+  /* ── setState ────────────────────────────────────────────────── */
+  function setState(n) {
+    currentState = n;
+    clearFallback();
+
+    const s = STATES[n];
+    const steps = document.querySelectorAll('.step');
+    const isDelivered = (n === 5);
+
+    // Stepper
+    steps.forEach((step, i) => {
+      const stepNum = i + 1;
+      step.className = 'step';
+      const circle = step.querySelector('.step-circle');
+
+      if (isDelivered) {
+        step.classList.add('delivered-state');
+        circle.textContent = STEP_ICONS_DELIVERED[i];
+      } else if (stepNum < n) {
+        step.classList.add('completed');
+        circle.textContent = '✓';
+      } else if (stepNum === n) {
+        step.classList.add('current');
+        circle.textContent = '◉';
+      } else {
+        circle.textContent = '○';
+      }
+    });
+
+    // Badge
+    const badge = document.getElementById('status-badge');
+    badge.className = 'status-badge ' + s.badgeClass;
+    document.getElementById('status-badge-text').textContent = s.badgeText;
+
+    // Dot
+    const dot = document.getElementById('status-dot');
+    dot.className = 'dot-pulse ' + s.dotClass;
+    dot.style.display = isDelivered ? 'none' : 'inline-block';
+
+    // Last update
+    document.getElementById('last-update').textContent = s.lastUpdate;
+
+    // ETA bar
+    const etaBar = document.getElementById('eta-bar');
+    etaBar.textContent = s.etaText;
+    etaBar.className = 'eta-bar' + (isDelivered ? ' delivered-eta' : '');
+
+    // Last event
+    const lastEvent = document.getElementById('last-event');
+    lastEvent.className = 'last-event' + (isDelivered ? ' delivered-event' : '');
+    document.getElementById('last-event-icon').textContent = s.eventIcon;
+    document.getElementById('last-event-title').textContent = s.eventTitle;
+    document.getElementById('last-event-sub').textContent = s.eventSub;
+    document.getElementById('last-event-time').textContent = s.eventTime;
+
+    // Success banner
+    const banner = document.getElementById('success-banner');
+    if (isDelivered) {
+      banner.classList.add('visible');
+      launchConfetti();
+    } else {
+      banner.classList.remove('visible');
+      stopConfetti();
+    }
+
+    // Show main sections
+    document.getElementById('stepper-section').style.display = '';
+    document.getElementById('last-event').style.display = '';
+
+    // Active button
+    document.querySelectorAll('#status-btns .demo-btn').forEach((btn, i) => {
+      btn.classList.toggle('active', i + 1 === n);
+    });
+  }
+
+  /* ── Fallback States ─────────────────────────────────────────── */
+  function showFallback(type) {
+    currentFallback = type;
+
+    // Hide stepper + last event
+    document.getElementById('stepper-section').style.display = 'none';
+    document.getElementById('last-event').style.display = 'none';
+    document.getElementById('success-banner').classList.remove('visible');
+    stopConfetti();
+
+    // Hide all fallback panels first
+    document.querySelectorAll('.fallback-section').forEach(el => el.classList.remove('visible'));
+
+    if (type === 'no-tracking') {
+      document.getElementById('fallback-no-tracking').classList.add('visible');
+      document.getElementById('status-badge').className = 'status-badge preparing';
+      document.getElementById('status-badge-text').textContent = 'جارٍ التجهيز';
+      document.getElementById('last-update').textContent = 'آخر تحديث: منذ ٢ ساعات';
+      document.getElementById('status-dot').className = 'dot-pulse blue';
+    } else if (type === 'error') {
+      document.getElementById('fallback-error').classList.add('visible');
+      document.getElementById('status-badge').className = 'status-badge shipped';
+      document.getElementById('status-badge-text').textContent = 'تعذّر التحديث';
+      document.getElementById('last-update').textContent = 'آخر تحديث: منذ ٤٣ دقيقة';
+      document.getElementById('status-dot').className = 'dot-pulse blue';
+    }
+
+    // Deactivate state buttons
+    document.querySelectorAll('#status-btns .demo-btn').forEach(btn => btn.classList.remove('active'));
+  }
+
+  function clearFallback() {
+    currentFallback = null;
+    document.querySelectorAll('.fallback-section').forEach(el => el.classList.remove('visible'));
+    document.getElementById('stepper-section').style.display = '';
+    document.getElementById('last-event').style.display = '';
+  }
+
+  /* ── Refresh button simulation ───────────────────────────────── */
+  function simulateRefresh(btn) {
+    btn.textContent = '⏳ جارٍ التحديث...';
+    btn.disabled = true;
+    setTimeout(() => {
+      btn.textContent = '🔄 تحديث الآن';
+      btn.disabled = false;
+      clearFallback();
+      setState(currentState);
+    }, 1800);
+  }
+
+  /* ── Event Log Toggle ────────────────────────────────────────── */
+  function toggleLog() {
+    const body = document.getElementById('log-body');
+    const toggle = document.getElementById('log-toggle');
+    body.classList.toggle('open');
+    toggle.classList.toggle('open');
+  }
+
+  /* ── Star Rating ─────────────────────────────────────────────── */
+  function rateStar(val) {
+    const stars = document.querySelectorAll('.star');
+    // Stars are displayed RTL (5,4,3,2,1), so data-val comparison still works
+    stars.forEach(star => {
+      star.classList.toggle('active', parseInt(star.dataset.val) <= val);
+    });
+  }
+
+  // Hover effect
+  document.querySelectorAll('.star').forEach(star => {
+    star.addEventListener('mouseover', () => {
+      const val = parseInt(star.dataset.val);
+      document.querySelectorAll('.star').forEach(s => {
+        s.style.color = parseInt(s.dataset.val) <= val ? 'var(--salla-amber)' : '#D1D5DB';
+      });
+    });
+    star.addEventListener('mouseleave', () => {
+      document.querySelectorAll('.star').forEach(s => {
+        s.style.color = s.classList.contains('active') ? 'var(--salla-amber)' : '#D1D5DB';
+      });
+    });
+  });
+
+  /* ── Confetti ────────────────────────────────────────────────── */
+  const canvas  = document.getElementById('confetti-canvas');
+  const ctx     = canvas.getContext('2d');
+  let pieces    = [];
+  let animFrame = null;
+  let confettiRunning = false;
+
+  const COLORS = ['#1C4854','#2563EB','#1A8F5A','#F5A623','#DC2626','#8B5CF6','#EC4899','#06B6D4'];
+
+  function resizeCanvas() {
+    canvas.width  = window.innerWidth;
+    canvas.height = window.innerHeight;
+  }
+
+  function randomPiece() {
+    return {
+      x: Math.random() * canvas.width,
+      y: Math.random() * -canvas.height * 0.5,
+      w: Math.random() * 8 + 5,
+      h: Math.random() * 4 + 3,
+      color: COLORS[Math.floor(Math.random() * COLORS.length)],
+      rotation: Math.random() * Math.PI * 2,
+      rotSpeed: (Math.random() - 0.5) * 0.12,
+      vx: (Math.random() - 0.5) * 2,
+      vy: Math.random() * 2.5 + 1.5,
+      opacity: 1,
+    };
+  }
+
+  function drawConfetti() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    pieces.forEach(p => {
+      ctx.save();
+      ctx.globalAlpha = p.opacity;
+      ctx.translate(p.x, p.y);
+      ctx.rotate(p.rotation);
+      ctx.fillStyle = p.color;
+      ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
+      ctx.restore();
+      p.x += p.vx;
+      p.y += p.vy;
+      p.rotation += p.rotSpeed;
+      if (p.y > canvas.height * 0.7) p.opacity -= 0.015;
+    });
+    pieces = pieces.filter(p => p.opacity > 0);
+    if (confettiRunning && pieces.length < 140) {
+      for (let i = 0; i < 3; i++) pieces.push(randomPiece());
+    }
+    if (pieces.length > 0) {
+      animFrame = requestAnimationFrame(drawConfetti);
+    } else {
+      canvas.style.display = 'none';
+    }
+  }
+
+  function launchConfetti() {
+    resizeCanvas();
+    canvas.style.display = 'block';
+    confettiRunning = true;
+    pieces = [];
+    for (let i = 0; i < 120; i++) pieces.push(randomPiece());
+    if (animFrame) cancelAnimationFrame(animFrame);
+    drawConfetti();
+    setTimeout(() => { confettiRunning = false; }, 3500);
+  }
+
+  function stopConfetti() {
+    confettiRunning = false;
+    pieces = [];
+    if (animFrame) cancelAnimationFrame(animFrame);
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    canvas.style.display = 'none';
+  }
+
+  window.addEventListener('resize', resizeCanvas);
+
+  /* ── Init ────────────────────────────────────────────────────── */
+  setState(4);
+</script>
+</body>
+</html>
