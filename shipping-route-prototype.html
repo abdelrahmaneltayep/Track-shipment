@@ -9,1227 +9,1033 @@
   <script src="https://unpkg.com/lucide@latest"></script>
   <style>
     :root {
-      --salla-teal:      #04B49C;
-      --salla-teal-10:   #E6F8F6;
-      --salla-purple:    #7B2D8B;
-      --salla-purple-10: #F3E8F7;
-      --salla-dark:      #1A1A2E;
-      --salla-gray:      #6B7280;
-      --salla-light:     #F7F8FA;
-      --salla-white:     #FFFFFF;
-      --salla-red:       #EF4444;
-      --salla-orange:    #F59E0B;
-      --salla-green:     #10B981;
-      --border:          #E5E7EB;
+      --teal:        #04B49C;
+      --teal-10:     #E6F8F6;
+      --teal-20:     #C7F0EB;
+      --nav-bg:      #0D1B2A;
+      --nav-border:  #1A2E42;
+      --dark:        #1A1A2E;
+      --text:        #2D2D2D;
+      --muted:       #6B7280;
+      --light:       #F7F8FA;
+      --white:       #FFFFFF;
+      --red:         #EF4444;
+      --red-10:      #FEF2F2;
+      --orange:      #F59E0B;
+      --orange-10:   #FFFBEB;
+      --green:       #10B981;
+      --green-10:    #F0FDF4;
+      --border:      #E5E7EB;
+      --border-2:    #D1D5DB;
+      --purple:      #7B2D8B;
+      --purple-10:   #F3E8F7;
     }
 
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
       font-family: 'Tajawal', sans-serif;
-      background: var(--salla-light);
-      color: var(--salla-dark);
-      min-width: 1280px;
+      background: #F4F5F7;
+      color: var(--text);
+      min-width: 1200px;
       font-size: 14px;
+      line-height: 1.5;
     }
 
-    /* ── NAVBAR ───────────────────────────────────── */
+    /* ─── NAVBAR ──────────────────────────────────────── */
     .navbar {
-      background: var(--salla-dark);
-      height: 56px;
-      padding: 0 24px;
+      background: var(--nav-bg);
+      height: 58px;
+      padding: 0 20px;
       display: flex;
       align-items: center;
       justify-content: space-between;
       position: sticky;
       top: 0;
-      z-index: 200;
+      z-index: 300;
+      border-bottom: 1px solid var(--nav-border);
     }
-    .nav-logo { display: flex; align-items: center; gap: 10px; }
-    .nav-logo-box {
-      background: var(--salla-teal);
-      color: #fff;
-      font-weight: 700;
-      font-size: 15px;
-      padding: 5px 13px;
+    .nav-r { display: flex; align-items: center; gap: 6px; }
+    .nav-logo {
+      display: flex; align-items: center; gap: 8px;
+      background: var(--teal);
       border-radius: 8px;
-      letter-spacing: 1px;
+      padding: 5px 10px;
+      margin-left: 12px;
     }
-    .nav-divider { width: 1px; height: 20px; background: #374151; margin: 0 4px; }
-    .nav-menu-btn {
-      color: #9CA3AF;
-      display: flex;
-      align-items: center;
-      gap: 5px;
-      cursor: pointer;
-      font-size: 13px;
-    }
-    .nav-links { display: flex; gap: 4px; list-style: none; }
-    .nav-links li a {
-      color: #9CA3AF;
-      text-decoration: none;
-      font-size: 13.5px;
-      font-weight: 400;
-      padding: 6px 10px;
-      border-radius: 6px;
-      transition: all 0.18s;
-      display: block;
-    }
-    .nav-links li a:hover { color: #fff; background: rgba(255,255,255,0.07); }
-    .nav-right { display: flex; align-items: center; gap: 6px; }
+    .nav-logo-text { color: #fff; font-weight: 700; font-size: 15px; letter-spacing: 1px; }
     .nav-icon {
-      width: 34px; height: 34px;
+      width: 36px; height: 36px;
       border-radius: 8px;
       display: flex; align-items: center; justify-content: center;
-      color: #9CA3AF;
+      color: #8CA3B8;
       cursor: pointer;
       transition: background 0.15s;
     }
-    .nav-icon:hover { background: rgba(255,255,255,0.08); color: #fff; }
+    .nav-icon:hover { background: rgba(255,255,255,0.07); color: #fff; }
+    .nav-links { display: flex; gap: 2px; }
+    .nav-link {
+      color: #8CA3B8;
+      text-decoration: none;
+      font-size: 13px;
+      padding: 6px 10px;
+      border-radius: 6px;
+      transition: all 0.15s;
+      display: flex; align-items: center; gap: 5px;
+    }
+    .nav-link:hover { color: #fff; background: rgba(255,255,255,0.07); }
     .nav-avatar {
       width: 34px; height: 34px;
-      background: var(--salla-teal);
+      background: var(--teal);
       border-radius: 50%;
       display: flex; align-items: center; justify-content: center;
-      color: #fff;
-      font-weight: 700;
-      font-size: 14px;
-      cursor: pointer;
+      color: #fff; font-weight: 700; font-size: 13px;
+      cursor: pointer; margin-right: 4px;
       border: 2px solid rgba(255,255,255,0.15);
     }
+    .nav-user {
+      display: flex; align-items: center; gap: 8px;
+      color: #8CA3B8; font-size: 13px; cursor: pointer;
+      padding: 4px 8px; border-radius: 8px;
+      transition: background 0.15s;
+    }
+    .nav-user:hover { background: rgba(255,255,255,0.05); color: #fff; }
 
-    /* ── SUB-HEADER ───────────────────────────────── */
+    /* ─── SUB-HEADER ──────────────────────────────────── */
     .sub-header {
       background: #fff;
       border-bottom: 1px solid var(--border);
-      padding: 10px 24px;
+      padding: 0 24px;
       display: flex;
       align-items: center;
       justify-content: space-between;
+      min-height: 44px;
       position: sticky;
-      top: 56px;
-      z-index: 100;
+      top: 58px;
+      z-index: 200;
     }
-    .breadcrumb { display: flex; align-items: center; gap: 6px; }
-    .breadcrumb a { color: var(--salla-gray); text-decoration: none; font-size: 13px; }
-    .breadcrumb a:hover { color: var(--salla-teal); }
-    .breadcrumb .sep { color: #D1D5DB; font-size: 12px; }
-    .breadcrumb .current { color: var(--salla-dark); font-weight: 600; font-size: 13px; }
+    .sub-nav-links { display: flex; gap: 0; }
+    .sub-nav-link {
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 13px;
+      padding: 12px 16px;
+      border-bottom: 2px solid transparent;
+      transition: all 0.15s;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .sub-nav-link:hover { color: var(--text); }
+    .sub-nav-link.active { color: var(--teal); border-bottom-color: var(--teal); font-weight: 600; }
+    .breadcrumb {
+      display: flex; align-items: center; gap: 6px;
+      font-size: 13px; color: var(--muted);
+      padding: 12px 0;
+    }
+    .breadcrumb a { color: var(--muted); text-decoration: none; }
+    .breadcrumb a:hover { color: var(--teal); }
+    .breadcrumb .sep { color: #D1D5DB; font-size: 11px; }
+    .breadcrumb .cur { color: var(--text); font-weight: 500; }
 
-    /* ── LAYOUT ───────────────────────────────────── */
-    .main-layout {
+    /* ─── MAIN LAYOUT ─────────────────────────────────── */
+    .layout {
       display: flex;
       gap: 20px;
-      max-width: 1500px;
+      max-width: 1320px;
       margin: 0 auto;
-      padding: 24px;
+      padding: 24px 24px 60px;
       align-items: flex-start;
     }
-    .col-sim { width: 340px; flex-shrink: 0; position: sticky; top: 104px; }
-    .col-center { flex: 1; min-width: 0; }
-    .col-summary { width: 280px; flex-shrink: 0; position: sticky; top: 104px; }
+    .col-left {
+      width: 268px;
+      flex-shrink: 0;
+      position: sticky;
+      top: 112px;
+    }
+    .col-main { flex: 1; min-width: 0; }
 
-    /* ── CARD ─────────────────────────────────────── */
+    /* ─── CARDS ───────────────────────────────────────── */
     .card {
       background: #fff;
-      border-radius: 12px;
-      box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      margin-bottom: 16px;
       overflow: hidden;
-      margin-bottom: 20px;
     }
     .card:last-child { margin-bottom: 0; }
-    .card-header {
-      padding: 15px 20px;
+    .card-hd {
+      padding: 16px 20px;
       border-bottom: 1px solid var(--border);
       display: flex;
       align-items: center;
       justify-content: space-between;
     }
-    .card-title { font-size: 15px; font-weight: 700; color: var(--salla-dark); }
+    .card-title { font-size: 15px; font-weight: 700; color: var(--text); }
     .card-body { padding: 20px; }
+    .section-badge {
+      font-size: 11px; font-weight: 600;
+      padding: 2px 8px; border-radius: 20px;
+      background: var(--teal-10); color: var(--teal);
+    }
+    .section-badge-gray {
+      font-size: 11px; font-weight: 600;
+      padding: 2px 8px; border-radius: 20px;
+      background: #F3F4F6; color: var(--muted);
+    }
 
-    /* ── BADGES ───────────────────────────────────── */
-    .badge {
-      font-size: 11px;
-      font-weight: 600;
-      padding: 2px 9px;
-      border-radius: 20px;
-      line-height: 1.6;
+    /* ─── TOGGLE SWITCH ───────────────────────────────── */
+    .tog { position: relative; width: 44px; height: 24px; flex-shrink: 0; }
+    .tog input { opacity: 0; width: 0; height: 0; position: absolute; }
+    .tog-track {
+      position: absolute; inset: 0;
+      background: #D1D5DB; border-radius: 24px;
+      cursor: pointer; transition: background 0.25s;
     }
-    .badge-opt  { background: var(--salla-teal-10); color: var(--salla-teal); }
-    .badge-gray { background: #F3F4F6; color: var(--salla-gray); }
-    .badge-purple { background: var(--salla-purple-10); color: var(--salla-purple); }
-
-    /* ── WIZARD STEPS ─────────────────────────────── */
-    .wiz-steps {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      margin-bottom: 22px;
-    }
-    .wiz-step {
-      display: flex;
-      align-items: center;
-      gap: 7px;
-      cursor: pointer;
-      padding: 4px 6px;
-      border-radius: 6px;
-      transition: background 0.15s;
-    }
-    .wiz-step:hover { background: var(--salla-teal-10); }
-    .wiz-num {
-      width: 28px; height: 28px;
-      border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 12px; font-weight: 700;
-      flex-shrink: 0;
-      transition: all 0.2s;
-    }
-    .wiz-label { font-size: 13px; font-weight: 500; transition: color 0.2s; }
-    .wiz-step.active   .wiz-num   { background: var(--salla-teal); color: #fff; }
-    .wiz-step.active   .wiz-label { color: var(--salla-teal); }
-    .wiz-step.done     .wiz-num   { background: var(--salla-green); color: #fff; }
-    .wiz-step.done     .wiz-label { color: var(--salla-green); }
-    .wiz-step.inactive .wiz-num   { background: #E5E7EB; color: var(--salla-gray); }
-    .wiz-step.inactive .wiz-label { color: var(--salla-gray); }
-    .wiz-arrow { color: #D1D5DB; font-size: 18px; line-height: 1; user-select: none; }
-
-    /* ── INTENT GRID ──────────────────────────────── */
-    .intent-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-      margin-bottom: 14px;
-    }
-    .intent-card {
-      border: 2px solid var(--border);
-      border-radius: 12px;
-      padding: 16px 14px 14px;
-      cursor: pointer;
-      position: relative;
-      background: #fff;
-      transition: border-color 0.2s, background 0.2s, transform 0.15s, box-shadow 0.15s;
-    }
-    .intent-card:hover {
-      border-color: var(--salla-teal);
-      background: var(--salla-teal-10);
-      box-shadow: 0 2px 10px rgba(4,180,156,0.12);
-      transform: translateY(-1px);
-    }
-    .intent-card.selected {
-      border-color: var(--salla-teal);
-      background: var(--salla-teal-10);
-      box-shadow: 0 2px 10px rgba(4,180,156,0.15);
-    }
-    .intent-check {
+    .tog-track::before {
+      content: '';
       position: absolute;
-      top: 9px;
-      right: 9px;
-      width: 20px; height: 20px;
-      background: var(--salla-teal);
-      border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      color: #fff;
-      font-size: 11px;
-      opacity: 0;
-      transform: scale(0.6);
-      transition: opacity 0.2s, transform 0.2s;
+      width: 18px; height: 18px; right: 3px; top: 3px;
+      background: #fff; border-radius: 50%;
+      transition: transform 0.25s;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.2);
     }
-    .intent-card.selected .intent-check { opacity: 1; transform: scale(1); }
-    .intent-icon { font-size: 26px; margin-bottom: 8px; display: block; }
-    .intent-title { font-size: 13px; font-weight: 700; color: var(--salla-dark); margin-bottom: 3px; }
-    .intent-sub { font-size: 11.5px; color: var(--salla-gray); line-height: 1.4; }
-    .skip-link {
-      text-align: center;
-      font-size: 12px;
-      color: var(--salla-gray);
-      cursor: pointer;
-      padding: 6px;
-      text-decoration: underline;
-      text-underline-offset: 2px;
-    }
-    .skip-link:hover { color: var(--salla-teal); }
+    .tog input:checked + .tog-track { background: var(--teal); }
+    .tog input:checked + .tog-track::before { transform: translateX(-20px); }
 
-    /* ── CHIPS ────────────────────────────────────── */
-    .chip-wrap {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
-      align-items: center;
-      border: 1.5px solid var(--border);
-      border-radius: 8px;
-      padding: 7px 10px;
-      min-height: 42px;
-      background: #fff;
-      cursor: text;
-      transition: border-color 0.2s, box-shadow 0.2s;
+    /* ─── FORM ELEMENTS ───────────────────────────────── */
+    .f-label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px; color: var(--text); }
+    .f-label .req { color: var(--red); margin-right: 2px; }
+    .f-input, .f-select {
+      width: 100%; border: 1.5px solid var(--border); border-radius: 8px;
+      padding: 9px 13px; font-family: 'Tajawal', sans-serif;
+      font-size: 14px; color: var(--text); background: #fff;
+      outline: none; transition: border-color 0.2s, box-shadow 0.2s;
     }
-    .chip-wrap:focus-within {
-      border-color: var(--salla-teal);
-      box-shadow: 0 0 0 3px rgba(4,180,156,0.12);
-    }
-    .chip {
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-      background: var(--salla-teal-10);
-      color: var(--salla-teal);
-      border: 1px solid rgba(4,180,156,0.35);
-      border-radius: 20px;
-      padding: 2px 9px;
-      font-size: 12px;
-      font-weight: 600;
-      user-select: none;
-    }
-    .chip-x {
-      cursor: pointer;
-      font-size: 15px;
-      line-height: 1;
-      opacity: 0.6;
-      transition: opacity 0.15s;
-      margin-right: -2px;
-    }
-    .chip-x:hover { opacity: 1; }
-    .chip-input {
-      border: none;
-      outline: none;
-      font-family: 'Tajawal', sans-serif;
-      font-size: 13px;
-      color: var(--salla-dark);
-      min-width: 90px;
-      flex: 1;
-      background: transparent;
-    }
-    .chip-input::placeholder { color: #9CA3AF; }
-
-    /* ── CONDITION BUILDER ────────────────────────── */
-    .cond-row {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      padding: 11px 12px;
-      border-right: 3px solid var(--border);
-      border-radius: 8px;
-      background: #fff;
-      margin-bottom: 2px;
-      transition: border-color 0.2s, box-shadow 0.2s;
-    }
-    .cond-row:hover {
-      border-right-color: var(--salla-teal);
-      box-shadow: 0 1px 6px rgba(4,180,156,0.08);
-    }
-    .cond-icon {
-      width: 28px; height: 28px;
-      border-radius: 6px;
-      background: var(--salla-teal-10);
-      display: flex; align-items: center; justify-content: center;
-      font-size: 13px;
-      flex-shrink: 0;
-    }
-    .cond-select {
-      border: 1.5px solid var(--border);
-      border-radius: 8px;
-      padding: 6px 10px;
-      font-family: 'Tajawal', sans-serif;
-      font-size: 13px;
-      color: var(--salla-dark);
-      background: #fff;
-      cursor: pointer;
-      outline: none;
-      transition: border-color 0.2s, box-shadow 0.2s;
-      -webkit-appearance: none;
+    .f-select {
+      -webkit-appearance: none; cursor: pointer;
       background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236B7280' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
-      background-repeat: no-repeat;
-      background-position: left 8px center;
-      padding-left: 26px;
+      background-repeat: no-repeat; background-position: left 10px center; padding-left: 30px;
     }
-    .cond-select:focus {
-      border-color: var(--salla-teal);
-      box-shadow: 0 0 0 3px rgba(4,180,156,0.12);
+    .f-input:focus, .f-select:focus {
+      border-color: var(--teal); box-shadow: 0 0 0 3px rgba(4,180,156,0.12);
     }
-    .cond-del {
-      width: 30px; height: 30px;
-      flex-shrink: 0;
-      border: none;
-      background: transparent;
-      cursor: pointer;
-      color: #D1D5DB;
-      border-radius: 6px;
+    .f-input::placeholder { color: #9CA3AF; }
+    .f-group { margin-bottom: 18px; }
+    .f-group:last-child { margin-bottom: 0; }
+    .f-hint { font-size: 12px; color: var(--muted); margin-top: 4px; }
+
+    /* ─── ROUTE-TYPE CARDS ────────────────────────────── */
+    .type-cards { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+    .type-card {
+      border: 1.5px solid var(--border); border-radius: 10px;
+      padding: 14px 12px; cursor: pointer; text-align: right;
+      transition: all 0.2s; position: relative; background: #fff;
+    }
+    .type-card:hover { border-color: var(--teal); background: var(--teal-10); }
+    .type-card.selected { border-color: var(--teal); background: var(--teal-10); }
+    .type-card-icon { font-size: 22px; margin-bottom: 8px; display: block; }
+    .type-card-title { font-size: 13px; font-weight: 700; color: var(--text); margin-bottom: 3px; }
+    .type-card-desc { font-size: 11.5px; color: var(--muted); line-height: 1.4; }
+    .type-card-check {
+      position: absolute; top: 8px; left: 8px;
+      width: 18px; height: 18px; background: var(--teal);
+      border-radius: 50%; color: #fff; font-size: 10px;
       display: flex; align-items: center; justify-content: center;
-      transition: color 0.15s, background 0.15s;
+      opacity: 0; transition: opacity 0.2s;
     }
-    .cond-del:hover { color: var(--salla-red); background: #FEF2F2; }
+    .type-card.selected .type-card-check { opacity: 1; }
 
-    /* Logic connector */
-    .logic-conn {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 4px 14px;
-      margin-bottom: 2px;
-    }
-    .logic-line { flex: 1; border-top: 1px dashed #D1D5DB; }
-    .logic-pill {
-      font-size: 11px;
-      font-weight: 700;
-      padding: 2px 10px;
-      border-radius: 20px;
-      background: var(--salla-teal-10);
-      color: var(--salla-teal);
-      letter-spacing: 0.5px;
-    }
-    .logic-pill.or { background: var(--salla-purple-10); color: var(--salla-purple); }
-
-    /* AND/OR toggle */
-    .and-or-toggle {
-      display: inline-flex;
-      border: 1.5px solid var(--border);
-      border-radius: 8px;
-      overflow: hidden;
-      background: var(--salla-light);
-    }
-    .and-or-btn {
-      padding: 5px 13px;
-      font-size: 12px;
-      font-weight: 600;
-      font-family: 'Tajawal', sans-serif;
-      border: none;
-      background: transparent;
-      cursor: pointer;
-      color: var(--salla-gray);
-      transition: background 0.2s, color 0.2s;
-    }
-    .and-or-btn.active { background: var(--salla-teal); color: #fff; }
-
-    /* Warning / conflict banner */
-    .conflict-banner {
-      background: #FEF3C7;
-      border-right: 4px solid var(--salla-orange);
-      border-radius: 8px;
-      padding: 10px 14px;
-      display: flex;
-      align-items: flex-start;
-      gap: 8px;
-      font-size: 13px;
-      color: #92400E;
-      margin-bottom: 12px;
-    }
-
-    /* Add condition button */
-    .btn-add-cond {
-      border: 1.5px dashed var(--border);
-      background: transparent;
-      border-radius: 8px;
-      padding: 7px 14px;
-      font-family: 'Tajawal', sans-serif;
-      font-size: 13px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.2s;
-      color: var(--salla-teal);
-    }
-    .btn-add-cond:hover { border-color: var(--salla-teal); background: var(--salla-teal-10); }
-    .btn-add-grp {
-      color: var(--salla-purple);
-      border-color: #D1B3D8;
-    }
-    .btn-add-grp:hover { border-color: var(--salla-purple); background: var(--salla-purple-10); }
-
-    /* Empty state */
-    .cond-empty {
-      text-align: center;
-      padding: 28px;
-      color: var(--salla-gray);
-    }
-    .cond-empty-icon { font-size: 32px; margin-bottom: 8px; }
-    .cond-empty-title { font-size: 13px; font-weight: 600; margin-bottom: 4px; color: #374151; }
-    .cond-empty-sub { font-size: 12px; }
-
-    /* ── SIMULATOR ────────────────────────────────── */
-    .sim-panel {
-      background: var(--salla-light);
-      border-radius: 12px;
-      box-shadow: 0 1px 4px rgba(0,0,0,0.08);
-      border-right: 3px solid var(--salla-teal);
-      overflow: hidden;
-    }
-    .sim-hd {
-      background: #fff;
-      padding: 15px 18px 12px;
-      border-bottom: 1px solid var(--border);
-    }
-    .sim-hd-title {
-      display: flex;
-      align-items: center;
-      gap: 7px;
-      margin-bottom: 2px;
-    }
-    .sim-hd-sub { font-size: 12px; color: var(--salla-gray); }
-    .sim-body { padding: 15px; }
-    .sim-label {
-      font-size: 10.5px;
-      font-weight: 700;
-      letter-spacing: 0.6px;
-      color: var(--salla-gray);
-      margin-bottom: 4px;
-      text-transform: uppercase;
-    }
-    .sim-field { margin-bottom: 11px; }
-    .sim-select, .sim-input-num {
-      width: 100%;
-      border: 1.5px solid var(--border);
-      border-radius: 8px;
-      padding: 6px 10px;
-      font-family: 'Tajawal', sans-serif;
-      font-size: 13px;
-      background: #fff;
-      outline: none;
-      transition: border-color 0.2s;
-      -webkit-appearance: none;
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236B7280' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
-      background-repeat: no-repeat;
-      background-position: left 8px center;
-      padding-left: 26px;
-    }
-    .sim-input-num {
-      background-image: none;
-      padding-left: 10px;
-    }
-    .sim-select:focus, .sim-input-num:focus {
-      border-color: var(--salla-teal);
-      box-shadow: 0 0 0 3px rgba(4,180,156,0.10);
-    }
-    .sim-slider-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px; }
-    .sim-slider-val { font-size: 12px; font-weight: 700; color: var(--salla-teal); }
-    input[type="range"] {
-      -webkit-appearance: none;
-      width: 100%;
-      height: 4px;
-      border-radius: 2px;
-      background: var(--border);
-      outline: none;
-      cursor: pointer;
-    }
-    input[type="range"]::-webkit-slider-thumb {
-      -webkit-appearance: none;
-      width: 16px; height: 16px;
-      border-radius: 50%;
-      background: var(--salla-teal);
-      cursor: pointer;
-      box-shadow: 0 1px 4px rgba(4,180,156,0.4);
-    }
-    .sim-divider { height: 1px; background: var(--border); margin: 12px 0; }
-    .sim-result {
-      border-radius: 10px;
-      padding: 13px;
-      transition: all 0.25s;
-    }
-    .sim-result.warn  { background: #FFFBEB; border: 1px solid #FDE68A; }
-    .sim-result.match { background: #F0FDF4; border: 1px solid #A7F3D0; }
-    .sim-result.miss  { background: #FEF2F2; border: 1px solid #FCA5A5; }
-    .sim-result-title {
-      display: flex;
-      align-items: flex-start;
-      gap: 6px;
-      font-size: 13px;
-      font-weight: 700;
-      margin-bottom: 6px;
-      line-height: 1.4;
-    }
-    .sim-carrier-row {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      padding: 7px 8px;
-      background: #fff;
-      border-radius: 6px;
-      margin-bottom: 5px;
-      border: 1px solid var(--border);
-      font-size: 12px;
-    }
-    .radio-dot {
-      width: 15px; height: 15px;
-      border: 2px solid var(--border);
-      border-radius: 50%;
-      flex-shrink: 0;
-    }
-    .sim-products-wrap { display: flex; flex-wrap: wrap; gap: 5px; }
-    .sim-prod-chip {
-      padding: 3px 9px;
-      border-radius: 20px;
-      font-size: 12px;
-      font-weight: 500;
-      cursor: pointer;
-      border: 1.5px solid;
-      transition: all 0.15s;
-    }
-    .sim-prod-chip.on  { background: var(--salla-teal-10); color: var(--salla-teal); border-color: rgba(4,180,156,0.4); }
-    .sim-prod-chip.off { background: #F3F4F6; color: #9CA3AF; border-color: #E5E7EB; }
-
-    /* ── CARRIER TOGGLE ───────────────────────────── */
+    /* ─── CARRIER ROWS ────────────────────────────────── */
+    .carrier-list { border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
     .carrier-row {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 14px 18px;
-      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; gap: 12px;
+      padding: 13px 16px; border-bottom: 1px solid var(--border);
       transition: background 0.15s;
     }
     .carrier-row:last-child { border-bottom: none; }
     .carrier-row:hover { background: #FAFAFA; }
     .carrier-logo {
-      width: 42px; height: 42px;
-      border-radius: 9px;
+      width: 40px; height: 40px; border-radius: 8px;
       display: flex; align-items: center; justify-content: center;
-      color: #fff;
-      font-size: 11px;
-      font-weight: 700;
-      flex-shrink: 0;
-      letter-spacing: 0.5px;
+      font-size: 11px; font-weight: 700; color: #fff; flex-shrink: 0;
+      letter-spacing: 0.3px;
     }
-    .toggle-sw { position: relative; width: 40px; height: 22px; flex-shrink: 0; }
-    .toggle-sw input { opacity: 0; width: 0; height: 0; position: absolute; }
-    .toggle-knob {
-      position: absolute;
-      inset: 0;
-      background: #D1D5DB;
-      border-radius: 22px;
-      cursor: pointer;
-      transition: background 0.25s;
-    }
-    .toggle-knob::before {
-      content: '';
-      position: absolute;
-      width: 16px; height: 16px;
-      right: 3px; top: 3px;
-      background: #fff;
-      border-radius: 50%;
-      transition: transform 0.25s;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.2);
-    }
-    .toggle-sw input:checked + .toggle-knob { background: var(--salla-teal); }
-    .toggle-sw input:checked + .toggle-knob::before { transform: translateX(-18px); }
+    .carrier-info { flex: 1; }
+    .carrier-name { font-size: 14px; font-weight: 600; }
+    .carrier-delivery { font-size: 12px; color: var(--muted); }
+    .carrier-price { font-size: 13px; font-weight: 600; color: var(--text); white-space: nowrap; }
 
-    /* ── SUMMARY CARD ─────────────────────────────── */
-    .sum-sec { margin-bottom: 14px; }
-    .sum-lbl {
-      font-size: 10.5px;
-      font-weight: 700;
-      letter-spacing: 0.5px;
-      color: var(--salla-gray);
-      text-transform: uppercase;
-      margin-bottom: 5px;
-    }
-    .sum-item {
+    /* ─── INTENT WIZARD ───────────────────────────────── */
+    .intent-banner {
+      background: linear-gradient(135deg, #E6F8F6 0%, #F0FDF9 100%);
+      border: 1.5px solid var(--teal-20);
+      border-radius: 10px;
+      padding: 16px 18px;
+      margin-bottom: 16px;
       display: flex;
       align-items: center;
-      gap: 6px;
-      font-size: 12.5px;
-      color: var(--salla-dark);
-      margin-bottom: 4px;
-      line-height: 1.4;
+      gap: 14px;
     }
-    .status-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+    .intent-banner-icon { font-size: 28px; flex-shrink: 0; }
+    .intent-banner-title { font-size: 14px; font-weight: 700; color: var(--teal); margin-bottom: 2px; }
+    .intent-banner-sub { font-size: 12px; color: #5B8A83; }
+    .intent-grid {
+      display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px;
+      margin-bottom: 14px;
+    }
+    .intent-card {
+      border: 1.5px solid var(--border); border-radius: 10px;
+      padding: 14px 12px; cursor: pointer; text-align: right;
+      transition: all 0.2s; background: #fff; position: relative;
+    }
+    .intent-card:hover { border-color: var(--teal); background: var(--teal-10); transform: translateY(-1px); box-shadow: 0 2px 8px rgba(4,180,156,0.12); }
+    .intent-card.selected { border-color: var(--teal); background: var(--teal-10); }
+    .intent-icon { font-size: 22px; margin-bottom: 7px; display: block; }
+    .intent-label { font-size: 13px; font-weight: 700; margin-bottom: 2px; }
+    .intent-desc { font-size: 11px; color: var(--muted); line-height: 1.4; }
+    .intent-check {
+      position: absolute; top: 8px; left: 8px;
+      width: 18px; height: 18px; background: var(--teal); border-radius: 50%;
+      color: #fff; font-size: 10px; display: flex; align-items: center; justify-content: center;
+      opacity: 0; transform: scale(0.7); transition: all 0.2s;
+    }
+    .intent-card.selected .intent-check { opacity: 1; transform: scale(1); }
+    .skip-link {
+      font-size: 12px; color: var(--muted); cursor: pointer;
+      text-decoration: underline; text-underline-offset: 2px;
+      text-align: center; display: block; padding: 4px;
+    }
+    .skip-link:hover { color: var(--teal); }
 
-    /* ── BUTTONS ──────────────────────────────────── */
-    .btn {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
-      padding: 9px 18px;
-      border-radius: 8px;
-      font-family: 'Tajawal', sans-serif;
-      font-size: 14px;
-      font-weight: 600;
-      cursor: pointer;
-      border: none;
+    /* ─── WIZARD STEPS ────────────────────────────────── */
+    .wiz-steps {
+      display: flex; align-items: center; gap: 0;
+      margin-bottom: 20px; border-bottom: 1px solid var(--border);
+      padding-bottom: 0;
+    }
+    .wiz-step-btn {
+      display: flex; align-items: center; gap: 8px;
+      padding: 12px 16px; font-size: 13px; font-weight: 600;
+      cursor: pointer; border-bottom: 2px solid transparent;
+      margin-bottom: -1px; color: var(--muted);
+      background: none; border-top: none; border-left: none; border-right: none;
+      font-family: 'Tajawal', sans-serif; transition: all 0.2s;
+    }
+    .wiz-step-btn:hover { color: var(--text); }
+    .wiz-step-btn.active { color: var(--teal); border-bottom-color: var(--teal); }
+    .wiz-step-btn.done { color: var(--green); }
+    .wiz-step-num {
+      width: 22px; height: 22px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 11px; font-weight: 700; flex-shrink: 0;
+    }
+    .wiz-step-btn.active   .wiz-step-num { background: var(--teal); color: #fff; }
+    .wiz-step-btn.done     .wiz-step-num { background: var(--green); color: #fff; }
+    .wiz-step-btn.inactive .wiz-step-num { background: #E5E7EB; color: var(--muted); }
+    .wiz-arrow { color: #D1D5DB; padding: 0 4px; font-size: 14px; }
+
+    /* ─── CONDITIONS ──────────────────────────────────── */
+    .logic-toggle {
+      display: inline-flex; border: 1.5px solid var(--border);
+      border-radius: 8px; overflow: hidden; background: #F9FAFB;
+    }
+    .logic-btn {
+      padding: 5px 12px; font-size: 12px; font-weight: 600;
+      font-family: 'Tajawal', sans-serif; border: none;
+      background: transparent; cursor: pointer; color: var(--muted);
       transition: all 0.2s;
-      line-height: 1;
     }
-    .btn-primary { background: var(--salla-teal); color: #fff; }
-    .btn-primary:hover { background: #03A38D; transform: translateY(-1px); box-shadow: 0 3px 10px rgba(4,180,156,0.3); }
-    .btn-primary:active { transform: translateY(0); }
-    .btn-outline {
-      background: transparent;
-      color: var(--salla-gray);
-      border: 1.5px solid var(--border);
+    .logic-btn.active { background: var(--teal); color: #fff; }
+    .cond-row {
+      display: flex; align-items: center; gap: 8px;
+      padding: 10px 12px; border-right: 3px solid var(--border);
+      border-radius: 8px; background: #fff; margin-bottom: 4px;
+      border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);
+      border-left: 1px solid var(--border);
+      transition: border-right-color 0.2s;
     }
-    .btn-outline:hover { border-color: var(--salla-teal); color: var(--salla-teal); }
-    .btn-ghost { background: transparent; color: var(--salla-gray); }
-    .btn-ghost:hover { color: var(--salla-teal); }
-    .btn-full { width: 100%; }
-    .btn-save-big {
-      width: 100%;
-      padding: 12px;
-      font-size: 15px;
-      border-radius: 10px;
+    .cond-row:hover { border-right-color: var(--teal); }
+    .cond-icon {
+      width: 28px; height: 28px; border-radius: 6px;
+      background: var(--teal-10); display: flex; align-items: center;
+      justify-content: center; font-size: 13px; flex-shrink: 0;
+    }
+    .cond-sel {
+      border: 1.5px solid var(--border); border-radius: 8px;
+      padding: 6px 10px; font-family: 'Tajawal', sans-serif;
+      font-size: 12px; color: var(--text); background: #fff;
+      cursor: pointer; outline: none; transition: border-color 0.2s;
+      -webkit-appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%236B7280' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+      background-repeat: no-repeat; background-position: left 7px center; padding-left: 22px;
+    }
+    .cond-sel:focus { border-color: var(--teal); }
+    .cond-del {
+      width: 28px; height: 28px; border: none; background: transparent;
+      cursor: pointer; color: #D1D5DB; border-radius: 6px;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; transition: all 0.2s;
+    }
+    .cond-del:hover { color: var(--red); background: var(--red-10); }
+    .logic-conn {
+      display: flex; align-items: center; gap: 8px; padding: 2px 14px;
+    }
+    .logic-line { flex: 1; border-top: 1px dashed #D1D5DB; }
+    .logic-pill {
+      font-size: 11px; font-weight: 700; padding: 1px 8px;
+      border-radius: 20px; background: var(--teal-10); color: var(--teal);
+    }
+    .logic-pill.or { background: var(--purple-10); color: var(--purple); }
+    .conflict-bar {
+      background: var(--orange-10); border-right: 3px solid var(--orange);
+      border-radius: 8px; padding: 10px 14px; font-size: 12px;
+      color: #92400E; margin-bottom: 12px; display: flex; gap: 8px; align-items: flex-start;
+    }
+    .add-cond-btn {
+      border: 1.5px dashed var(--border); background: transparent;
+      border-radius: 8px; padding: 7px 14px; font-family: 'Tajawal', sans-serif;
+      font-size: 12px; font-weight: 600; cursor: pointer;
+      color: var(--teal); transition: all 0.2s;
+    }
+    .add-cond-btn:hover { border-color: var(--teal); background: var(--teal-10); }
+    .add-cond-grp { color: var(--purple); }
+    .add-cond-grp:hover { border-color: var(--purple); background: var(--purple-10); }
+
+    /* ─── CHIP INPUT ──────────────────────────────────── */
+    .chip-wrap {
+      display: flex; flex-wrap: wrap; gap: 5px; align-items: center;
+      border: 1.5px solid var(--border); border-radius: 8px;
+      padding: 6px 10px; min-height: 38px; background: #fff;
+      cursor: text; transition: border-color 0.2s, box-shadow 0.2s; flex: 1;
+    }
+    .chip-wrap:focus-within { border-color: var(--teal); box-shadow: 0 0 0 3px rgba(4,180,156,0.1); }
+    .chip {
+      display: inline-flex; align-items: center; gap: 3px;
+      background: var(--teal-10); color: var(--teal);
+      border: 1px solid rgba(4,180,156,0.3); border-radius: 20px;
+      padding: 2px 8px; font-size: 11.5px; font-weight: 600;
+    }
+    .chip-x { cursor: pointer; opacity: 0.6; font-size: 14px; line-height: 1; }
+    .chip-x:hover { opacity: 1; }
+    .chip-input {
+      border: none; outline: none; font-family: 'Tajawal', sans-serif;
+      font-size: 12px; min-width: 80px; flex: 1; background: transparent;
+    }
+    .chip-input::placeholder { color: #9CA3AF; }
+
+    /* ─── COND EMPTY STATE ────────────────────────────── */
+    .cond-empty {
+      text-align: center; padding: 32px 20px; color: var(--muted);
+      border: 1.5px dashed var(--border); border-radius: 10px;
+    }
+    .cond-empty-icon { font-size: 36px; margin-bottom: 10px; opacity: 0.5; }
+    .cond-empty-title { font-size: 14px; font-weight: 600; color: #374151; margin-bottom: 4px; }
+    .cond-empty-sub { font-size: 12px; margin-bottom: 16px; }
+
+    /* ─── SIMULATOR (left panel) ──────────────────────── */
+    .sim-panel {
+      background: #fff; border: 1px solid var(--border);
+      border-radius: 10px; overflow: hidden;
+      border-top: 3px solid var(--teal);
+    }
+    .sim-hd { padding: 14px 16px; border-bottom: 1px solid var(--border); background: var(--teal-10); }
+    .sim-hd-row { display: flex; align-items: center; gap: 7px; margin-bottom: 1px; }
+    .sim-hd-title { font-size: 13px; font-weight: 700; color: var(--teal); }
+    .sim-hd-sub { font-size: 11px; color: #5B8A83; }
+    .sim-body { padding: 14px; }
+    .sim-field { margin-bottom: 10px; }
+    .sim-lbl { font-size: 10px; font-weight: 700; letter-spacing: 0.5px; color: var(--muted); text-transform: uppercase; margin-bottom: 3px; }
+    .sim-sel, .sim-num {
+      width: 100%; border: 1.5px solid var(--border); border-radius: 7px;
+      padding: 6px 9px; font-family: 'Tajawal', sans-serif;
+      font-size: 12px; background: #fff; outline: none;
+      transition: border-color 0.2s; -webkit-appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%236B7280' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+      background-repeat: no-repeat; background-position: left 7px center; padding-left: 22px;
+    }
+    .sim-num { background-image: none; padding-left: 9px; }
+    .sim-sel:focus, .sim-num:focus { border-color: var(--teal); }
+    .sim-slider-row { display: flex; justify-content: space-between; margin-bottom: 3px; }
+    .sim-slider-val { font-size: 11px; font-weight: 700; color: var(--teal); }
+    input[type="range"] {
+      -webkit-appearance: none; width: 100%; height: 4px;
+      background: var(--border); border-radius: 2px; outline: none; cursor: pointer;
+    }
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none; width: 14px; height: 14px;
+      border-radius: 50%; background: var(--teal); cursor: pointer;
+      box-shadow: 0 1px 4px rgba(4,180,156,0.4);
+    }
+    .sim-divider { height: 1px; background: var(--border); margin: 10px 0; }
+    .sim-result { border-radius: 8px; padding: 11px; margin-top: 8px; transition: all 0.2s; }
+    .sim-result.warn  { background: var(--orange-10); border: 1px solid #FDE68A; }
+    .sim-result.match { background: var(--green-10); border: 1px solid #A7F3D0; }
+    .sim-result.miss  { background: var(--red-10); border: 1px solid #FCA5A5; }
+    .sim-result-title { display: flex; align-items: flex-start; gap: 5px; font-size: 12px; font-weight: 700; margin-bottom: 4px; line-height: 1.4; }
+    .sim-carrier-opt {
+      display: flex; align-items: center; gap: 7px;
+      padding: 6px 8px; background: #fff; border-radius: 6px;
+      margin-bottom: 4px; border: 1px solid var(--border); font-size: 11.5px;
+    }
+    .radio-dot { width: 13px; height: 13px; border: 2px solid var(--border); border-radius: 50%; flex-shrink: 0; }
+    .sim-prod-wrap { display: flex; flex-wrap: wrap; gap: 4px; }
+    .sim-prod-chip {
+      padding: 2px 8px; border-radius: 20px; font-size: 11px;
+      font-weight: 500; cursor: pointer; border: 1.5px solid; transition: all 0.15s;
+    }
+    .sim-prod-chip.on  { background: var(--teal-10); color: var(--teal); border-color: rgba(4,180,156,0.35); }
+    .sim-prod-chip.off { background: #F3F4F6; color: #9CA3AF; border-color: #E5E7EB; }
+
+    /* ─── SUMMARY CARD ────────────────────────────────── */
+    .sum-card { background: #fff; border: 1px solid var(--border); border-radius: 10px; overflow: hidden; margin-bottom: 14px; }
+    .sum-hd { padding: 13px 16px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+    .sum-hd-title { font-size: 13px; font-weight: 700; }
+    .sum-body { padding: 14px 16px; }
+    .sum-sec { margin-bottom: 12px; }
+    .sum-sec:last-child { margin-bottom: 0; }
+    .sum-lbl { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--muted); margin-bottom: 4px; }
+    .sum-val { font-size: 13px; font-weight: 500; color: var(--text); }
+    .sum-item { display: flex; align-items: center; gap: 5px; font-size: 12px; margin-bottom: 3px; }
+    .sum-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+    .sum-divider { height: 1px; background: var(--border); margin: 10px 0; }
+    .status-row { display: flex; align-items: center; gap: 6px; }
+    .status-indicator { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+
+    /* ─── PRIORITY SECTION ────────────────────────────── */
+    .priority-row {
+      display: flex; align-items: center; gap: 10px;
+      padding: 12px 14px; border: 1.5px solid var(--border);
+      border-radius: 9px; cursor: pointer; transition: all 0.2s;
+      background: #fff; margin-bottom: 8px;
+    }
+    .priority-row:hover { border-color: var(--teal); background: var(--teal-10); }
+    .priority-row.active { border-color: var(--teal); background: var(--teal-10); }
+    .priority-icon { width: 32px; height: 32px; border-radius: 8px; background: var(--teal-10); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+
+    /* ─── BUTTONS ─────────────────────────────────────── */
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center;
+      gap: 6px; padding: 9px 18px; border-radius: 8px;
+      font-family: 'Tajawal', sans-serif; font-size: 14px;
+      font-weight: 600; cursor: pointer; border: none; transition: all 0.2s;
+    }
+    .btn-teal { background: var(--teal); color: #fff; }
+    .btn-teal:hover { background: #03A48D; }
+    .btn-outline { background: #fff; border: 1.5px solid var(--border); color: var(--muted); }
+    .btn-outline:hover { border-color: var(--teal); color: var(--teal); }
+    .btn-sm { padding: 6px 13px; font-size: 12px; border-radius: 7px; }
+    .btn-full { width: 100%; padding: 12px; font-size: 15px; border-radius: 9px; }
+    .btn-ghost { background: transparent; color: var(--muted); }
+    .btn-ghost:hover { color: var(--teal); }
+    .save-bar {
+      background: #fff; border: 1px solid var(--border); border-radius: 10px;
+      padding: 16px 20px; display: flex; justify-content: space-between;
+      align-items: center; gap: 12px;
     }
 
-    /* ── FORM INPUTS ──────────────────────────────── */
-    .f-label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px; }
-    .f-input {
-      width: 100%;
-      border: 1.5px solid var(--border);
-      border-radius: 8px;
-      padding: 9px 13px;
-      font-family: 'Tajawal', sans-serif;
-      font-size: 14px;
-      color: var(--salla-dark);
-      outline: none;
-      transition: border-color 0.2s, box-shadow 0.2s;
-    }
-    .f-input:focus { border-color: var(--salla-teal); box-shadow: 0 0 0 3px rgba(4,180,156,0.12); }
-    .f-input::placeholder { color: #9CA3AF; }
-    .f-group { margin-bottom: 16px; }
-
-    /* ── TOAST ────────────────────────────────────── */
+    /* ─── TOAST ───────────────────────────────────────── */
     #toast {
-      position: fixed;
-      bottom: 24px;
-      left: 50%;
-      transform: translateX(-50%) translateY(80px);
-      background: var(--salla-dark);
-      color: #fff;
-      padding: 12px 24px;
-      border-radius: 12px;
-      font-size: 14px;
-      font-weight: 500;
-      z-index: 9999;
-      transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1);
-      box-shadow: 0 6px 24px rgba(0,0,0,0.2);
-      white-space: nowrap;
-      pointer-events: none;
+      position: fixed; bottom: 24px; right: 50%; transform: translateX(50%) translateY(80px);
+      background: var(--dark); color: #fff; padding: 11px 20px;
+      border-radius: 10px; font-size: 13px; font-weight: 500;
+      z-index: 9999; transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1);
+      box-shadow: 0 6px 24px rgba(0,0,0,0.18); white-space: nowrap; pointer-events: none;
     }
-    #toast.show { transform: translateX(-50%) translateY(0); }
-    #toast.t-success { background: var(--salla-green); }
+    #toast.show { transform: translateX(50%) translateY(0); }
+    #toast.t-success { background: var(--green); }
+    #toast.t-warn { background: var(--orange); }
 
-    /* ── CONFETTI ─────────────────────────────────── */
+    /* ─── CONFETTI ────────────────────────────────────── */
     #confetti { position: fixed; inset: 0; pointer-events: none; z-index: 9998; }
     .cf {
-      position: absolute;
-      top: -12px;
-      border-radius: 2px;
+      position: absolute; top: -10px; border-radius: 2px;
       animation: cffall linear forwards;
     }
     @keyframes cffall {
-      0%   { transform: translateY(0) rotate(0deg) scale(1); opacity: 1; }
-      80%  { opacity: 1; }
-      100% { transform: translateY(105vh) rotate(740deg) scale(0.5); opacity: 0; }
+      0%   { opacity: 1; transform: translateY(0) rotate(0deg); }
+      100% { opacity: 0; transform: translateY(105vh) rotate(720deg); }
     }
 
-    /* ── ANIMATIONS ───────────────────────────────── */
+    /* ─── MISC ────────────────────────────────────────── */
+    .hidden { display: none !important; }
     .fade-in { animation: fadeIn 0.25s ease; }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
     .sim-fade { animation: simFade 0.2s ease; }
-    @keyframes simFade { from { opacity: 0.5; transform: scale(0.98); } to { opacity: 1; transform: none; } }
-    .step-slide { animation: stepSlide 0.3s ease; }
-    @keyframes stepSlide { from { opacity: 0; transform: translateX(-12px); } to { opacity: 1; transform: none; } }
+    @keyframes simFade { from { opacity: 0.5; transform: scale(0.99); } to { opacity: 1; transform: none; } }
+    .flex { display: flex; } .items-center { align-items: center; } .gap-8 { gap: 8px; } .gap-12 { gap: 12px; }
+    .justify-between { justify-content: space-between; } .text-sm { font-size: 13px; }
+    .text-xs { font-size: 11px; } .text-muted { color: var(--muted); }
+    .text-teal { color: var(--teal); } .font-bold { font-weight: 700; }
+    .mt-8 { margin-top: 8px; } .mt-12 { margin-top: 12px; } .mt-16 { margin-top: 16px; }
+    .mb-8 { margin-bottom: 8px; } .mb-12 { margin-bottom: 12px; }
 
-    /* ── UTILS ────────────────────────────────────── */
-    .hidden { display: none !important; }
-    .flex { display: flex; }
-    .items-center { align-items: center; }
-    .justify-between { justify-content: space-between; }
-    .gap-8 { gap: 8px; }
-    .gap-12 { gap: 12px; }
-    .mt-8 { margin-top: 8px; }
-    .mt-12 { margin-top: 12px; }
-    .mt-16 { margin-top: 16px; }
-    .mb-8 { margin-bottom: 8px; }
-    .mb-12 { margin-bottom: 12px; }
-    .text-sm { font-size: 13px; }
-    .text-xs { font-size: 11px; }
-    .text-gray { color: var(--salla-gray); }
-    .text-teal { color: var(--salla-teal); }
-    .text-green { color: var(--salla-green); }
-    .text-red { color: var(--salla-red); }
-    .font-bold { font-weight: 700; }
-    .hint { font-size: 12px; color: var(--salla-gray); margin-top: 5px; }
-
-    /* ── RESPONSIVE ───────────────────────────────── */
-    @media (max-width: 1100px) {
-      .col-summary { display: none; }
-    }
-    @media (max-width: 768px) {
+    @media (max-width: 1000px) {
+      .col-left { display: none; }
       body { min-width: auto; }
-      .main-layout { flex-direction: column; padding: 12px; }
-      .col-sim, .col-center { width: 100%; position: static; }
-      .col-sim { order: -1; }
-      .nav-links { display: none; }
     }
-
-    /* intent-extras toggle */
-    .sub-toggle {
-      display: flex;
-      align-items: center;
-      gap: 7px;
-      font-size: 13px;
-      color: var(--salla-gray);
-      cursor: pointer;
-      margin-top: 10px;
-    }
-    .sub-toggle input { accent-color: var(--salla-teal); cursor: pointer; }
   </style>
 </head>
 <body>
 
-<!-- ── TOAST ─────────────────────────────────────── -->
 <div id="toast"></div>
-
-<!-- ── CONFETTI ───────────────────────────────────── -->
 <div id="confetti"></div>
 
-<!-- ── NAVBAR ─────────────────────────────────────── -->
+<!-- ── NAVBAR ─────────────────────────────────────────── -->
 <nav class="navbar">
-  <div class="nav-logo">
-    <div class="nav-logo-box">سلة</div>
-    <div class="nav-divider"></div>
-    <div class="nav-menu-btn">
-      <i data-lucide="grid-3x3" style="width:15px;height:15px"></i>
-      <span style="font-size:13px">الكل</span>
+  <div class="nav-r" style="gap:12px">
+    <div class="nav-user">
+      <div class="nav-avatar">و</div>
+      <span>وليد عيسى</span>
+      <i data-lucide="chevron-down" style="width:14px;height:14px"></i>
     </div>
-  </div>
-
-  <ul class="nav-links">
-    <li><a href="#">الرئيسية</a></li>
-    <li><a href="#">الطلبات</a></li>
-    <li><a href="#">المنتجات</a></li>
-    <li><a href="#">التسويق</a></li>
-    <li><a href="#">المتجر وقنوات البيع</a></li>
-    <li><a href="#">التقارير</a></li>
-  </ul>
-
-  <div class="nav-right">
-    <div class="nav-icon"><i data-lucide="search" style="width:17px;height:17px"></i></div>
+    <div style="width:1px;height:24px;background:var(--nav-border)"></div>
+    <div class="nav-logo">
+      <i data-lucide="package" style="width:15px;height:15px;color:#fff"></i>
+      <span class="nav-logo-text">سلة</span>
+    </div>
+    <div class="nav-icon"><i data-lucide="grid" style="width:17px;height:17px"></i></div>
     <div class="nav-icon"><i data-lucide="bell" style="width:17px;height:17px"></i></div>
     <div class="nav-icon"><i data-lucide="message-circle" style="width:17px;height:17px"></i></div>
     <div class="nav-icon"><i data-lucide="settings" style="width:17px;height:17px"></i></div>
-    <div class="nav-avatar">W</div>
   </div>
+
+  <nav class="nav-links">
+    <a class="nav-link" href="#">الرئيسية</a>
+    <a class="nav-link" href="#">الطلبات</a>
+    <a class="nav-link" href="#">المنتجات</a>
+    <a class="nav-link" href="#">التسويق</a>
+    <a class="nav-link" href="#">قنوات البيع</a>
+    <a class="nav-link" href="#">التقارير</a>
+    <a class="nav-link" href="#">المزيد <i data-lucide="more-horizontal" style="width:13px;height:13px"></i></a>
+  </nav>
 </nav>
 
-<!-- ── SUB-HEADER ─────────────────────────────────── -->
+<!-- ── SUB-HEADER ─────────────────────────────────────── -->
 <div class="sub-header">
   <nav class="breadcrumb">
-    <a href="#">الشحن والتوصيل</a>
+    <a href="#">الشحن</a>
     <span class="sep">›</span>
     <a href="#">الإعدادات</a>
     <span class="sep">›</span>
-    <a href="#">مسارات الشحن</a>
+    <a href="#">المسارات</a>
     <span class="sep">›</span>
-    <span class="current">مسار شحن جديد</span>
+    <span class="cur">مسار جديدة</span>
   </nav>
-  <div style="display:flex;gap:8px;align-items:center">
-    <button class="btn btn-outline" style="padding:6px 14px;font-size:13px">إلغاء</button>
-    <button class="btn btn-primary" style="padding:6px 14px;font-size:13px" onclick="handleSave(event)">
-      <i data-lucide="save" style="width:14px;height:14px"></i>
+  <div style="display:flex;gap:8px">
+    <button class="btn btn-outline btn-sm">إلغاء</button>
+    <button class="btn btn-teal btn-sm" onclick="handleSave(event)">
+      <i data-lucide="save" style="width:13px;height:13px"></i>
       حفظ المسار
     </button>
   </div>
 </div>
 
-<!-- ── MAIN LAYOUT ─────────────────────────────────── -->
-<div class="main-layout">
+<!-- ── MAIN LAYOUT ─────────────────────────────────────── -->
+<div class="layout">
 
-  <!-- ════════════════════════════════════════════════
-       RIGHT COLUMN — Live Checkout Simulator
-  ════════════════════════════════════════════════ -->
-  <div class="col-sim">
+  <!-- LEFT COLUMN ───────────────────────────────────── -->
+  <div class="col-left">
+
+    <!-- Route summary -->
+    <div class="sum-card">
+      <div class="sum-hd">
+        <span class="sum-hd-title">ملخص المسار</span>
+        <i data-lucide="file-text" style="width:14px;height:14px;color:var(--muted)"></i>
+      </div>
+      <div class="sum-body">
+        <div class="sum-sec">
+          <div class="sum-lbl">اسم المسار</div>
+          <div class="sum-val" id="sumName" style="color:var(--muted);font-style:italic">لم يُحدَّد بعد</div>
+        </div>
+        <div class="sum-divider"></div>
+        <div class="sum-sec">
+          <div class="sum-lbl">نوع العرض</div>
+          <div id="sumType" class="sum-val" style="color:var(--muted)">—</div>
+        </div>
+        <div class="sum-divider"></div>
+        <div class="sum-sec">
+          <div class="sum-lbl">الشروط</div>
+          <div id="sumConds"><div style="font-size:12px;color:var(--muted);font-style:italic">لا توجد شروط</div></div>
+        </div>
+        <div class="sum-divider"></div>
+        <div class="sum-sec">
+          <div class="sum-lbl">شركات الشحن</div>
+          <div id="sumCarriers"><div style="font-size:12px;color:var(--muted);font-style:italic">لم تُختَر بعد</div></div>
+        </div>
+        <div class="sum-divider"></div>
+        <div class="sum-sec" style="margin-bottom:14px">
+          <div class="sum-lbl">الحالة</div>
+          <div class="status-row" id="sumStatus">
+            <div class="status-indicator" style="background:var(--orange)"></div>
+            <span style="font-size:12px;color:var(--orange);font-weight:600">في انتظار الإعداد</span>
+          </div>
+          <div id="sumApplies" style="font-size:11px;color:var(--muted);margin-top:4px">أكمل الإعداد لمعرفة نطاق التطبيق</div>
+        </div>
+        <button class="btn btn-teal btn-full" onclick="handleSave(event)" style="font-size:13px;padding:9px">حفظ المسار</button>
+        <button class="btn btn-ghost btn-full" style="font-size:12px;margin-top:6px;padding:7px">إلغاء</button>
+      </div>
+    </div>
+
+    <!-- Live Simulator -->
     <div class="sim-panel">
       <div class="sim-hd">
-        <div class="sim-hd-title">
-          <i data-lucide="eye" style="width:17px;height:17px;color:var(--salla-teal)"></i>
-          <span style="font-size:14px;font-weight:700">محاكي الدفع المباشر</span>
-          <span class="badge badge-opt" style="margin-right:auto">مباشر</span>
+        <div class="sim-hd-row">
+          <i data-lucide="eye" style="width:14px;height:14px;color:var(--teal)"></i>
+          <span class="sim-hd-title">محاكي الدفع المباشر</span>
         </div>
-        <p class="sim-hd-sub">كيف سيرى عميلك خيارات الشحن</p>
+        <div class="sim-hd-sub">كيف سيرى عميلك خيارات الشحن</div>
       </div>
-
       <div class="sim-body">
-        <!-- City -->
         <div class="sim-field">
-          <div class="sim-label">المدينة</div>
-          <select class="sim-select" id="simCity" onchange="runSimulator()">
-            <option>الرياض</option>
-            <option>جدة</option>
-            <option>مكة المكرمة</option>
-            <option>الدمام</option>
-            <option>الخبر</option>
-            <option>أبها</option>
-            <option>تبوك</option>
-            <option>المدينة المنورة</option>
-            <option>الطائف</option>
-            <option>بريدة</option>
+          <div class="sim-lbl">المدينة</div>
+          <select class="sim-sel" id="simCity" onchange="runSim()">
+            <option>الرياض</option><option>جدة</option><option>مكة المكرمة</option>
+            <option>الدمام</option><option>الخبر</option><option>أبها</option>
+            <option>تبوك</option><option>المدينة المنورة</option>
           </select>
         </div>
-
-        <!-- Products -->
         <div class="sim-field">
-          <div class="sim-label">المنتجات في السلة</div>
-          <div class="sim-products-wrap" id="simProducts">
-            <div class="sim-prod-chip on" data-prod="قميص أزرق" onclick="toggleSimProd(this)">قميص أزرق</div>
-            <div class="sim-prod-chip off" data-prod="حذاء رياضي" onclick="toggleSimProd(this)">حذاء رياضي</div>
-            <div class="sim-prod-chip off" data-prod="ساعة ذهبية" onclick="toggleSimProd(this)">ساعة ذهبية</div>
+          <div class="sim-lbl">المنتجات في السلة</div>
+          <div class="sim-prod-wrap" id="simProds">
+            <div class="sim-prod-chip on" data-p="قميص أزرق" onclick="toggleSimProd(this)">قميص أزرق</div>
+            <div class="sim-prod-chip off" data-p="حذاء رياضي" onclick="toggleSimProd(this)">حذاء رياضي</div>
+            <div class="sim-prod-chip off" data-p="ساعة ذهبية" onclick="toggleSimProd(this)">ساعة ذهبية</div>
           </div>
         </div>
-
-        <!-- Weight slider -->
         <div class="sim-field">
           <div class="sim-slider-row">
-            <div class="sim-label">وزن الطلب</div>
-            <span class="sim-slider-val" id="wtDisplay">2.5 كغ</span>
+            <div class="sim-lbl">وزن الطلب</div>
+            <span class="sim-slider-val" id="wtLbl">2.5 كغ</span>
           </div>
-          <input type="range" id="simWeight" min="0" max="30" step="0.5" value="2.5"
-            oninput="document.getElementById('wtDisplay').textContent=this.value+' كغ'; runSimulator()">
+          <input type="range" id="simWt" min="0" max="30" step="0.5" value="2.5"
+            oninput="document.getElementById('wtLbl').textContent=this.value+' كغ';runSim()">
         </div>
-
-        <!-- Order value -->
-        <div class="sim-field">
-          <div class="sim-label">قيمة الطلب</div>
-          <div style="display:flex;gap:6px;align-items:center">
-            <input class="sim-input-num" type="number" id="simValue" value="350"
-              oninput="runSimulator()" style="flex:1">
-            <span class="text-sm text-gray">ريال</span>
+        <div class="sim-field" style="display:flex;align-items:center;gap:6px">
+          <div style="flex:1">
+            <div class="sim-lbl">قيمة الطلب</div>
+            <input class="sim-num" type="number" id="simVal" value="350" oninput="runSim()">
           </div>
+          <span style="font-size:11px;color:var(--muted);margin-top:14px">ريال</span>
         </div>
-
         <div class="sim-divider"></div>
-
-        <!-- Result -->
         <div id="simResult" class="sim-result warn">
-          <div class="sim-result-title">
-            <span>⚠️</span>
-            <span style="color:#92400E">لا توجد شروط — سيُطبَّق على كل الطلبات</span>
-          </div>
-          <p style="font-size:12px;color:#92400E">أضف شروطاً لتحديد متى يُطبَّق هذا المسار</p>
+          <div class="sim-result-title"><span>⚠️</span><span style="color:#92400E">لا توجد شروط — سيُطبَّق على كل الطلبات</span></div>
+          <p style="font-size:11px;color:#92400E">أضف شروطاً لتحديد نطاق المسار</p>
         </div>
-
-        <!-- Carrier preview (shown on match) -->
-        <div id="simCarrierPreview" class="hidden mt-12">
-          <div class="sim-label mb-8">معاينة خيارات الشحن للعميل</div>
+        <div id="simCarrierPreview" class="hidden" style="margin-top:10px">
+          <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--muted);margin-bottom:6px">معاينة ما يراه العميل</div>
           <div id="simCarrierList"></div>
         </div>
       </div>
     </div>
+
   </div>
 
-  <!-- ════════════════════════════════════════════════
-       CENTER COLUMN — Main Route Builder
-  ════════════════════════════════════════════════ -->
-  <div class="col-center">
+  <!-- MAIN COLUMN ───────────────────────────────────── -->
+  <div class="col-main">
 
-    <!-- ── WIZARD CARD ──────────────────────────────── -->
-    <div class="card" id="wizardCard">
-      <div class="card-body">
+    <!-- ── ROUTE ENABLED TOGGLE ──────────────────────── -->
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+      <div style="display:flex;align-items:center;gap:10px">
+        <label class="tog"><input type="checkbox" checked id="routeEnabled"><span class="tog-track"></span></label>
+        <span style="font-size:14px;font-weight:600" id="enabledLabel">المسار مفعّل</span>
+      </div>
+      <span class="text-xs text-muted">يمكنك إيقاف المسار مؤقتاً دون حذفه</span>
+    </div>
+    <script>
+      document.getElementById('routeEnabled').addEventListener('change', function() {
+        document.getElementById('enabledLabel').textContent = this.checked ? 'المسار مفعّل' : 'المسار موقوف';
+      });
+    </script>
 
-        <!-- Step breadcrumb -->
-        <div class="wiz-steps" id="wizSteps">
-          <div class="wiz-step active" id="ws1" onclick="jumpStep(1)">
-            <div class="wiz-num">1</div>
-            <span class="wiz-label">الهدف</span>
+    <!-- ── INTENT WIZARD ──────────────────────────────── -->
+    <div class="card" id="intentCard">
+      <div class="card-hd">
+        <div>
+          <div class="card-title">ما هدفك من هذا المسار؟</div>
+          <div style="font-size:12px;color:var(--muted);margin-top:2px">اختر الغرض الأساسي — سنجهّز لك الإعدادات تلقائياً</div>
+        </div>
+        <div class="wiz-steps" style="margin:0;border:none;padding:0;gap:4px">
+          <div class="wiz-step-btn active" id="ws1" onclick="goWiz(1)" style="padding:6px 10px">
+            <div class="wiz-step-num">1</div><span>الهدف</span>
           </div>
           <span class="wiz-arrow">←</span>
-          <div class="wiz-step inactive" id="ws2" onclick="jumpStep(2)">
-            <div class="wiz-num">2</div>
-            <span class="wiz-label">الشروط</span>
+          <div class="wiz-step-btn inactive" id="ws2" onclick="goWiz(2)" style="padding:6px 10px">
+            <div class="wiz-step-num">2</div><span>الإعداد</span>
           </div>
           <span class="wiz-arrow">←</span>
-          <div class="wiz-step inactive" id="ws3" onclick="jumpStep(3)">
-            <div class="wiz-num">3</div>
-            <span class="wiz-label">الاسم والحفظ</span>
-          </div>
-        </div>
-
-        <!-- ── STEP 1: Intent ─────────────────────── -->
-        <div id="s1" class="step-slide">
-          <h3 style="font-size:17px;font-weight:700;margin-bottom:5px">ماذا تريد أن يحدث؟</h3>
-          <p class="text-sm text-gray mb-12">اختر الغرض الأساسي من هذا المسار — سنجهّز لك كل شيء</p>
-
-          <div class="intent-grid">
-            <div class="intent-card" data-intent="0" onclick="pickIntent(0)">
-              <div class="intent-check">✓</div>
-              <span class="intent-icon">🌍</span>
-              <div class="intent-title">أشحن لكل المدن</div>
-              <div class="intent-sub">افتراضي لجميع الطلبات</div>
-            </div>
-            <div class="intent-card" data-intent="1" onclick="pickIntent(1)">
-              <div class="intent-check">✓</div>
-              <span class="intent-icon">🏙️</span>
-              <div class="intent-title">أشحن لمدن محددة</div>
-              <div class="intent-sub">اختر المناطق التي تخدمها</div>
-            </div>
-            <div class="intent-card" data-intent="2" onclick="pickIntent(2)">
-              <div class="intent-check">✓</div>
-              <span class="intent-icon">📦</span>
-              <div class="intent-title">أشحن منتجات معينة فقط</div>
-              <div class="intent-sub">حدد المنتجات أو الفئات</div>
-            </div>
-            <div class="intent-card" data-intent="3" onclick="pickIntent(3)">
-              <div class="intent-check">✓</div>
-              <span class="intent-icon">🚫</span>
-              <div class="intent-title">أستثني مناطق معينة</div>
-              <div class="intent-sub">أشحن لكل مكان إلا...</div>
-            </div>
-            <div class="intent-card" data-intent="4" onclick="pickIntent(4)">
-              <div class="intent-check">✓</div>
-              <span class="intent-icon">💰</span>
-              <div class="intent-title">سعر شحن حسب الوزن</div>
-              <div class="intent-sub">شروط حسب وزن الطلب</div>
-            </div>
-            <div class="intent-card" data-intent="5" onclick="pickIntent(5)">
-              <div class="intent-check">✓</div>
-              <span class="intent-icon">⚡</span>
-              <div class="intent-title">مسار علامتي التجارية</div>
-              <div class="intent-sub">اسم وصورة مخصصة</div>
-            </div>
-          </div>
-
-          <div class="skip-link" onclick="skipWizard()">تخطي — أبني مسار مخصص ←</div>
-        </div>
-
-        <!-- ── STEP 2: Pre-filled conditions ─────── -->
-        <div id="s2" class="hidden">
-          <div class="flex items-center justify-between mb-12">
-            <div>
-              <h3 style="font-size:16px;font-weight:700;margin-bottom:3px" id="s2Title">تحديد الشروط</h3>
-              <p class="text-sm text-gray" id="s2Sub">بناءً على هدفك، جهّزنا لك الشروط الأساسية</p>
-            </div>
-            <button class="btn btn-outline" style="padding:5px 12px;font-size:12px" onclick="jumpStep(1)">
-              <i data-lucide="arrow-right" style="width:13px;height:13px"></i> السابق
-            </button>
-          </div>
-
-          <!-- Info banner -->
-          <div id="s2Banner" style="background:var(--salla-teal-10);border-right:3px solid var(--salla-teal);border-radius:8px;padding:12px 14px;margin-bottom:16px">
-            <div style="font-size:13px;font-weight:600;color:var(--salla-teal);margin-bottom:2px" id="s2BannerTitle">✨ تم إعداد الشروط تلقائياً</div>
-            <div style="font-size:12px;color:var(--salla-gray)" id="s2BannerSub">يمكنك تعديلها أو إضافة المزيد من الشروط في القسم أدناه</div>
-          </div>
-
-          <!-- Cities extra -->
-          <div id="extraCities" class="hidden">
-            <label class="f-label">المدن المشمولة</label>
-            <div class="chip-wrap mb-8" id="s2CityWrap" onclick="document.getElementById('s2CityInput').focus()">
-              <!-- chips injected by JS -->
-              <input class="chip-input" id="s2CityInput" placeholder="اكتب مدينة واضغط Enter..."
-                onkeydown="s2AddCity(event)" list="cityList">
-            </div>
-            <datalist id="cityList">
-              <option>الرياض</option><option>جدة</option><option>الدمام</option>
-              <option>مكة المكرمة</option><option>المدينة المنورة</option><option>الخبر</option>
-              <option>أبها</option><option>تبوك</option><option>الطائف</option><option>بريدة</option>
-            </datalist>
-            <label class="sub-toggle">
-              <input type="checkbox" id="excludeToggle" onchange="s2ExcludeChanged()">
-              <span>استثني هذه المدن بدلاً من تحديدها</span>
-            </label>
-          </div>
-
-          <!-- Products extra -->
-          <div id="extraProducts" class="hidden">
-            <label class="f-label">المنتجات المشمولة</label>
-            <div class="chip-wrap mb-8">
-              <div class="chip" style="background:var(--salla-purple-10);color:var(--salla-purple);border-color:rgba(123,45,139,0.3)">قميص أزرق <span class="chip-x" onclick="this.closest('.chip').remove()">×</span></div>
-              <div class="chip" style="background:var(--salla-purple-10);color:var(--salla-purple);border-color:rgba(123,45,139,0.3)">حذاء رياضي <span class="chip-x" onclick="this.closest('.chip').remove()">×</span></div>
-              <input class="chip-input" placeholder="ابحث عن منتج...">
-            </div>
-          </div>
-
-          <!-- Weight extra -->
-          <div id="extraWeight" class="hidden">
-            <label class="f-label">وزن الطلب</label>
-            <div style="display:flex;gap:10px;align-items:center">
-              <select class="cond-select">
-                <option>أكبر من</option><option>أصغر من</option><option>يساوي</option>
-              </select>
-              <input class="f-input" type="number" value="5" style="width:100px">
-              <span class="text-sm text-gray">كغ</span>
-            </div>
-          </div>
-
-          <!-- Default extra -->
-          <div id="extraDefault" class="hidden">
-            <div style="background:#F0FDF4;border-right:3px solid var(--salla-green);border-radius:8px;padding:12px 14px">
-              <div style="font-size:13px;font-weight:600;color:var(--salla-green)">✅ مسار بدون شروط — يُطبَّق على كل الطلبات</div>
-              <div style="font-size:12px;color:#065F46;margin-top:2px">يمكنك إضافة شروط إضافية في قسم الشروط أدناه</div>
-            </div>
-          </div>
-
-          <div class="flex gap-8 mt-16">
-            <button class="btn btn-primary" onclick="jumpStep(3)">التالي: الاسم والحفظ ←</button>
-          </div>
-        </div>
-
-        <!-- ── STEP 3: Name + Save ──────────────── -->
-        <div id="s3" class="hidden">
-          <div class="flex items-center justify-between mb-12">
-            <div>
-              <h3 style="font-size:16px;font-weight:700;margin-bottom:3px">اسم المسار والحفظ</h3>
-              <p class="text-sm text-gray">سمِّ مسارك ثم احفظه لتطبيقه فوراً</p>
-            </div>
-            <button class="btn btn-outline" style="padding:5px 12px;font-size:12px" onclick="jumpStep(2)">
-              <i data-lucide="arrow-right" style="width:13px;height:13px"></i> السابق
-            </button>
-          </div>
-          <div class="f-group">
-            <label class="f-label">اسم المسار</label>
-            <input class="f-input" id="nameWiz" placeholder="مثال: شحن المدن الرئيسية"
-              oninput="syncName(this.value)">
-          </div>
-          <div style="background:#F9FAFB;border-radius:8px;padding:12px 14px;margin-bottom:16px;border:1px solid var(--border)">
-            <div class="text-sm" style="font-weight:600;margin-bottom:6px">ملخص المسار:</div>
-            <div id="s3Summary" class="text-sm text-gray"></div>
-          </div>
-          <button class="btn btn-primary btn-full" style="padding:12px;font-size:15px" onclick="handleSave(event)">
-            <i data-lucide="check-circle" style="width:17px;height:17px"></i>
-            حفظ المسار
-          </button>
-        </div>
-
-      </div><!-- card-body -->
-    </div><!-- wizardCard -->
-
-    <!-- ── CONDITIONS CARD ───────────────────────────── -->
-    <div class="card" id="condCard">
-      <div class="card-header">
-        <div style="display:flex;align-items:center;gap:10px">
-          <span class="card-title">شروط تطبيق المسار</span>
-          <span class="badge badge-opt">اختياري</span>
-        </div>
-        <div style="display:flex;align-items:center;gap:8px">
-          <span class="text-sm text-gray">تطبيق عندما:</span>
-          <div class="and-or-toggle">
-            <button class="and-or-btn active" id="andBtn" onclick="setLogic('AND')">كل الشروط (AND)</button>
-            <button class="and-or-btn" id="orBtn" onclick="setLogic('OR')">أي شرط (OR)</button>
+          <div class="wiz-step-btn inactive" id="ws3" onclick="goWiz(3)" style="padding:6px 10px">
+            <div class="wiz-step-num">3</div><span>الحفظ</span>
           </div>
         </div>
       </div>
-      <div class="card-body">
-        <!-- Conflict banner -->
-        <div class="conflict-banner hidden" id="conflictBanner">
-          <span style="flex-shrink:0">⚠️</span>
-          <div>
-            <div style="font-weight:700">تعارض محتمل في الشروط</div>
-            <div style="font-size:12px;margin-top:2px">هذه الشروط قد لا تتطابق مع أي طلب. راجع منطق AND/OR.</div>
+
+      <!-- Step 1 -->
+      <div id="wizS1" class="card-body">
+        <div class="intent-grid">
+          <div class="intent-card" onclick="pickIntent(0)">
+            <div class="intent-check">✓</div>
+            <span class="intent-icon">🌍</span>
+            <div class="intent-label">أشحن لكل المدن</div>
+            <div class="intent-desc">افتراضي لجميع الطلبات</div>
+          </div>
+          <div class="intent-card" onclick="pickIntent(1)">
+            <div class="intent-check">✓</div>
+            <span class="intent-icon">🏙️</span>
+            <div class="intent-label">أشحن لمدن محددة</div>
+            <div class="intent-desc">اختر المناطق التي تخدمها</div>
+          </div>
+          <div class="intent-card" onclick="pickIntent(2)">
+            <div class="intent-check">✓</div>
+            <span class="intent-icon">📦</span>
+            <div class="intent-label">أشحن منتجات معينة فقط</div>
+            <div class="intent-desc">حدد المنتجات أو الفئات</div>
+          </div>
+          <div class="intent-card" onclick="pickIntent(3)">
+            <div class="intent-check">✓</div>
+            <span class="intent-icon">🚫</span>
+            <div class="intent-label">أستثني مناطق معينة</div>
+            <div class="intent-desc">أشحن لكل مكان إلا...</div>
+          </div>
+          <div class="intent-card" onclick="pickIntent(4)">
+            <div class="intent-check">✓</div>
+            <span class="intent-icon">💰</span>
+            <div class="intent-label">سعر حسب الوزن</div>
+            <div class="intent-desc">شروط بناءً على وزن الطلب</div>
+          </div>
+          <div class="intent-card" onclick="pickIntent(5)">
+            <div class="intent-check">✓</div>
+            <span class="intent-icon">⚡</span>
+            <div class="intent-label">مسار العلامة التجارية</div>
+            <div class="intent-desc">اسم وصورة ومسمى مخصص</div>
           </div>
         </div>
+        <div class="skip-link" onclick="skipWizard()">تخطي — أبني مسار مخصص ←</div>
+      </div>
 
-        <!-- Conditions list -->
-        <div id="condList"></div>
-
-        <!-- Add buttons -->
-        <div style="display:flex;gap:8px;margin-top:14px;flex-wrap:wrap">
-          <button class="btn-add-cond" onclick="addCond()">+ إضافة شرط</button>
-          <button class="btn-add-cond btn-add-grp" onclick="addGrpCond()">+ إضافة مجموعة شروط</button>
+      <!-- Step 2 -->
+      <div id="wizS2" class="hidden card-body">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+          <div>
+            <div style="font-size:14px;font-weight:700" id="s2Title">تحديد الشروط</div>
+            <div style="font-size:12px;color:var(--muted)" id="s2Sub">جهّزنا لك الشروط بناءً على هدفك</div>
+          </div>
+          <button class="btn btn-outline btn-sm" onclick="goWiz(1)">← السابق</button>
         </div>
+        <!-- Info banner -->
+        <div id="s2Banner" style="background:var(--teal-10);border-right:3px solid var(--teal);border-radius:8px;padding:12px 14px;margin-bottom:14px">
+          <div style="font-size:13px;font-weight:600;color:var(--teal)" id="s2BannerTitle">✨ تم إعداد الشروط تلقائياً</div>
+          <div style="font-size:12px;color:#5B8A83;margin-top:2px" id="s2BannerSub">يمكنك تعديلها أو إضافة المزيد في قسم الشروط أدناه</div>
+        </div>
+        <!-- Cities extras -->
+        <div id="extraCities" class="hidden">
+          <label class="f-label" style="font-size:13px">المدن المشمولة</label>
+          <div class="chip-wrap mb-8" id="s2CityWrap" onclick="document.getElementById('s2CityIn').focus()">
+            <input class="chip-input" id="s2CityIn" placeholder="اكتب مدينة واضغط Enter..." onkeydown="s2AddCity(event)">
+          </div>
+          <div style="font-size:11px;color:var(--muted);margin-bottom:10px">المتاح: الرياض، جدة، الدمام، مكة المكرمة، المدينة المنورة، الخبر، أبها، تبوك...</div>
+          <label style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer">
+            <input type="checkbox" id="excludeTog" onchange="s2ExcludeChange()" style="accent-color:var(--teal)">
+            استثني هذه المدن بدلاً من تحديدها
+          </label>
+        </div>
+        <!-- Products extras -->
+        <div id="extraProducts" class="hidden">
+          <label class="f-label" style="font-size:13px">المنتجات المشمولة</label>
+          <div class="chip-wrap">
+            <div class="chip" style="background:var(--purple-10);color:var(--purple);border-color:rgba(123,45,139,0.25)">قميص أزرق <span class="chip-x" onclick="this.closest('.chip').remove()">×</span></div>
+            <div class="chip" style="background:var(--purple-10);color:var(--purple);border-color:rgba(123,45,139,0.25)">حذاء رياضي <span class="chip-x" onclick="this.closest('.chip').remove()">×</span></div>
+            <input class="chip-input" placeholder="ابحث عن منتج...">
+          </div>
+        </div>
+        <!-- Weight extras -->
+        <div id="extraWeight" class="hidden">
+          <label class="f-label" style="font-size:13px">وزن الطلب</label>
+          <div style="display:flex;align-items:center;gap:10px">
+            <select class="cond-sel f-select" style="width:120px"><option>أكبر من</option><option>أصغر من</option></select>
+            <input class="f-input" type="number" value="5" style="width:90px">
+            <span class="text-muted text-sm">كغ</span>
+          </div>
+        </div>
+        <!-- Default extras -->
+        <div id="extraDefault" class="hidden">
+          <div style="background:var(--green-10);border-right:3px solid var(--green);border-radius:8px;padding:12px 14px">
+            <div style="font-size:13px;font-weight:600;color:var(--green)">✅ مسار بدون شروط — يُطبَّق على كل الطلبات</div>
+            <div style="font-size:12px;color:#065F46;margin-top:2px">يمكنك إضافة شروط مخصصة في قسم الشروط أدناه</div>
+          </div>
+        </div>
+        <div style="display:flex;gap:8px;margin-top:16px">
+          <button class="btn btn-teal" onclick="goWiz(3)">التالي: الاسم والحفظ ←</button>
+        </div>
+      </div>
+
+      <!-- Step 3 -->
+      <div id="wizS3" class="hidden card-body">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+          <div>
+            <div style="font-size:14px;font-weight:700">اسم المسار والحفظ</div>
+            <div style="font-size:12px;color:var(--muted)">سمِّ مسارك ثم احفظه لتطبيقه على متجرك</div>
+          </div>
+          <button class="btn btn-outline btn-sm" onclick="goWiz(2)">← السابق</button>
+        </div>
+        <div class="f-group">
+          <label class="f-label">اسم المسار</label>
+          <input class="f-input" id="nameWiz" placeholder="مثال: شحن المدن الرئيسية" oninput="syncName(this.value)">
+        </div>
+        <div style="background:#F9FAFB;border:1px solid var(--border);border-radius:8px;padding:12px 14px;margin-bottom:14px;font-size:12px" id="s3Preview"></div>
+        <button class="btn btn-teal btn-full" onclick="handleSave(event)">
+          <i data-lucide="check-circle" style="width:15px;height:15px"></i>
+          حفظ المسار
+        </button>
       </div>
     </div>
 
-    <!-- ── ROUTE NAME CARD (for skipped wizard) ──────── -->
-    <div class="card hidden" id="nameCard">
-      <div class="card-header">
+    <!-- ── معلومات المسار ────────────────────────────── -->
+    <div class="card">
+      <div class="card-hd">
         <span class="card-title">معلومات المسار</span>
       </div>
       <div class="card-body">
-        <div class="f-group" style="margin:0">
-          <label class="f-label">اسم المسار</label>
-          <input class="f-input" id="nameMain" placeholder="مثال: شحن المدن الرئيسية"
+        <!-- Route name -->
+        <div class="f-group">
+          <label class="f-label">اسم المسار <span class="req">*</span></label>
+          <input class="f-input" id="routeNameMain" placeholder="كتابة اسم للمسار"
             oninput="syncNameMain(this.value)">
         </div>
+
+        <!-- How route appears -->
+        <div class="f-group">
+          <label class="f-label">كيف يظهر هذا المسار للعميل <span class="req">*</span></label>
+          <div class="type-cards">
+            <div class="type-card selected" onclick="selectType(this,'إظهار شركات محددة')">
+              <div class="type-card-check">✓</div>
+              <span class="type-card-icon">🏢</span>
+              <div class="type-card-title">إظهار شركات محددة</div>
+              <div class="type-card-desc">تظهر الشركات المحددة وفق الشروط والأولوية في صفحة الدفع</div>
+            </div>
+            <div class="type-card" onclick="selectType(this,'تنين تلقائي')">
+              <div class="type-card-check">✓</div>
+              <span class="type-card-icon">⚙️</span>
+              <div class="type-card-title">تنين تلقائي</div>
+              <div class="type-card-desc">تظهر فقط الشركة المحددة والأولوية وفق الشروط بصفحة الدفع</div>
+            </div>
+            <div class="type-card" onclick="selectType(this,'مسمى خاص')">
+              <div class="type-card-check">✓</div>
+              <span class="type-card-icon">✨</span>
+              <div class="type-card-title">مسمى خاص</div>
+              <div class="type-card-desc">إخفاء أسماء وشعارات شركات الشحن وإظهار مسميات خاصة مرتبطة بالشركات</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Carriers -->
+        <div class="f-group" style="margin-bottom:0">
+          <label class="f-label">شركة/ات الشحن <span class="req">*</span></label>
+          <div class="carrier-list" id="carrierList"></div>
+        </div>
       </div>
     </div>
 
-    <!-- ── CARRIERS CARD ──────────────────────────────── -->
-    <div class="card">
-      <div class="card-header">
-        <span class="card-title">اختر شركات الشحن</span>
-        <span class="text-sm text-gray" id="carrierCount">2 شركات محددة</span>
-      </div>
-      <div id="carrierList"></div>
-    </div>
-
-    <!-- ── BOTTOM SAVE BAR ────────────────────────────── -->
-    <div style="display:flex;gap:10px;justify-content:flex-end;padding:8px 0 40px">
-      <button class="btn btn-outline">إلغاء</button>
-      <button class="btn btn-primary" style="padding:10px 28px" onclick="handleSave(event)">
-        <i data-lucide="save" style="width:15px;height:15px"></i>
-        حفظ المسار
-      </button>
-    </div>
-
-  </div><!-- col-center -->
-
-  <!-- ════════════════════════════════════════════════
-       LEFT COLUMN — Route Summary
-  ════════════════════════════════════════════════ -->
-  <div class="col-summary">
-    <div class="card" style="margin-bottom:0">
-      <div class="card-header">
-        <span class="card-title">الملخص</span>
-        <i data-lucide="file-text" style="width:15px;height:15px;color:var(--salla-gray)"></i>
+    <!-- ── شروط تطبيق المسار ──────────────────────────── -->
+    <div class="card" id="condCard">
+      <div class="card-hd">
+        <div style="display:flex;align-items:center;gap:10px">
+          <span class="card-title">شروط تطبيق المسار</span>
+          <span class="section-badge">اختياري</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <span style="font-size:12px;color:var(--muted)">تطبيق عندما:</span>
+          <div class="logic-toggle">
+            <button class="logic-btn active" id="andBtn" onclick="setLogic('AND')">كل الشروط (AND)</button>
+            <button class="logic-btn" id="orBtn" onclick="setLogic('OR')">أي شرط (OR)</button>
+          </div>
+        </div>
       </div>
       <div class="card-body">
-
-        <div class="sum-sec">
-          <div class="sum-lbl">اسم المسار</div>
-          <div id="sumName" style="font-size:13.5px;font-weight:500;color:var(--salla-gray);font-style:italic">لم يُحدَّد بعد</div>
-        </div>
-
-        <div style="height:1px;background:var(--border);margin:12px 0"></div>
-
-        <div class="sum-sec">
-          <div class="sum-lbl">الشروط</div>
-          <div id="sumConds"><div style="font-size:13px;color:var(--salla-gray);font-style:italic">لا توجد شروط</div></div>
-        </div>
-
-        <div style="height:1px;background:var(--border);margin:12px 0"></div>
-
-        <div class="sum-sec">
-          <div class="sum-lbl">شركات الشحن</div>
-          <div id="sumCarriers"></div>
-        </div>
-
-        <div style="height:1px;background:var(--border);margin:12px 0"></div>
-
-        <div class="sum-sec" style="margin-bottom:16px">
-          <div class="sum-lbl">الحالة</div>
-          <div id="sumStatus" class="flex items-center gap-8">
-            <div class="status-dot" style="background:var(--salla-orange)"></div>
-            <span style="font-size:13px;color:var(--salla-orange);font-weight:600">في انتظار الإعداد</span>
+        <div class="conflict-bar hidden" id="conflictBar">
+          <span>⚠️</span>
+          <div>
+            <div style="font-weight:700">تعارض محتمل في الشروط</div>
+            <div style="font-size:11px;margin-top:1px">هذه الشروط قد لا تتطابق مع أي طلب — راجع منطق AND/OR.</div>
           </div>
-          <div id="sumApplies" class="text-xs text-gray mt-8">أضف شروطاً لتحديد نطاق التطبيق</div>
         </div>
-
-        <button class="btn btn-primary btn-full btn-save-big" onclick="handleSave(event)">حفظ المسار</button>
-        <button class="btn btn-ghost btn-full" style="margin-top:8px;font-size:13px">إلغاء</button>
+        <div id="condList"></div>
+        <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap">
+          <button class="add-cond-btn" onclick="addCond()">+ إضافة شرط جديد</button>
+          <button class="add-cond-btn add-cond-grp" onclick="addGrpCond()">+ إضافة مجموعة شروط</button>
+        </div>
       </div>
     </div>
-  </div>
 
-</div><!-- main-layout -->
+    <!-- ── الأولوية ───────────────────────────────────── -->
+    <div class="card">
+      <div class="card-hd">
+        <div style="display:flex;align-items:center;gap:8px">
+          <span class="card-title">الأولوية</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:6px">
+          <i data-lucide="info" style="width:14px;height:14px;color:var(--muted)"></i>
+          <span style="font-size:12px;color:var(--muted)">يتحكم بترتيب ظهور خيارات الشحن للعميل في صفحة الدفع</span>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="f-group">
+          <label class="f-label">خيارات ترتيب الأولوية <span class="req">*</span></label>
+          <select class="f-select">
+            <option value="">توصيات سلة</option>
+            <option>الأرخص أولاً</option>
+            <option>الأسرع أولاً</option>
+            <option>الأعلى تقييماً أولاً</option>
+          </select>
+        </div>
+      </div>
+    </div>
 
-<!-- ══════════════════════════════════════════════════════
-     JAVASCRIPT
-══════════════════════════════════════════════════════ -->
+    <!-- ── أولوية تطبيق المسارات ────────────────────── -->
+    <div class="card">
+      <div class="card-hd">
+        <div style="display:flex;align-items:center;gap:10px">
+          <span class="card-title">أولوية تطبيق المسارات</span>
+          <span class="section-badge">اختياري</span>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="f-group" style="margin:0">
+          <label class="f-label">إضافة هذا المسار بعد</label>
+          <p class="f-hint" style="margin-bottom:8px">اختر المسار الذي تود تطبيق هذا المسار بعده. إذا لم تحدد مسارات، فسيتم وضعه في آخر الترتيب تلقائياً.</p>
+          <select class="f-select">
+            <option value="">اختر المسار</option>
+            <option>مسار الشحن الافتراضي</option>
+            <option>شحن المدن الرئيسية</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── SAVE BAR ────────────────────────────────────── -->
+    <div class="save-bar">
+      <div style="font-size:13px;color:var(--muted)">
+        <i data-lucide="info" style="width:13px;height:13px;vertical-align:middle;margin-left:4px"></i>
+        سيُطبَّق المسار فور الحفظ على جميع الطلبات الجديدة
+      </div>
+      <div style="display:flex;gap:8px">
+        <button class="btn btn-outline">إلغاء</button>
+        <button class="btn btn-teal" onclick="handleSave(event)">
+          <i data-lucide="save" style="width:14px;height:14px"></i>
+          حفظ المسار
+        </button>
+      </div>
+    </div>
+
+  </div><!-- col-main -->
+</div><!-- layout -->
+
 <script>
-/* ── MOCK DATA ──────────────────────────────────────── */
-const CITIES = ["الرياض","جدة","الدمام","مكة المكرمة","المدينة المنورة","الخبر","أبها","تبوك","الطائف","بريدة"];
-const PRODUCTS = [
-  {id:1, name:"قميص أزرق",    category:"ملابس",      weight:0.5},
-  {id:2, name:"حذاء رياضي",   category:"أحذية",      weight:1.2},
-  {id:3, name:"ساعة ذهبية",   category:"إكسسوارات",  weight:0.3},
-  {id:4, name:"حقيبة جلدية",  category:"حقائب",      weight:2.1},
-];
-const CARRIERS_DATA = [
-  {id:1, name:"أرامكس",              abbr:"AX", delivery:"2–4 أيام عمل", enabled:true,  color:"#FF6B35"},
-  {id:2, name:"SMSA",               abbr:"SM", delivery:"1–3 أيام عمل", enabled:true,  color:"#00A859"},
-  {id:3, name:"DHL",                abbr:"DH", delivery:"3–7 أيام عمل", enabled:false, color:"#FFCC00"},
-  {id:4, name:"SPL البريد السعودي", abbr:"SP", delivery:"1–2 أيام عمل", enabled:false, color:"#005B9F"},
-];
+/* ── MOCK DATA ─────────────────────────────────────────── */
+const CITIES_ALL = ["الرياض","جدة","الدمام","مكة المكرمة","المدينة المنورة","الخبر","أبها","تبوك","الطائف","بريدة","حائل","ينبع","القطيف","الجبيل","عرعر"];
 const COND_TYPES = ["المدينة / المنطقة","المنتجات","الفئات","وزن الطلب","قيمة الطلب","الكمية"];
 const OPERATORS = {
   "المدينة / المنطقة": ["تساوي","لا تساوي"],
-  "المنتجات":          ["موجود في السلة","ليس في السلة","من القائمة موجودة في السلة"],
+  "المنتجات":          ["موجود في السلة","ليس في السلة","✦ من القائمة فقط"],
   "الفئات":            ["تنتمي إلى","لا تنتمي إلى"],
   "وزن الطلب":         ["أكبر من","أصغر من","يساوي"],
   "قيمة الطلب":        ["أكبر من","أصغر من","يساوي"],
@@ -1239,586 +1045,348 @@ const TYPE_ICONS = {
   "المدينة / المنطقة":"📍","المنتجات":"📦","الفئات":"🏷️",
   "وزن الطلب":"⚖️","قيمة الطلب":"💰","الكمية":"🔢"
 };
-const INTENT_NAMES = [
-  "شحن كل المدن", "شحن المدن الرئيسية", "شحن المنتجات المحددة",
-  "استثناء المناطق", "شحن حسب الوزن", "مسار العلامة التجارية"
+const CARRIERS_DATA = [
+  {id:1,name:"أرامكس",         abbr:"AX",delivery:"2–4 أيام عمل",enabled:true, color:"#FF6B35",price:"25"},
+  {id:2,name:"SMSA",           abbr:"SM",delivery:"1–3 أيام عمل",enabled:true, color:"#00A859",price:"20"},
+  {id:3,name:"DHL",            abbr:"DH",delivery:"3–7 أيام عمل",enabled:false,color:"#D4AF00",price:"35"},
+  {id:4,name:"SPL البريد السعودي",abbr:"SP",delivery:"1–2 أيام عمل",enabled:false,color:"#005B9F",price:"15"},
 ];
+const INTENT_NAMES = ["شحن كل المدن","شحن المدن الرئيسية","شحن المنتجات المحددة","استثناء المناطق","شحن حسب الوزن","مسار العلامة التجارية"];
 
-/* ── APP STATE ──────────────────────────────────────── */
+/* ── STATE ─────────────────────────────────────────────── */
 let S = {
-  step: 1,
-  intent: null,
-  logic: 'AND',
-  routeName: '',
+  step:1, intent:null, routeName:'', logic:'AND',
+  conditions:[], condId:0,
   carriers: JSON.parse(JSON.stringify(CARRIERS_DATA)),
-  conditions: [],
-  condId: 0,
-  s2Cities: ["الرياض","جدة","الدمام","مكة المكرمة","المدينة المنورة"],
-  s2Exclude: false,
-  simActiveProds: ["قميص أزرق"],
-  happyShown: false,
-  wizardSkipped: false,
+  s2Cities:["الرياض","جدة","الدمام","مكة المكرمة","المدينة المنورة"],
+  s2Exclude:false,
+  simProds:["قميص أزرق"],
+  selectedType:"إظهار شركات محددة",
+  happyShown:false, wizSkipped:false,
 };
 
-/* ── INIT ───────────────────────────────────────────── */
-window.addEventListener('DOMContentLoaded', () => {
+/* ── INIT ──────────────────────────────────────────────── */
+window.addEventListener('DOMContentLoaded',()=>{
   lucide.createIcons();
   renderCarriers();
   renderConds();
   renderSummary();
-  runSimulator();
+  runSim();
 });
 
-/* ════════════════════════════════════════════════════
-   WIZARD
-═══════════════════════════════════════════════════ */
-function jumpStep(n) {
-  if (n > 1 && S.intent === null && !S.wizardSkipped) return;
-  if (n > 2 && S.intent === null && !S.wizardSkipped) return;
-  S.step = n;
-  ['s1','s2','s3'].forEach((id,i) => {
-    const el = document.getElementById(id);
-    if (i+1 === n) { el.classList.remove('hidden'); el.classList.add('step-slide'); }
-    else el.classList.add('hidden');
+/* ── WIZARD ────────────────────────────────────────────── */
+function goWiz(n){
+  if(n>1 && S.intent===null && !S.wizSkipped) return;
+  S.step=n;
+  ['wizS1','wizS2','wizS3'].forEach((id,i)=>document.getElementById(id).classList.toggle('hidden',i+1!==n));
+  ['ws1','ws2','ws3'].forEach((id,i)=>{
+    const el=document.getElementById(id);
+    el.className='wiz-step-btn '+(i+1<n?'done':i+1===n?'active':'inactive');
   });
-  ['ws1','ws2','ws3'].forEach((id,i) => {
-    const el = document.getElementById(id);
-    el.className = 'wiz-step ' + (i+1 < n ? 'done' : i+1 === n ? 'active' : 'inactive');
-  });
-  if (n === 2) buildStep2();
-  if (n === 3) buildStep3Summary();
+  if(n===2) setupStep2();
+  if(n===3) buildS3Preview();
   lucide.createIcons();
 }
 
-function pickIntent(idx) {
-  document.querySelectorAll('.intent-card').forEach(c => c.classList.remove('selected'));
+function pickIntent(idx){
+  document.querySelectorAll('.intent-card').forEach(c=>c.classList.remove('selected'));
   document.querySelectorAll('.intent-card')[idx].classList.add('selected');
-  S.intent = idx;
-  const name = INTENT_NAMES[idx];
-  S.routeName = name;
-  document.getElementById('nameWiz').value = name;
-  document.getElementById('nameMain').value = name;
+  S.intent=idx;
+  S.routeName=INTENT_NAMES[idx];
+  document.getElementById('nameWiz').value=S.routeName;
+  document.getElementById('routeNameMain').value=S.routeName;
   renderSummaryName();
-  setTimeout(() => jumpStep(2), 280);
+  setTimeout(()=>goWiz(2),260);
 }
 
-function buildStep2() {
-  const extras = ['extraCities','extraProducts','extraWeight','extraDefault'];
-  extras.forEach(id => document.getElementById(id).classList.add('hidden'));
-  const titles = [
-    ['مسار شامل لكل المدن',   'بدون قيود مناطق — سيُطبَّق على جميع الطلبات'],
-    ['تحديد مدن الشحن',       'أضف أو احذف المدن التي تريد تغطيتها'],
-    ['تحديد المنتجات',        'حدد المنتجات التي يغطيها هذا المسار'],
-    ['استثناء المناطق',       'حدد المناطق التي لا تريد الشحن إليها'],
-    ['تحديد شرط الوزن',       'طبّق المسار على الطلبات التي تتجاوز وزناً معيناً'],
-    ['إعداد مسار العلامة التجارية','خصص اسم وصورة لتجربة شحن مميزة'],
+function setupStep2(){
+  ['extraCities','extraProducts','extraWeight','extraDefault'].forEach(id=>document.getElementById(id).classList.add('hidden'));
+  const banners=[
+    ['مسار شامل لكل المدن','بدون قيود — يُطبَّق على جميع الطلبات'],
+    ['تحديد مدن الشحن','أضف أو احذف المدن التي تريد تغطيتها'],
+    ['تحديد المنتجات','حدد المنتجات التي يغطيها هذا المسار'],
+    ['استثناء المناطق','حدد المناطق التي لا تريد الشحن إليها'],
+    ['تحديد شرط الوزن','طبّق المسار على الطلبات بوزن معين'],
+    ['مسار العلامة التجارية','خصص اسم وصورة ومسمى مخصص'],
   ];
-  document.getElementById('s2Title').textContent = titles[S.intent][0];
-  document.getElementById('s2Sub').textContent   = titles[S.intent][1];
-
-  S.conditions = [];
-  if (S.intent === 0 || S.intent === 5) {
+  document.getElementById('s2Title').textContent=banners[S.intent][0];
+  document.getElementById('s2Sub').textContent=banners[S.intent][1];
+  S.conditions=[];
+  if(S.intent===0||S.intent===5){
     document.getElementById('extraDefault').classList.remove('hidden');
-    document.getElementById('s2BannerTitle').textContent = S.intent === 5 ? '✨ مسار العلامة التجارية' : '✅ مسار افتراضي شامل';
-    document.getElementById('s2BannerSub').textContent = 'بدون شروط — يمكنك إضافة شروط مخصصة في قسم الشروط';
-  } else if (S.intent === 1 || S.intent === 3) {
+  } else if(S.intent===1||S.intent===3){
     document.getElementById('extraCities').classList.remove('hidden');
-    renderS2CityChips();
-    // Pre-fill conditions
-    addCondData('المدينة / المنطقة', S.intent === 3 ? 'لا تساوي' : 'تساوي', [...S.s2Cities]);
-    renderConds();
-  } else if (S.intent === 2) {
+    renderS2Chips();
+    addCondData('المدينة / المنطقة', S.intent===3?'لا تساوي':'تساوي', [...S.s2Cities]);
+    renderConds(); runSim(); renderSummary();
+  } else if(S.intent===2){
     document.getElementById('extraProducts').classList.remove('hidden');
-    addCondData('المنتجات', 'من القائمة موجودة في السلة', ['قميص أزرق','حذاء رياضي']);
+    addCondData('المنتجات','✦ من القائمة فقط',['قميص أزرق','حذاء رياضي']);
     renderConds();
-  } else if (S.intent === 4) {
+  } else if(S.intent===4){
     document.getElementById('extraWeight').classList.remove('hidden');
-    addCondData('وزن الطلب', 'أكبر من', ['5']);
+    addCondData('وزن الطلب','أكبر من',['5']);
     renderConds();
   }
-  runSimulator();
   renderSummary();
 }
 
-function buildStep3Summary() {
-  const cc = S.conditions.length;
-  const enabled = S.carriers.filter(c=>c.enabled).map(c=>c.name);
-  let txt = '';
-  if (cc === 0) txt += '<div>• لا توجد شروط (يُطبَّق على الكل)</div>';
-  else txt += `<div>• ${cc} شرط/شروط محددة</div>`;
-  if (enabled.length) txt += `<div>• شركات: ${enabled.join('، ')}</div>`;
-  document.getElementById('s3Summary').innerHTML = txt;
+function buildS3Preview(){
+  const cc=S.conditions.length;
+  const en=S.carriers.filter(c=>c.enabled).map(c=>c.name);
+  document.getElementById('s3Preview').innerHTML=
+    `<div style="font-size:12px;font-weight:600;margin-bottom:6px">ملخص المسار:</div>`+
+    `<div style="font-size:12px;color:var(--muted)">• ${cc===0?'لا توجد شروط (يُطبَّق على الكل)':cc+' شرط/شروط محددة'}</div>`+
+    `<div style="font-size:12px;color:var(--muted)">• شركات الشحن: ${en.length?en.join('، '):'لم تُختَر'}</div>`;
 }
 
-function skipWizard() {
-  S.wizardSkipped = true;
-  document.getElementById('wizardCard').classList.add('hidden');
-  document.getElementById('nameCard').classList.remove('hidden');
-  document.getElementById('nameCard').classList.add('fade-in');
+function skipWizard(){
+  S.wizSkipped=true;
+  document.getElementById('intentCard').classList.add('hidden');
 }
 
-function syncName(v) {
-  S.routeName = v;
-  document.getElementById('nameMain').value = v;
-  renderSummaryName();
-}
-function syncNameMain(v) {
-  S.routeName = v;
-  const wEl = document.getElementById('nameWiz');
-  if (wEl) wEl.value = v;
-  renderSummaryName();
-}
+function syncName(v){ S.routeName=v; document.getElementById('routeNameMain').value=v; renderSummaryName(); }
+function syncNameMain(v){ S.routeName=v; const w=document.getElementById('nameWiz'); if(w)w.value=v; renderSummaryName(); }
 
-/* ── STEP 2 CITY CHIPS ──────────────────────────── */
-function renderS2CityChips() {
-  const wrap = document.getElementById('s2CityWrap');
-  const input = document.getElementById('s2CityInput');
-  // Remove old chips
-  wrap.querySelectorAll('.chip').forEach(c => c.remove());
-  S.s2Cities.forEach(city => {
-    const chip = document.createElement('div');
-    chip.className = 'chip';
-    chip.innerHTML = `${city} <span class="chip-x" onclick="removeS2City('${city}')">×</span>`;
-    wrap.insertBefore(chip, input);
+/* ── STEP 2 CITIES ─────────────────────────────────────── */
+function renderS2Chips(){
+  const wrap=document.getElementById('s2CityWrap');
+  const inp=document.getElementById('s2CityIn');
+  wrap.querySelectorAll('.chip').forEach(c=>c.remove());
+  S.s2Cities.forEach(city=>{
+    const ch=document.createElement('div');
+    ch.className='chip';
+    ch.innerHTML=`${city}<span class="chip-x" onclick="removeS2City('${city}')">×</span>`;
+    wrap.insertBefore(ch,inp);
   });
 }
-function removeS2City(city) {
-  S.s2Cities = S.s2Cities.filter(c => c !== city);
-  renderS2CityChips();
-  syncS2CitysToConds();
+function removeS2City(c){ S.s2Cities=S.s2Cities.filter(x=>x!==c); renderS2Chips(); syncS2ToCond(); }
+function s2AddCity(e){
+  if(e.key!=='Enter')return;
+  const v=e.target.value.trim(); if(!v||S.s2Cities.includes(v))return;
+  S.s2Cities.push(v); e.target.value=''; renderS2Chips(); syncS2ToCond();
 }
-function s2AddCity(e) {
-  if (e.key !== 'Enter') return;
-  const v = e.target.value.trim();
-  if (!v || S.s2Cities.includes(v)) return;
-  S.s2Cities.push(v);
-  e.target.value = '';
-  renderS2CityChips();
-  syncS2CitysToConds();
-}
-function syncS2CitysToConds() {
-  const c = S.conditions.find(c => c.type === 'المدينة / المنطقة');
-  if (c) {
-    c.values = [...S.s2Cities];
-    c.operator = S.s2Exclude ? 'لا تساوي' : 'تساوي';
-    renderConds();
-    runSimulator();
-    renderSummary();
-  }
-}
-function s2ExcludeChanged() {
-  S.s2Exclude = document.getElementById('excludeToggle').checked;
-  syncS2CitysToConds();
+function s2ExcludeChange(){ S.s2Exclude=document.getElementById('excludeTog').checked; syncS2ToCond(); }
+function syncS2ToCond(){
+  const c=S.conditions.find(c=>c.type==='المدينة / المنطقة');
+  if(c){ c.values=[...S.s2Cities]; c.operator=S.s2Exclude?'لا تساوي':'تساوي'; renderConds(); runSim(); renderSummary(); }
 }
 
-/* ════════════════════════════════════════════════════
-   CONDITIONS
-═══════════════════════════════════════════════════ */
-function addCondData(type, op, vals) {
-  S.conditions.push({ id: ++S.condId, type, operator: op, values: [...vals] });
-}
-function addCond() {
-  addCondData('المدينة / المنطقة', 'تساوي', []);
-  renderConds();
-  runSimulator();
-  renderSummary();
-}
-function addGrpCond() {
-  addCondData('قيمة الطلب', 'أكبر من', []);
-  renderConds();
-  runSimulator();
-  renderSummary();
-}
-function delCond(id) {
-  S.conditions = S.conditions.filter(c => c.id !== id);
-  renderConds();
-  runSimulator();
-  renderSummary();
-  checkConflict();
-}
-function chType(id, type) {
-  const c = S.conditions.find(c => c.id === id);
-  if (!c) return;
-  c.type = type;
-  c.operator = OPERATORS[type][0];
-  c.values = [];
-  renderConds();
-  runSimulator();
-  checkConflict();
-}
-function chOp(id, op) {
-  const c = S.conditions.find(c => c.id === id);
-  if (!c) return;
-  c.operator = op;
-  checkConflict();
-  runSimulator();
-}
-function addCondVal(e, id) {
-  if (e.key !== 'Enter') return;
-  const v = e.target.value.trim();
-  if (!v) return;
-  const c = S.conditions.find(c => c.id === id);
-  if (c && !c.values.includes(v)) {
-    c.values.push(v);
-    e.target.value = '';
-    renderConds();
-    runSimulator();
-    renderSummary();
-  }
-}
-function delCondVal(id, val) {
-  const c = S.conditions.find(c => c.id === id);
-  if (c) {
-    c.values = c.values.filter(v => v !== val);
-    renderConds();
-    runSimulator();
-    renderSummary();
-  }
-}
-function chNumVal(id, val) {
-  const c = S.conditions.find(c => c.id === id);
-  if (c) { c.values = [val]; runSimulator(); renderSummary(); }
+/* ── TYPE CARDS ────────────────────────────────────────── */
+function selectType(el,name){
+  document.querySelectorAll('.type-card').forEach(c=>c.classList.remove('selected'));
+  el.classList.add('selected'); S.selectedType=name;
+  document.getElementById('sumType').textContent=name;
+  document.getElementById('sumType').style.color='var(--text)';
 }
 
-function renderConds() {
-  const list = document.getElementById('condList');
-  if (S.conditions.length === 0) {
-    list.innerHTML = `
-      <div class="cond-empty">
-        <div class="cond-empty-icon">📋</div>
-        <div class="cond-empty-title">لا توجد شروط بعد</div>
-        <div class="cond-empty-sub">المسار بدون شروط سيُطبَّق على جميع الطلبات تلقائياً</div>
-      </div>`;
-    return;
-  }
-  list.innerHTML = '';
-  S.conditions.forEach((cond, idx) => {
-    if (idx > 0) {
-      const conn = document.createElement('div');
-      conn.className = 'logic-conn';
-      const pillClass = S.logic === 'OR' ? 'logic-pill or' : 'logic-pill';
-      const pillText  = S.logic === 'AND' ? 'و' : 'أو';
-      conn.innerHTML = `<div class="logic-line"></div><div class="${pillClass}">${pillText}</div><div class="logic-line"></div>`;
-      list.appendChild(conn);
-    }
-    const row = document.createElement('div');
-    row.className = 'cond-row fade-in';
-    const typeOpts = COND_TYPES.map(t =>
-      `<option value="${t}" ${t===cond.type?'selected':''}>${t}</option>`).join('');
-    const opOpts = (OPERATORS[cond.type]||[]).map(o =>
-      `<option value="${o}" ${o===cond.operator?'selected':''}>${o}</option>`).join('');
-    const isChip = ['المدينة / المنطقة','المنتجات','الفئات'].includes(cond.type);
-    const isNum  = ['وزن الطلب','قيمة الطلب','الكمية'].includes(cond.type);
-    let valHtml = '';
-    if (isChip) {
-      const chips = cond.values.map(v =>
-        `<div class="chip" style="font-size:11.5px;padding:2px 8px">${v}<span class="chip-x" onclick="delCondVal(${cond.id},'${v}')">×</span></div>`).join('');
-      const ph = cond.type==='المدينة / المنطقة' ? 'اكتب مدينة...' : 'اكتب للبحث...';
-      valHtml = `<div class="chip-wrap" style="flex:1;min-width:120px;cursor:text"
-          onclick="this.querySelector('input').focus()">
-          ${chips}
-          <input class="chip-input" placeholder="${ph}"
-            onkeydown="addCondVal(event,${cond.id})">
-        </div>`;
-    } else {
-      const unit = cond.type==='وزن الطلب'?'كغ': cond.type==='قيمة الطلب'?'ريال':'';
-      valHtml = `<div style="display:flex;align-items:center;gap:6px;flex:1">
-          <input type="number" class="f-input" value="${cond.values[0]||''}"
-            placeholder="أدخل القيمة" oninput="chNumVal(${cond.id},this.value)"
-            style="flex:1;padding:7px 10px">
-          ${unit ? `<span class="text-sm text-gray">${unit}</span>` : ''}
-        </div>`;
-    }
-    row.innerHTML = `
-      <div class="cond-icon">${TYPE_ICONS[cond.type]||'📌'}</div>
-      <select class="cond-select" onchange="chType(${cond.id},this.value)">${typeOpts}</select>
-      <select class="cond-select" onchange="chOp(${cond.id},this.value)">${opOpts}</select>
-      ${valHtml}
-      <button class="cond-del" onclick="delCond(${cond.id})" title="حذف">
-        <i data-lucide="trash-2" style="width:14px;height:14px"></i>
-      </button>`;
-    list.appendChild(row);
-  });
-  lucide.createIcons();
-  checkConflict();
-}
-
-function setLogic(mode) {
-  S.logic = mode;
-  document.getElementById('andBtn').classList.toggle('active', mode==='AND');
-  document.getElementById('orBtn').classList.toggle('active',  mode==='OR');
-  renderConds();
-  runSimulator();
-}
-
-function checkConflict() {
-  const banner = document.getElementById('conflictBanner');
-  const cityConds = S.conditions.filter(c => c.type==='المدينة / المنطقة');
-  let conflict = false;
-  if (S.logic === 'AND') {
-    for (let i=0; i<cityConds.length; i++) {
-      for (let j=i+1; j<cityConds.length; j++) {
-        const a = cityConds[i], b = cityConds[j];
-        if (a.operator==='تساوي' && b.operator==='لا تساوي') {
-          if (a.values.some(v => b.values.includes(v))) { conflict = true; break; }
-        }
-        if (a.operator==='لا تساوي' && b.operator==='تساوي') {
-          if (b.values.some(v => a.values.includes(v))) { conflict = true; break; }
-        }
-      }
-    }
-  }
-  banner.classList.toggle('hidden', !conflict);
-}
-
-/* ════════════════════════════════════════════════════
-   CARRIERS
-═══════════════════════════════════════════════════ */
-function renderCarriers() {
-  const list = document.getElementById('carrierList');
-  list.innerHTML = S.carriers.map(c => `
+/* ── CARRIERS ───────────────────────────────────────────── */
+function renderCarriers(){
+  const list=document.getElementById('carrierList');
+  list.innerHTML=S.carriers.map(c=>`
     <div class="carrier-row">
       <div class="carrier-logo" style="background:${c.color}">${c.abbr}</div>
-      <div style="flex:1">
-        <div style="font-size:14px;font-weight:600">${c.name}</div>
-        <div style="font-size:12px;color:var(--salla-gray)">${c.delivery}</div>
+      <div class="carrier-info">
+        <div class="carrier-name">${c.name}</div>
+        <div class="carrier-delivery">${c.delivery}</div>
       </div>
-      <label class="toggle-sw">
+      <div class="carrier-price">${c.price} ريال</div>
+      <label class="tog">
         <input type="checkbox" ${c.enabled?'checked':''} onchange="toggleCarrier(${c.id})">
-        <span class="toggle-knob"></span>
+        <span class="tog-track"></span>
       </label>
     </div>`).join('');
-  updateCarrierCount();
-  renderSummaryCarriers();
+  renderSummaryCarriers(); updateSummaryStatus();
+}
+function toggleCarrier(id){
+  const c=S.carriers.find(c=>c.id===id); if(!c)return;
+  c.enabled=!c.enabled; renderSummaryCarriers(); updateSummaryStatus(); runSim();
 }
 
-function toggleCarrier(id) {
-  const c = S.carriers.find(c => c.id===id);
-  if (c) { c.enabled = !c.enabled; updateCarrierCount(); renderSummaryCarriers(); updateSummaryStatus(); runSimulator(); }
-}
-function updateCarrierCount() {
-  const n = S.carriers.filter(c=>c.enabled).length;
-  document.getElementById('carrierCount').textContent = `${n} شركة${n!==1?'':'ات'} محددة`;
-}
+/* ── CONDITIONS ─────────────────────────────────────────── */
+function addCondData(type,op,vals){ S.conditions.push({id:++S.condId,type,operator:op,values:[...vals]}); }
+function addCond(){ addCondData('المدينة / المنطقة','تساوي',[]); renderConds(); runSim(); renderSummary(); }
+function addGrpCond(){ addCondData('قيمة الطلب','أكبر من',[]); renderConds(); runSim(); renderSummary(); }
+function delCond(id){ S.conditions=S.conditions.filter(c=>c.id!==id); renderConds(); runSim(); renderSummary(); checkConflict(); }
+function chType(id,t){ const c=S.conditions.find(c=>c.id===id); if(!c)return; c.type=t; c.operator=(OPERATORS[t]||[])[0]; c.values=[]; renderConds(); runSim(); checkConflict(); }
+function chOp(id,op){ const c=S.conditions.find(c=>c.id===id); if(c){c.operator=op; checkConflict(); runSim();} }
+function addCondVal(e,id){ if(e.key!=='Enter')return; const v=e.target.value.trim(); if(!v)return; const c=S.conditions.find(c=>c.id===id); if(c&&!c.values.includes(v)){c.values.push(v);e.target.value='';renderConds();runSim();renderSummary();} }
+function delCondVal(id,val){ const c=S.conditions.find(c=>c.id===id); if(c){c.values=c.values.filter(v=>v!==val);renderConds();runSim();renderSummary();} }
+function chNum(id,v){ const c=S.conditions.find(c=>c.id===id); if(c){c.values=[v];runSim();renderSummary();} }
+function setLogic(m){ S.logic=m; document.getElementById('andBtn').classList.toggle('active',m==='AND'); document.getElementById('orBtn').classList.toggle('active',m==='OR'); renderConds(); runSim(); }
 
-/* ── SIMULATOR ────────────────────────────────────── */
-function toggleSimProd(el) {
-  const prod = el.dataset.prod;
-  if (S.simActiveProds.includes(prod)) {
-    S.simActiveProds = S.simActiveProds.filter(p=>p!==prod);
-    el.classList.remove('on'); el.classList.add('off');
-  } else {
-    S.simActiveProds.push(prod);
-    el.classList.remove('off'); el.classList.add('on');
+function renderConds(){
+  const list=document.getElementById('condList');
+  if(S.conditions.length===0){
+    list.innerHTML=`
+      <div class="cond-empty">
+        <div class="cond-empty-icon"><i data-lucide="file-minus" style="width:36px;height:36px;opacity:0.35"></i></div>
+        <div class="cond-empty-title">لا توجد شروط</div>
+        <div class="cond-empty-sub">سيتم عرض كل شركات الشحن في حالة عدم وجود أي شروط</div>
+        <button class="btn btn-teal btn-sm" onclick="addCond()" style="margin-top:4px">
+          <i data-lucide="plus" style="width:13px;height:13px"></i> إضافة شرط جديد
+        </button>
+      </div>`;
+    lucide.createIcons(); checkConflict(); return;
   }
-  runSimulator();
+  list.innerHTML='';
+  S.conditions.forEach((cond,idx)=>{
+    if(idx>0){
+      const conn=document.createElement('div'); conn.className='logic-conn';
+      conn.innerHTML=`<div class="logic-line"></div><div class="logic-pill ${S.logic==='OR'?'or':''}">${S.logic==='AND'?'و':'أو'}</div><div class="logic-line"></div>`;
+      list.appendChild(conn);
+    }
+    const row=document.createElement('div'); row.className='cond-row fade-in';
+    const typeOpts=COND_TYPES.map(t=>`<option ${t===cond.type?'selected':''}>${t}</option>`).join('');
+    const opOpts=(OPERATORS[cond.type]||[]).map(o=>`<option ${o===cond.operator?'selected':''}>${o}</option>`).join('');
+    const isChip=['المدينة / المنطقة','المنتجات','الفئات'].includes(cond.type);
+    let valHtml='';
+    if(isChip){
+      const chips=cond.values.map(v=>`<div class="chip">${v}<span class="chip-x" onclick="delCondVal(${cond.id},'${v}')">×</span></div>`).join('');
+      const ph=cond.type==='المدينة / المنطقة'?'اكتب مدينة...':'اكتب للبحث...';
+      valHtml=`<div class="chip-wrap" onclick="this.querySelector('input').focus()">${chips}<input class="chip-input" placeholder="${ph}" onkeydown="addCondVal(event,${cond.id})"></div>`;
+    } else {
+      const unit=cond.type==='وزن الطلب'?'كغ':cond.type==='قيمة الطلب'?'ريال':'';
+      valHtml=`<div style="display:flex;align-items:center;gap:6px;flex:1"><input type="number" class="f-input" value="${cond.values[0]||''}" placeholder="أدخل القيمة" oninput="chNum(${cond.id},this.value)" style="flex:1;padding:7px 10px">${unit?`<span class="text-muted text-xs">${unit}</span>`:''}</div>`;
+    }
+    row.innerHTML=`
+      <div class="cond-icon">${TYPE_ICONS[cond.type]||'📌'}</div>
+      <select class="cond-sel" onchange="chType(${cond.id},this.value)">${typeOpts}</select>
+      <select class="cond-sel" onchange="chOp(${cond.id},this.value)">${opOpts}</select>
+      ${valHtml}
+      <button class="cond-del" onclick="delCond(${cond.id})"><i data-lucide="trash-2" style="width:13px;height:13px"></i></button>`;
+    list.appendChild(row);
+  });
+  lucide.createIcons(); checkConflict();
 }
 
-function runSimulator() {
-  const resultEl  = document.getElementById('simResult');
-  const previewEl = document.getElementById('simCarrierPreview');
-  resultEl.classList.add('sim-fade');
-  setTimeout(() => resultEl.classList.remove('sim-fade'), 300);
-
-  const city   = document.getElementById('simCity').value;
-  const weight = parseFloat(document.getElementById('simWeight').value)||0;
-  const value  = parseFloat(document.getElementById('simValue').value)||0;
-
-  if (S.conditions.length === 0) {
-    resultEl.className = 'sim-result warn';
-    resultEl.innerHTML = `
-      <div class="sim-result-title"><span>⚠️</span>
-        <span style="color:#92400E">لا توجد شروط — سيُطبَّق على كل الطلبات</span>
-      </div>
-      <p style="font-size:12px;color:#92400E;margin-top:4px">أضف شروطاً لتحديد متى يُطبَّق هذا المسار</p>`;
-    previewEl.classList.add('hidden');
-    return;
+function checkConflict(){
+  const cc=S.conditions.filter(c=>c.type==='المدينة / المنطقة');
+  let conflict=false;
+  if(S.logic==='AND') for(let i=0;i<cc.length;i++) for(let j=i+1;j<cc.length;j++){
+    const a=cc[i],b=cc[j];
+    if(a.operator==='تساوي'&&b.operator==='لا تساوي'&&a.values.some(v=>b.values.includes(v))) conflict=true;
+    if(a.operator==='لا تساوي'&&b.operator==='تساوي'&&b.values.some(v=>a.values.includes(v))) conflict=true;
   }
+  document.getElementById('conflictBar').classList.toggle('hidden',!conflict);
+}
 
-  const matches = S.conditions.map(cond => evalCond(cond, city, weight, value));
-  const overall = S.logic==='AND' ? matches.every(Boolean) : matches.some(Boolean);
+/* ── SIMULATOR ──────────────────────────────────────────── */
+function toggleSimProd(el){ const p=el.dataset.p; if(S.simProds.includes(p)){S.simProds=S.simProds.filter(x=>x!==p);el.classList.remove('on');el.classList.add('off');}else{S.simProds.push(p);el.classList.remove('off');el.classList.add('on');} runSim(); }
 
-  if (overall) {
-    resultEl.className = 'sim-result match';
-    resultEl.innerHTML = `
-      <div class="sim-result-title"><span>✅</span>
-        <span style="color:var(--salla-green)">هذا المسار سيُطبَّق على هذا الطلب</span>
-      </div>
-      <p style="font-size:12px;color:var(--salla-green);margin-top:4px">سيرى العميل خيارات الشحن التالية:</p>`;
-    previewEl.classList.remove('hidden');
-    renderSimCarriers();
-    if (!S.happyShown) { S.happyShown = true; setTimeout(doHappyMoment, 400); }
+function runSim(){
+  const res=document.getElementById('simResult'); const prev=document.getElementById('simCarrierPreview');
+  res.classList.add('sim-fade'); setTimeout(()=>res.classList.remove('sim-fade'),250);
+  const city=document.getElementById('simCity').value;
+  const wt=parseFloat(document.getElementById('simWt').value)||0;
+  const val=parseFloat(document.getElementById('simVal').value)||0;
+  if(S.conditions.length===0){
+    res.className='sim-result warn';
+    res.innerHTML='<div class="sim-result-title"><span>⚠️</span><span style="color:#92400E">لا توجد شروط — سيُطبَّق على كل الطلبات</span></div><p style="font-size:11px;color:#92400E;margin-top:3px">أضف شروطاً لتحديد نطاق المسار</p>';
+    prev.classList.add('hidden'); updateSummaryStatus(); return;
+  }
+  const matches=S.conditions.map(c=>evalCond(c,city,wt,val));
+  const ok=S.logic==='AND'?matches.every(Boolean):matches.some(Boolean);
+  if(ok){
+    res.className='sim-result match';
+    res.innerHTML='<div class="sim-result-title"><span>✅</span><span style="color:var(--green)">هذا المسار سيُطبَّق على هذا الطلب</span></div><p style="font-size:11px;color:var(--green);margin-top:3px">سيرى العميل خيارات الشحن التالية:</p>';
+    prev.classList.remove('hidden'); renderSimCarriers();
+    if(!S.happyShown){S.happyShown=true;setTimeout(()=>{spawnConfetti();showToast('🎉 مسارك يعمل! عميلك سيرى خيارات الشحن.','success')},400);}
   } else {
-    resultEl.className = 'sim-result miss';
-    resultEl.innerHTML = `
-      <div class="sim-result-title"><span>🔴</span>
-        <span style="color:var(--salla-red)">لن يُطبَّق على هذا الطلب</span>
-      </div>
-      <p style="font-size:12px;color:var(--salla-red);margin-top:4px">لا توجد خيارات شحن للعميل في هذه الحالة</p>`;
-    previewEl.classList.add('hidden');
+    res.className='sim-result miss';
+    res.innerHTML='<div class="sim-result-title"><span>🔴</span><span style="color:var(--red)">لن يُطبَّق على هذا الطلب</span></div><p style="font-size:11px;color:var(--red);margin-top:3px">لا توجد خيارات شحن للعميل في هذه الحالة</p>';
+    prev.classList.add('hidden');
   }
   updateSummaryStatus();
 }
 
-function evalCond(cond, city, weight, value) {
-  if (cond.type === 'المدينة / المنطقة') {
-    const inList = cond.values.includes(city);
-    return cond.operator === 'تساوي' ? inList : !inList;
-  }
-  if (cond.type === 'المنتجات' || cond.type === 'الفئات') {
-    const hasMatch = S.simActiveProds.some(p => cond.values.includes(p));
-    return (cond.operator === 'موجود في السلة' || cond.operator === 'من القائمة موجودة في السلة')
-      ? hasMatch : !hasMatch;
-  }
-  const thr = parseFloat(cond.values[0])||0;
-  const v   = cond.type==='وزن الطلب' ? weight : value;
-  if (cond.operator==='أكبر من') return v > thr;
-  if (cond.operator==='أصغر من') return v < thr;
-  return v === thr;
+function evalCond(c,city,wt,val){
+  if(c.type==='المدينة / المنطقة'){const inL=c.values.includes(city);return c.operator==='تساوي'?inL:!inL;}
+  if(c.type==='المنتجات'||c.type==='الفئات'){const m=S.simProds.some(p=>c.values.includes(p));return(c.operator==='موجود في السلة'||c.operator==='✦ من القائمة فقط')?m:!m;}
+  const thr=parseFloat(c.values[0])||0;
+  const v=c.type==='وزن الطلب'?wt:val;
+  return c.operator==='أكبر من'?v>thr:c.operator==='أصغر من'?v<thr:v===thr;
 }
 
-function renderSimCarriers() {
-  const enabled = S.carriers.filter(c=>c.enabled);
-  document.getElementById('simCarrierList').innerHTML = enabled.map(c => `
-    <div class="sim-carrier-row">
+function renderSimCarriers(){
+  const en=S.carriers.filter(c=>c.enabled);
+  document.getElementById('simCarrierList').innerHTML=en.map(c=>`
+    <div class="sim-carrier-opt">
       <div class="radio-dot"></div>
-      <div style="width:22px;height:22px;background:${c.color};border-radius:4px;flex-shrink:0"></div>
+      <div style="width:20px;height:20px;background:${c.color};border-radius:4px;flex-shrink:0"></div>
       <div>
-        <div style="font-size:12px;font-weight:600">${c.name}</div>
-        <div style="font-size:11px;color:var(--salla-gray)">${c.delivery}</div>
+        <div style="font-size:11px;font-weight:600">${c.name}</div>
+        <div style="font-size:10px;color:var(--muted)">${c.delivery}</div>
       </div>
+      <span style="font-size:11px;font-weight:700;margin-right:auto">${c.price} ر</span>
     </div>`).join('');
 }
 
-function doHappyMoment() {
-  spawnConfetti();
-  showToast('🎉 مسارك يعمل! عميلك سيرى خيارات الشحن.', 'success');
+/* ── SUMMARY ────────────────────────────────────────────── */
+function renderSummary(){ renderSummaryName(); renderSummaryConds(); renderSummaryCarriers(); updateSummaryStatus(); }
+function renderSummaryName(){
+  const el=document.getElementById('sumName');
+  el.textContent=S.routeName||'لم يُحدَّد بعد';
+  el.style.color=S.routeName?'var(--text)':'var(--muted)';
+  el.style.fontStyle=S.routeName?'normal':'italic';
+  el.style.fontWeight=S.routeName?'600':'400';
 }
-
-/* ════════════════════════════════════════════════════
-   SUMMARY
-═══════════════════════════════════════════════════ */
-function renderSummary() {
-  renderSummaryName();
-  renderSummaryConds();
-  renderSummaryCarriers();
-  updateSummaryStatus();
+function renderSummaryConds(){
+  const el=document.getElementById('sumConds');
+  if(!S.conditions.length){el.innerHTML='<div style="font-size:12px;color:var(--muted);font-style:italic">لا توجد شروط</div>';return;}
+  el.innerHTML=S.conditions.map(c=>{
+    const icon=TYPE_ICONS[c.type]||'📌';
+    const vals=!c.values.length?'غير محدد':c.values.length<=2?c.values.join('، '):`${c.values.slice(0,2).join('، ')} (+${c.values.length-2})`;
+    return`<div class="sum-item">${icon}<span class="text-muted text-xs">${c.type}:</span><span style="font-size:12px">${vals}</span></div>`;
+  }).join('');
 }
-function renderSummaryName() {
-  const el = document.getElementById('sumName');
-  el.textContent   = S.routeName || 'لم يُحدَّد بعد';
-  el.style.color       = S.routeName ? 'var(--salla-dark)' : 'var(--salla-gray)';
-  el.style.fontStyle   = S.routeName ? 'normal' : 'italic';
-  el.style.fontWeight  = S.routeName ? '600' : '400';
+function renderSummaryCarriers(){
+  const el=document.getElementById('sumCarriers');
+  const on=S.carriers.filter(c=>c.enabled);
+  if(!on.length){el.innerHTML='<div style="font-size:12px;color:var(--muted);font-style:italic">لم تُختَر بعد</div>';return;}
+  el.innerHTML=on.map(c=>`<div class="sum-item"><div class="sum-dot" style="background:${c.color}"></div><span style="font-size:12px">${c.name}</span></div>`).join('');
 }
-function renderSummaryConds() {
-  const el = document.getElementById('sumConds');
-  if (S.conditions.length === 0) {
-    el.innerHTML = `<div style="font-size:13px;color:var(--salla-gray);font-style:italic">لا توجد شروط</div>`;
+function updateSummaryStatus(){
+  const en=S.carriers.filter(c=>c.enabled);
+  const ready=S.routeName&&en.length>0;
+  const st=document.getElementById('sumStatus');
+  const ap=document.getElementById('sumApplies');
+  if(ready){
+    st.innerHTML='<div class="status-indicator" style="background:var(--green)"></div><span style="font-size:12px;color:var(--green);font-weight:600">جاهز للحفظ</span>';
+    const cities=S.conditions.filter(c=>c.type==='المدينة / المنطقة'&&c.operator==='تساوي').flatMap(c=>c.values);
+    ap.textContent=cities.length?`سيُطبَّق على: ${cities.slice(0,3).join('، ')}${cities.length>3?` (+${cities.length-3})`:''}`:S.conditions.length===0?'سيُطبَّق على: كل الطلبات':'شروط مخصصة';
   } else {
-    el.innerHTML = S.conditions.map(c => {
-      const icon = TYPE_ICONS[c.type]||'📌';
-      const vals = c.values.length === 0 ? 'غير محدد'
-        : c.values.length <= 2 ? c.values.join('، ')
-        : `${c.values.slice(0,2).join('، ')} (+${c.values.length-2})`;
-      return `<div class="sum-item">${icon}
-        <span class="text-gray text-sm">${c.type}:</span>
-        <span class="text-sm">${vals}</span>
-      </div>`;
-    }).join('');
-  }
-}
-function renderSummaryCarriers() {
-  const el = document.getElementById('sumCarriers');
-  const on = S.carriers.filter(c=>c.enabled);
-  if (on.length === 0) {
-    el.innerHTML = `<div style="font-size:13px;color:var(--salla-gray);font-style:italic">لم يُختَر شركات</div>`;
-  } else {
-    el.innerHTML = on.map(c =>
-      `<div class="sum-item">
-         <div class="status-dot" style="background:${c.color}"></div>
-         <span class="text-sm">${c.name}</span>
-       </div>`).join('');
-  }
-}
-function updateSummaryStatus() {
-  const statusEl  = document.getElementById('sumStatus');
-  const appliesEl = document.getElementById('sumApplies');
-  const enabled   = S.carriers.filter(c=>c.enabled);
-  const ready     = S.routeName && enabled.length > 0;
-  if (ready) {
-    statusEl.innerHTML = `
-      <div class="status-dot" style="background:var(--salla-green)"></div>
-      <span style="font-size:13px;color:var(--salla-green);font-weight:600">جاهز للحفظ</span>`;
-    const cities = S.conditions
-      .filter(c=>c.type==='المدينة / المنطقة' && c.operator==='تساوي')
-      .flatMap(c=>c.values);
-    if (cities.length > 0) {
-      const preview = cities.slice(0,3).join('، ') + (cities.length>3 ? ` (+${cities.length-3})` : '');
-      appliesEl.textContent = `سيُطبَّق على: ${preview}`;
-    } else {
-      appliesEl.textContent = S.conditions.length===0 ? 'سيُطبَّق على: كل الطلبات' : 'شروط مخصصة';
-    }
-  } else {
-    statusEl.innerHTML = `
-      <div class="status-dot" style="background:var(--salla-orange)"></div>
-      <span style="font-size:13px;color:var(--salla-orange);font-weight:600">في انتظار الإعداد</span>`;
-    appliesEl.textContent = !S.routeName ? 'أضف اسماً للمسار لإكمال الإعداد'
-      : enabled.length===0 ? 'اختر شركة شحن واحدة على الأقل' : '';
+    st.innerHTML='<div class="status-indicator" style="background:var(--orange)"></div><span style="font-size:12px;color:var(--orange);font-weight:600">في انتظار الإعداد</span>';
+    ap.textContent=!S.routeName?'أضف اسماً للمسار لإكمال الإعداد':en.length===0?'اختر شركة شحن واحدة على الأقل':'';
   }
 }
 
-/* ════════════════════════════════════════════════════
-   SAVE
-═══════════════════════════════════════════════════ */
-function handleSave(e) {
-  const btn = e.currentTarget;
-  const orig = btn.innerHTML;
-  btn.innerHTML = '<i data-lucide="loader" style="width:15px;height:15px"></i> جاري الحفظ...';
-  btn.disabled = true;
-  lucide.createIcons();
-  setTimeout(() => {
-    btn.innerHTML = '<i data-lucide="check-circle" style="width:15px;height:15px"></i> تم الحفظ';
-    btn.style.background = 'var(--salla-green)';
-    showToast('✅ تم حفظ المسار بنجاح', 'success');
-    setTimeout(() => {
-      btn.innerHTML = orig;
-      btn.style.background = '';
-      btn.disabled = false;
-      lucide.createIcons();
-    }, 3000);
-  }, 1300);
+/* ── SAVE ───────────────────────────────────────────────── */
+function handleSave(e){
+  const btn=e.currentTarget; const orig=btn.innerHTML;
+  btn.innerHTML='<i data-lucide="loader" style="width:14px;height:14px"></i> جاري الحفظ...';
+  btn.disabled=true; lucide.createIcons();
+  setTimeout(()=>{
+    btn.innerHTML='<i data-lucide="check-circle" style="width:14px;height:14px"></i> تم الحفظ';
+    btn.style.background='var(--green)'; showToast('✅ تم حفظ المسار بنجاح','success');
+    setTimeout(()=>{btn.innerHTML=orig;btn.style.background='';btn.disabled=false;lucide.createIcons();},3000);
+  },1300);
 }
 
-/* ════════════════════════════════════════════════════
-   TOAST & CONFETTI
-═══════════════════════════════════════════════════ */
-function showToast(msg, type='') {
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.className = 'show' + (type ? ' t-'+type : '');
-  setTimeout(() => { t.className = ''; }, 3800);
+/* ── TOAST & CONFETTI ──────────────────────────────────── */
+function showToast(msg,type=''){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.className='show'+(type?` t-${type}`:'');
+  setTimeout(()=>{t.className='';},3800);
 }
-
-function spawnConfetti() {
-  const ctn = document.getElementById('confetti');
-  const cols = ['#04B49C','#7B2D8B','#F59E0B','#EF4444','#10B981','#3B82F6','#EC4899','#F97316'];
-  for (let i=0; i<70; i++) {
-    const d = document.createElement('div');
-    d.className = 'cf';
-    const size = Math.random()*8+4;
-    d.style.cssText = [
-      `left:${Math.random()*100}%`,
-      `width:${size}px`,
-      `height:${size}px`,
-      `background:${cols[Math.floor(Math.random()*cols.length)]}`,
-      `border-radius:${Math.random()>0.4?'50%':'3px'}`,
-      `animation-duration:${Math.random()*2+2.5}s`,
-      `animation-delay:${Math.random()*1.2}s`,
-      `transform:rotate(${Math.random()*360}deg)`,
-    ].join(';');
-    ctn.appendChild(d);
-    setTimeout(() => d.remove(), 5000);
+function spawnConfetti(){
+  const ctn=document.getElementById('confetti');
+  const cols=['#04B49C','#7B2D8B','#F59E0B','#EF4444','#10B981','#3B82F6','#EC4899'];
+  for(let i=0;i<65;i++){
+    const d=document.createElement('div'); d.className='cf';
+    const sz=Math.random()*8+4;
+    d.style.cssText=`left:${Math.random()*100}%;width:${sz}px;height:${sz}px;background:${cols[Math.floor(Math.random()*cols.length)]};border-radius:${Math.random()>.4?'50%':'3px'};animation-duration:${Math.random()*2+2.5}s;animation-delay:${Math.random()*1.2}s`;
+    ctn.appendChild(d); setTimeout(()=>d.remove(),5000);
   }
 }
 </script>
