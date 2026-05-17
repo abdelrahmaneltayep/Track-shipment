@@ -1,0 +1,1010 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="ar">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>المسارات — نموذج تفاعلي</title>
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { tajawal: ['Tajawal','sans-serif'] },
+          colors: {
+            teal: { DEFAULT:'#04B49C', dark:'#0E6B5E', light:'#E6F7F5' },
+            purple: { DEFAULT:'#7B2D8B', light:'#F9F0FF' },
+          }
+        }
+      }
+    }
+  </script>
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+  <style>
+    body { font-family: 'Tajawal', sans-serif; }
+    [x-cloak] { display: none !important; }
+
+    /* Smooth fade for x-show elements */
+    [x-show] { transition: opacity 0.2s ease; }
+
+    /* Scrollbar styling */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb { background: #c1c1c1; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #a1a1a1; }
+
+    /* Custom toggle underline tab */
+    .nav-tab-active {
+      border-bottom: 3px solid #04B49C;
+      color: #04B49C;
+    }
+
+    /* Operator badge circle */
+    .op-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      font-family: monospace;
+      font-weight: bold;
+      font-size: 16px;
+      flex-shrink: 0;
+    }
+
+    /* Step circle */
+    .step-circle {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      font-size: 13px;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+
+    /* Product tag */
+    .product-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: #E6F7F5;
+      color: #04B49C;
+      border: 1px solid #04B49C;
+      border-radius: 20px;
+      padding: 3px 10px;
+      font-size: 13px;
+      font-weight: 500;
+    }
+
+    /* Range slider teal */
+    input[type="range"] {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 100%;
+      height: 6px;
+      background: #E6F7F5;
+      border-radius: 4px;
+      outline: none;
+    }
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: #04B49C;
+      cursor: pointer;
+      border: 2px solid white;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+    }
+
+    /* Segmented control selected */
+    .seg-selected {
+      background: #04B49C;
+      color: white;
+    }
+
+    /* Floating btn pulse */
+    @keyframes soft-pulse {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(4,180,156,0.4); }
+      50% { box-shadow: 0 0 0 8px rgba(4,180,156,0); }
+    }
+    .floating-btn { animation: soft-pulse 2.5s infinite; }
+
+    /* Dropdown animation handled via x-transition */
+  </style>
+</head>
+<body class="bg-[#F8F9FB] text-[#1A1A2E] min-h-screen font-tajawal" x-data="appData()" x-cloak>
+
+  <!-- ═══ TOAST ═══ -->
+  <div
+    x-show="showToast"
+    x-transition:enter="transition ease-out duration-300"
+    x-transition:enter-start="opacity-0 -translate-y-2"
+    x-transition:enter-end="opacity-100 translate-y-0"
+    x-transition:leave="transition ease-in duration-200"
+    x-transition:leave-end="opacity-0 -translate-y-2"
+    :class="toastType==='success' ? 'bg-green-50 border-green-500 text-green-800' : 'bg-amber-50 border-amber-500 text-amber-800'"
+    class="fixed top-4 left-4 z-50 border rounded-xl px-4 py-3 shadow-lg text-sm font-medium max-w-xs"
+    style="direction:rtl"
+  >
+    <span x-text="toastMsg"></span>
+  </div>
+
+  <!-- ═══ TOP NAV ═══ -->
+  <nav class="bg-[#1A1A2E] h-14 flex items-center justify-between px-6 sticky top-0 z-30">
+    <!-- Right: Brand -->
+    <div class="flex items-center gap-3">
+      <span class="bg-teal text-white text-xs font-bold px-3 py-1 rounded-full tracking-wide">salla</span>
+      <span class="text-gray-400 text-xs">متجر وليد عيسى</span>
+    </div>
+
+    <!-- Center: View Toggle Tabs -->
+    <div class="flex items-center gap-0 border-b border-gray-700 h-14">
+      <button
+        @click="view='builder'"
+        :class="view==='builder' ? 'nav-tab-active text-teal' : 'text-gray-400 hover:text-gray-200'"
+        class="px-5 h-full text-sm font-medium transition-colors"
+      >
+        🛠 بناء المسار
+      </button>
+      <button
+        @click="view='simulation'"
+        :class="view==='simulation' ? 'nav-tab-active text-teal' : 'text-gray-400 hover:text-gray-200'"
+        class="px-5 h-full text-sm font-medium transition-colors"
+      >
+        🧪 وضع المحاكاة
+      </button>
+    </div>
+
+    <!-- Left: Info + Avatar -->
+    <div class="flex items-center gap-3">
+      <span class="text-gray-500 text-xs hidden md:block">نموذج تفاعلي — للاختبار الداخلي فقط | المسارات v2</span>
+      <div class="w-8 h-8 rounded-full bg-teal flex items-center justify-center text-white text-xs font-bold">و</div>
+    </div>
+  </nav>
+
+  <!-- ══════════════════════════════════════════════════════ -->
+  <!-- VIEW A — ROUTE BUILDER                                 -->
+  <!-- ══════════════════════════════════════════════════════ -->
+  <div
+    x-show="view === 'builder'"
+    x-transition:enter="transition ease-out duration-200"
+    x-transition:enter-start="opacity-0"
+    x-transition:enter-end="opacity-100"
+    x-transition:leave="transition ease-in duration-150"
+    x-transition:leave-end="opacity-0"
+    class="max-w-3xl mx-auto px-4 py-8"
+  >
+    <!-- Page Header -->
+    <div class="flex items-center justify-between mb-2">
+      <div class="flex items-center gap-2">
+        <button class="text-gray-500 hover:text-gray-700 text-sm">←</button>
+        <h1 class="text-xl font-bold">إنشاء مسار جديد</h1>
+      </div>
+      <button class="bg-teal text-white text-sm font-semibold px-5 py-2 rounded-xl hover:bg-teal-dark transition-colors shadow-sm">
+        حفظ المسار
+      </button>
+    </div>
+    <!-- Breadcrumb -->
+    <p class="text-xs text-gray-400 mb-6 me-1">الشحن &rsaquo; الإعدادات &rsaquo; مسارات الشحن &rsaquo; مسار جديد</p>
+
+    <!-- ── CONDITIONS CARD ── -->
+    <div class="bg-white rounded-2xl shadow-sm p-6 mb-5">
+      <div class="flex items-center justify-between mb-5">
+        <h2 class="text-base font-bold">شروط المسار</h2>
+        <button
+          @click="addCondition()"
+          class="text-teal border border-teal text-sm font-semibold px-4 py-1.5 rounded-lg hover:bg-teal-light transition-colors"
+        >
+          + إضافة شرط
+        </button>
+      </div>
+
+      <!-- Condition Rows -->
+      <div class="space-y-6">
+        <template x-for="cond in conditions" :key="cond.id">
+          <div class="border border-gray-100 rounded-xl p-4 bg-gray-50/50">
+
+            <!-- Row: Delete + Type badge + Operator dropdown -->
+            <div class="flex items-center gap-3 flex-wrap">
+              <!-- Delete -->
+              <button
+                @click="removeCondition(cond.id)"
+                class="text-red-400 hover:text-red-600 hover:bg-red-50 w-7 h-7 rounded-lg flex items-center justify-center text-sm transition-colors flex-shrink-0"
+                title="حذف الشرط"
+              >×</button>
+
+              <!-- Type badge -->
+              <span class="bg-gray-100 text-gray-600 text-xs font-medium px-3 py-1 rounded-full flex-shrink-0">
+                منتجات محددة
+              </span>
+
+              <!-- Operator Dropdown Trigger -->
+              <div class="relative flex-shrink-0">
+                <button
+                  @click="showOperatorDropdown = showOperatorDropdown === cond.id ? null : cond.id"
+                  class="flex items-center gap-2 border border-gray-200 bg-white text-sm font-medium px-3 py-1.5 rounded-lg hover:border-teal hover:text-teal transition-colors"
+                >
+                  <span
+                    class="font-mono text-xs font-bold"
+                    :class="getOperator(cond.operator)?.key === 'subset_only' ? 'text-teal' : 'text-gray-600'"
+                    x-text="getOperator(cond.operator)?.badge"
+                  ></span>
+                  <span x-text="getOperator(cond.operator)?.label"></span>
+                  <svg class="w-3 h-3 text-gray-400" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clip-rule="evenodd"/></svg>
+                </button>
+
+                <!-- Operator Dropdown Panel -->
+                <div
+                  x-show="showOperatorDropdown === cond.id"
+                  @click.outside="showOperatorDropdown = null"
+                  x-transition:enter="transition ease-out duration-100"
+                  x-transition:enter-start="opacity-0 scale-95"
+                  x-transition:enter-end="opacity-100 scale-100"
+                  x-transition:leave="transition ease-in duration-75"
+                  x-transition:leave-start="opacity-100 scale-100"
+                  x-transition:leave-end="opacity-0 scale-95"
+                  class="absolute top-full mt-2 z-20 bg-white rounded-xl shadow-xl border border-gray-100 w-80 overflow-hidden"
+                  style="right:0"
+                >
+                  <div class="p-2">
+                    <template x-for="op in operators" :key="op.key">
+                      <button
+                        @click="selectOperator(cond.id, op.key)"
+                        :class="{
+                          'border-r-[3px] border-teal bg-teal-light/50': op.key === 'subset_only',
+                          'bg-gray-50': cond.operator !== op.key && op.key !== 'subset_only'
+                        }"
+                        class="w-full text-right flex items-start gap-3 px-3 py-2.5 rounded-lg hover:bg-gray-50 transition-colors relative mb-1"
+                        :style="op.key === 'subset_only' ? 'border-right: 3px solid #04B49C;' : ''"
+                      >
+                        <!-- Badge circle -->
+                        <span
+                          class="op-badge mt-0.5"
+                          :class="op.key === 'subset_only' ? 'bg-teal/10 text-teal' : 'bg-gray-100 text-gray-600'"
+                          x-text="op.badge"
+                        ></span>
+
+                        <!-- Text -->
+                        <div class="flex-1 min-w-0">
+                          <div class="flex items-center gap-2">
+                            <span class="font-bold text-sm text-gray-800" x-text="op.label"></span>
+                            <!-- "جديد" pill -->
+                            <span x-show="op.isNew" class="bg-teal text-white text-[10px] font-bold px-2 py-0.5 rounded-full">✦ جديد</span>
+                          </div>
+                          <p class="text-xs text-gray-500 mt-0.5" x-text="op.desc"></p>
+                        </div>
+
+                        <!-- Notation + checkmark -->
+                        <div class="flex flex-col items-end gap-1 flex-shrink-0">
+                          <span
+                            class="font-mono text-xs"
+                            :class="op.key === 'subset_only' ? 'text-teal' : 'text-gray-400'"
+                            x-text="op.notation"
+                          ></span>
+                          <span x-show="cond.operator === op.key" class="text-teal text-sm">✓</span>
+                        </div>
+                      </button>
+                    </template>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Product Tags Row -->
+            <div class="mt-3 flex flex-wrap gap-2 items-center">
+              <template x-for="prod in cond.products" :key="prod">
+                <span class="product-tag">
+                  <span x-text="prod"></span>
+                  <button @click="removeProduct(cond.id, prod)" class="text-teal hover:text-teal-dark font-bold leading-none">×</button>
+                </span>
+              </template>
+
+              <!-- Add Product mini dropdown -->
+              <div class="relative" x-data="{ open: false, search: '' }">
+                <button
+                  @click="open = !open"
+                  class="text-gray-500 border border-dashed border-gray-300 hover:border-teal hover:text-teal text-xs px-3 py-1.5 rounded-full transition-colors"
+                >
+                  + إضافة منتج
+                </button>
+                <div
+                  x-show="open"
+                  @click.outside="open = false; search = ''"
+                  x-transition:enter="transition ease-out duration-100"
+                  x-transition:enter-start="opacity-0 scale-95"
+                  x-transition:enter-end="opacity-100 scale-100"
+                  class="absolute top-full mt-1 z-20 bg-white rounded-xl shadow-xl border border-gray-100 w-56"
+                  style="right:0"
+                >
+                  <div class="p-2">
+                    <input
+                      x-model="search"
+                      type="text"
+                      placeholder="ابحث عن منتج..."
+                      class="w-full text-sm border border-gray-200 rounded-lg px-3 py-1.5 mb-2 outline-none focus:border-teal"
+                    />
+                    <div class="max-h-40 overflow-y-auto space-y-0.5">
+                      <template x-for="prod in allProducts.filter(p => !cond.products.includes(p) && p.includes(search))" :key="prod">
+                        <button
+                          @click="cond.products.push(prod); open = false; search = ''"
+                          class="w-full text-right text-sm px-3 py-1.5 rounded-lg hover:bg-teal-light hover:text-teal transition-colors"
+                          x-text="prod"
+                        ></button>
+                      </template>
+                      <p
+                        x-show="allProducts.filter(p => !cond.products.includes(p) && p.includes(search)).length === 0"
+                        class="text-xs text-gray-400 text-center py-2"
+                      >لا توجد منتجات</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Inline Explanation (subset_only + products exist) -->
+            <div
+              x-show="cond.operator === 'subset_only' && cond.products.length > 0"
+              x-transition:enter="transition ease-out duration-200"
+              x-transition:enter-start="opacity-0 translate-y-1"
+              x-transition:enter-end="opacity-100 translate-y-0"
+              class="mt-3 bg-teal-light border-r-4 border-teal rounded-xl p-4"
+            >
+              <p class="text-teal-dark font-bold text-sm mb-2">💡 ماذا يعني هذا الشرط؟</p>
+              <div class="space-y-1.5">
+                <div class="flex items-start gap-2">
+                  <span class="text-green-600 text-sm">✅</span>
+                  <div class="text-sm text-gray-700">
+                    <span class="font-medium">الطلب يحتوي فقط على: </span>
+                    <span class="flex flex-wrap gap-1 mt-1">
+                      <template x-for="prod in cond.products" :key="prod">
+                        <span class="product-tag text-xs py-0.5" x-text="prod"></span>
+                      </template>
+                    </span>
+                  </div>
+                </div>
+                <div class="flex items-start gap-2">
+                  <span class="text-red-500 text-sm">❌</span>
+                  <p class="text-sm text-gray-700"><span class="font-medium">لا يُقبل:</span> طلب فيه iPhone + منتج خارج القائمة</p>
+                </div>
+                <div class="flex items-start gap-2">
+                  <span class="text-gray-400 text-sm">📌</span>
+                  <p class="text-sm text-gray-500">مثال: مسار شحن سريع للأجهزة الإلكترونية فقط</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Empty Product Warning (subset_only + no products) -->
+            <div
+              x-show="cond.operator === 'subset_only' && cond.products.length === 0"
+              x-transition:enter="transition ease-out duration-200"
+              x-transition:enter-start="opacity-0"
+              x-transition:enter-end="opacity-100"
+              class="mt-2 bg-amber-50 border border-amber-300 rounded-lg p-3 text-amber-800 text-sm"
+            >
+              ⚠️ القائمة فارغة — أضف منتجاً واحداً على الأقل لتفعيل هذا الشرط
+            </div>
+
+          </div>
+        </template>
+
+        <!-- Empty state if no conditions -->
+        <div x-show="conditions.length === 0" class="text-center py-8 text-gray-400">
+          <p class="text-sm">لا توجد شروط — أضف شرطاً لتخصيص المسار</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── ROUTE TYPE CARD ── -->
+    <div class="bg-white rounded-2xl shadow-sm p-6 mb-5">
+      <h2 class="text-base font-bold mb-4">نوع الشحن</h2>
+      <div class="grid grid-cols-3 gap-3">
+        <template x-for="type in ['شحن عادي','شحن سريع','نقطة التسليم']" :key="type">
+          <button
+            @click="routeType = type"
+            :class="routeType === type
+              ? 'border-2 border-teal bg-teal-light text-teal'
+              : 'border border-gray-200 bg-white text-gray-600 hover:border-gray-300'"
+            class="rounded-xl p-4 text-sm font-medium text-center transition-all relative"
+          >
+            <div class="flex flex-col items-center gap-2">
+              <span x-text="type === 'شحن عادي' ? '🚚' : type === 'شحن سريع' ? '⚡' : '📦'" class="text-2xl"></span>
+              <span x-text="type"></span>
+            </div>
+            <span
+              x-show="routeType === type"
+              class="absolute top-2 left-2 bg-teal text-white w-5 h-5 rounded-full flex items-center justify-center text-xs"
+            >✓</span>
+          </button>
+        </template>
+      </div>
+    </div>
+
+    <!-- ── TEST BANNER ── -->
+    <div class="bg-teal-light border border-teal/30 rounded-xl p-4 flex items-center justify-between">
+      <p class="text-sm text-teal-dark font-medium">💡 هل تريد اختبار هذا المسار قبل الحفظ؟</p>
+      <button @click="goToSimulation()" class="text-teal font-bold text-sm hover:underline">
+        تجربة الآن ←
+      </button>
+    </div>
+
+    <!-- ── FLOATING "تجربة المسار" BUTTON ── -->
+    <div class="fixed bottom-6 left-6 z-40">
+      <button
+        @click="goToSimulation()"
+        class="floating-btn bg-teal text-white rounded-2xl px-5 py-3 shadow-xl text-sm font-bold flex items-center gap-2 hover:bg-teal-dark transition-colors"
+      >
+        <span>🧪</span>
+        <span>تجربة المسار</span>
+      </button>
+    </div>
+
+  </div>
+  <!-- END VIEW A -->
+
+
+  <!-- ══════════════════════════════════════════════════════ -->
+  <!-- VIEW B — SIMULATION MODE                               -->
+  <!-- ══════════════════════════════════════════════════════ -->
+  <div
+    x-show="view === 'simulation'"
+    x-transition:enter="transition ease-out duration-200"
+    x-transition:enter-start="opacity-0"
+    x-transition:enter-end="opacity-100"
+    x-transition:leave="transition ease-in duration-150"
+    x-transition:leave-end="opacity-0"
+    class="max-w-5xl mx-auto px-4 py-8"
+  >
+    <!-- Page Header -->
+    <div class="flex items-center justify-between mb-6">
+      <button
+        @click="goToBuilder()"
+        class="flex items-center gap-2 text-gray-600 hover:text-gray-800 text-sm font-medium transition-colors"
+      >
+        <span>←</span>
+        <span>العودة للمسار</span>
+      </button>
+      <div class="flex items-center gap-2">
+        <span class="text-2xl">🧪</span>
+        <h1 class="text-xl font-bold">وضع المحاكاة</h1>
+      </div>
+      <div class="w-24"></div><!-- spacer -->
+    </div>
+
+    <!-- ── QUICK-FILL SCENARIOS ── -->
+    <div class="mb-6">
+      <div class="flex gap-2 flex-wrap justify-center mb-2">
+        <template x-for="(sc, i) in scenarios" :key="i">
+          <button
+            @click="loadScenario(sc)"
+            :title="'النتيجة المتوقعة: ' + sc.expected"
+            class="border border-gray-200 bg-white text-sm font-medium px-4 py-2 rounded-full hover:border-teal hover:text-teal hover:bg-teal-light transition-all shadow-sm"
+            x-text="sc.label"
+          ></button>
+        </template>
+      </div>
+      <p class="text-center text-xs text-gray-400">سيناريوهات جاهزة — انقر للاختبار الفوري</p>
+    </div>
+
+    <!-- ── TWO COLUMN LAYOUT ── -->
+    <div class="flex gap-6" style="flex-direction: row;">
+
+      <!-- RIGHT COLUMN (60%) — Cart Builder -->
+      <div class="w-3/5">
+        <div class="bg-white rounded-2xl shadow-sm p-6">
+          <h2 class="text-base font-bold mb-5">بيانات الطلب التجريبي</h2>
+
+          <div class="space-y-6">
+
+            <!-- Step 1: Products -->
+            <div>
+              <div class="flex items-center gap-2 mb-3">
+                <div
+                  class="step-circle"
+                  :class="cartProducts.length > 0 ? 'bg-teal text-white' : 'border-2 border-gray-300 text-gray-400'"
+                >١</div>
+                <span class="font-semibold text-sm">اختر منتجات الطلب</span>
+                <span x-show="cartProducts.length > 0" class="bg-teal text-white text-xs font-bold px-2 py-0.5 rounded-full" x-text="cartProducts.length + ' منتجات مختارة'"></span>
+              </div>
+              <!-- Selected products -->
+              <div class="flex flex-wrap gap-2 mb-3 min-h-8">
+                <template x-for="prod in cartProducts" :key="prod">
+                  <span class="product-tag">
+                    <span x-text="prod"></span>
+                    <button @click="cartProducts = cartProducts.filter(p => p !== prod)" class="text-teal hover:text-teal-dark font-bold">×</button>
+                  </span>
+                </template>
+                <span x-show="cartProducts.length === 0" class="text-gray-400 text-sm py-1">لم تختر أي منتج بعد</span>
+              </div>
+              <!-- Product search to add -->
+              <div class="relative" x-data="{ open: false, search: '' }">
+                <input
+                  type="text"
+                  x-model="search"
+                  @focus="open = true"
+                  @click.outside="open = false; search = ''"
+                  placeholder="🔍 ابحث وأضف منتجاً..."
+                  class="w-full text-sm border border-gray-200 rounded-xl px-4 py-2 outline-none focus:border-teal transition-colors"
+                />
+                <div
+                  x-show="open && allProducts.filter(p => !cartProducts.includes(p) && p.includes(search)).length > 0"
+                  class="absolute top-full mt-1 z-10 bg-white rounded-xl shadow-lg border border-gray-100 w-full"
+                >
+                  <div class="p-2 max-h-40 overflow-y-auto space-y-0.5">
+                    <template x-for="prod in allProducts.filter(p => !cartProducts.includes(p) && p.includes(search))" :key="prod">
+                      <button
+                        @click="cartProducts.push(prod); search = ''; open = false"
+                        class="w-full text-right text-sm px-3 py-2 rounded-lg hover:bg-teal-light hover:text-teal transition-colors"
+                        x-text="prod"
+                      ></button>
+                    </template>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Step 2: Cart Value -->
+            <div>
+              <div class="flex items-center gap-2 mb-3">
+                <div
+                  class="step-circle"
+                  :class="cartValue > 0 ? 'bg-teal text-white' : 'border-2 border-gray-300 text-gray-400'"
+                >٢</div>
+                <span class="font-semibold text-sm">قيمة الطلب</span>
+              </div>
+              <div class="flex items-center gap-3">
+                <div class="flex items-center border border-gray-200 rounded-xl overflow-hidden flex-1">
+                  <input
+                    type="number"
+                    x-model.number="cartValue"
+                    min="0"
+                    max="5000"
+                    class="flex-1 text-sm px-4 py-2 outline-none text-right"
+                  />
+                  <span class="bg-gray-50 border-r border-gray-200 px-3 py-2 text-sm text-gray-500">ريال</span>
+                </div>
+              </div>
+              <input
+                type="range"
+                min="0"
+                max="2000"
+                x-model.number="cartValue"
+                class="mt-2 w-full"
+              />
+              <div class="flex justify-between text-xs text-gray-400 mt-1">
+                <span>٠</span>
+                <span class="text-teal font-medium" x-text="cartValue + ' ريال'"></span>
+                <span>٢٠٠٠</span>
+              </div>
+            </div>
+
+            <!-- Step 3: Weight -->
+            <div>
+              <div class="flex items-center gap-2 mb-3">
+                <div
+                  class="step-circle"
+                  :class="cartWeight > 0 ? 'bg-teal text-white' : 'border-2 border-gray-300 text-gray-400'"
+                >٣</div>
+                <span class="font-semibold text-sm">وزن الطلب</span>
+              </div>
+              <div class="flex items-center border border-gray-200 rounded-xl overflow-hidden">
+                <input
+                  type="number"
+                  x-model.number="cartWeight"
+                  min="0"
+                  step="0.1"
+                  class="flex-1 text-sm px-4 py-2 outline-none text-right"
+                />
+                <span class="bg-gray-50 border-r border-gray-200 px-3 py-2 text-sm text-gray-500">كجم</span>
+              </div>
+            </div>
+
+            <!-- Step 4: Quantity -->
+            <div>
+              <div class="flex items-center gap-2 mb-3">
+                <div
+                  class="step-circle"
+                  :class="cartQty > 0 ? 'bg-teal text-white' : 'border-2 border-gray-300 text-gray-400'"
+                >٤</div>
+                <span class="font-semibold text-sm">كمية المنتجات</span>
+              </div>
+              <div class="flex items-center border border-gray-200 rounded-xl overflow-hidden w-40">
+                <button
+                  @click="if(cartQty > 1) cartQty--"
+                  class="px-3 py-2 text-gray-500 hover:bg-gray-50 border-l border-gray-200 transition-colors"
+                >−</button>
+                <input
+                  type="number"
+                  x-model.number="cartQty"
+                  min="1"
+                  class="flex-1 text-sm px-2 py-2 outline-none text-center"
+                />
+                <button
+                  @click="cartQty++"
+                  class="px-3 py-2 text-gray-500 hover:bg-gray-50 border-r border-gray-200 transition-colors"
+                >+</button>
+              </div>
+            </div>
+
+            <!-- Step 5: Region -->
+            <div>
+              <div class="flex items-center gap-2 mb-3">
+                <div
+                  class="step-circle"
+                  :class="cartRegion ? 'bg-teal text-white' : 'border-2 border-gray-300 text-gray-400'"
+                >٥</div>
+                <span class="font-semibold text-sm">موقع التوصيل</span>
+              </div>
+              <div class="flex flex-wrap gap-2">
+                <template x-for="region in ['المنطقة الوسطى','الغربية','الشرقية','الشمالية','الجنوبية']" :key="region">
+                  <button
+                    @click="cartRegion = region"
+                    :class="cartRegion === region
+                      ? 'bg-teal text-white border-teal'
+                      : 'bg-white text-gray-600 border-gray-200 hover:border-teal hover:text-teal'"
+                    class="border text-xs font-medium px-3 py-1.5 rounded-full transition-all"
+                    x-text="region"
+                  ></button>
+                </template>
+              </div>
+            </div>
+
+            <!-- Step 6: Run -->
+            <div>
+              <div class="flex items-center gap-2 mb-3">
+                <div class="step-circle bg-teal text-white">٦</div>
+                <span class="font-semibold text-sm">تشغيل المحاكاة</span>
+              </div>
+              <button
+                @click="runSimulation()"
+                class="w-full bg-teal text-white font-bold py-3 rounded-xl hover:bg-teal-dark transition-colors text-sm shadow-sm"
+              >
+                🔍 اختبر الآن
+              </button>
+              <p class="text-xs text-gray-400 mt-2 text-center">سيتم مقارنة هذا الطلب مع شروط المسار المُعرَّف</p>
+            </div>
+
+          </div>
+        </div>
+      </div>
+      <!-- END Right Column -->
+
+      <!-- LEFT COLUMN (40%) — Result Panel -->
+      <div class="w-2/5">
+        <div class="bg-white rounded-2xl shadow-sm p-6 sticky top-20">
+          <h2 class="text-base font-bold mb-4">نتيجة المحاكاة</h2>
+
+          <!-- Empty State -->
+          <div x-show="simResult === null" class="text-center py-10">
+            <div class="text-5xl mb-3">🧪</div>
+            <p class="text-gray-400 text-sm leading-relaxed">أدخل بيانات الطلب واضغط<br>«اختبر الآن»</p>
+          </div>
+
+          <!-- State 1: MATCH -->
+          <div
+            x-show="simResult === 'match'"
+            x-transition:enter="transition ease-out duration-300"
+            x-transition:enter-start="opacity-0 translate-y-2"
+            x-transition:enter-end="opacity-100 translate-y-0"
+            class="border-2 border-green-500 bg-green-50 rounded-xl p-5"
+          >
+            <div class="text-center mb-4">
+              <div class="text-5xl mb-2">✅</div>
+              <h3 class="text-green-700 font-bold text-base">هذا الطلب يطابق المسار</h3>
+            </div>
+            <div class="border-t border-green-200 pt-4 space-y-2">
+              <div class="flex justify-between text-sm">
+                <span class="text-gray-500">المسار المُطبَّق</span>
+                <span class="font-semibold text-gray-800" x-text="simDetails.routeName"></span>
+              </div>
+              <div class="flex justify-between text-sm">
+                <span class="text-gray-500">نوع الشحن</span>
+                <span class="font-semibold text-gray-800" x-text="simDetails.shipping"></span>
+              </div>
+              <div class="flex justify-between text-sm">
+                <span class="text-gray-500">السعر</span>
+                <span class="font-semibold text-gray-800" x-text="simDetails.price"></span>
+              </div>
+              <div class="flex justify-between text-sm">
+                <span class="text-gray-500">المدة</span>
+                <span class="font-semibold text-gray-800" x-text="simDetails.duration"></span>
+              </div>
+            </div>
+            <div class="border-t border-green-200 pt-4 mt-4">
+              <p class="text-xs text-gray-500 font-semibold mb-2">شروط متطابقة:</p>
+              <div class="space-y-1.5">
+                <div class="flex items-center gap-2 text-sm text-green-700">
+                  <span>✓</span>
+                  <span x-text="simDetails.conditionLabel"></span>
+                </div>
+                <div class="flex items-center gap-2 text-sm text-green-700">
+                  <span>✓</span>
+                  <span>قيمة السلة: <span x-text="cartValue"></span> ريال</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- State 2: FALLBACK -->
+          <div
+            x-show="simResult === 'fallback'"
+            x-transition:enter="transition ease-out duration-300"
+            x-transition:enter-start="opacity-0 translate-y-2"
+            x-transition:enter-end="opacity-100 translate-y-0"
+            class="border-2 border-orange-500 bg-amber-50 rounded-xl p-5"
+          >
+            <div class="text-center mb-4">
+              <div class="text-5xl mb-2">⚠️</div>
+              <h3 class="text-amber-700 font-bold text-base leading-snug">لا يوجد مسار مطابق — سيُطبَّق الافتراضي</h3>
+            </div>
+            <div class="border-t border-amber-200 pt-4 space-y-2">
+              <div class="flex justify-between text-sm">
+                <span class="text-gray-500">المسار المُطبَّق</span>
+                <span class="font-semibold text-gray-800">المسار الافتراضي</span>
+              </div>
+            </div>
+            <div class="border-t border-amber-200 pt-4 mt-4">
+              <p class="text-xs text-gray-500 font-semibold mb-2">الشروط غير المتطابقة:</p>
+              <div class="flex items-center gap-2 text-sm text-red-600">
+                <span>✗</span>
+                <span>منتجات محددة — الطلب يحتوي منتجاً خارجياً</span>
+              </div>
+            </div>
+            <div class="mt-4 flex gap-2">
+              <button class="flex-1 text-teal border border-teal text-xs font-semibold py-2 rounded-lg hover:bg-teal-light transition-colors">
+                💡 عدّل شرط المنتجات
+              </button>
+              <button class="flex-1 text-teal border border-teal text-xs font-semibold py-2 rounded-lg hover:bg-teal-light transition-colors">
+                راجع المسار الافتراضي
+              </button>
+            </div>
+          </div>
+
+          <!-- State 3: NO ROUTE -->
+          <div
+            x-show="simResult === 'no_route'"
+            x-transition:enter="transition ease-out duration-300"
+            x-transition:enter-start="opacity-0 translate-y-2"
+            x-transition:enter-end="opacity-100 translate-y-0"
+            class="border-2 border-red-600 bg-red-50 rounded-xl p-5"
+            style="border-color:#B71C1C; background:#FFF5F5;"
+          >
+            <div class="text-center mb-4">
+              <div class="text-5xl mb-2">⛔</div>
+              <h3 class="font-bold text-base leading-snug" style="color:#B71C1C;">هذا الطلب لن يصل — لا مسار ولا افتراضي</h3>
+            </div>
+            <div class="border-t border-red-200 pt-4 space-y-2">
+              <div class="flex justify-between text-sm">
+                <span class="text-gray-500">السبب</span>
+                <span class="font-semibold text-red-700">المسار الافتراضي معطّل</span>
+              </div>
+              <p class="text-xs text-red-700 bg-red-100 rounded-lg p-2 mt-1">هذا يعني: العميل لن يرى أي خيار شحن</p>
+            </div>
+            <div class="mt-4 space-y-2">
+              <button
+                @click="defaultRouteEnabled=true; runSimulation()"
+                class="w-full bg-red-700 text-white text-sm font-bold py-2.5 rounded-xl hover:bg-red-800 transition-colors"
+                style="background:#B71C1C;"
+              >
+                🔧 فعّل المسار الافتراضي
+              </button>
+              <button class="w-full border border-gray-300 text-gray-600 text-sm font-medium py-2.5 rounded-xl hover:bg-gray-50 transition-colors">
+                راجع الشروط
+              </button>
+            </div>
+          </div>
+
+          <!-- State 4: CONFLICT -->
+          <div
+            x-show="simResult === 'conflict'"
+            x-transition:enter="transition ease-out duration-300"
+            x-transition:enter-start="opacity-0 translate-y-2"
+            x-transition:enter-end="opacity-100 translate-y-0"
+            class="rounded-xl p-5"
+            style="border: 2px solid #7B2D8B; background: #F9F0FF;"
+          >
+            <div class="text-center mb-4">
+              <div class="text-5xl mb-2">🔄</div>
+              <h3 class="font-bold text-base leading-snug" style="color:#7B2D8B;">هذا الطلب يطابق مسارَين في نفس الوقت</h3>
+            </div>
+            <div class="border-t pt-4 space-y-3" style="border-color:#E9D5FF;">
+              <div class="flex justify-between text-sm">
+                <span class="text-gray-500">المسار الأول</span>
+                <div class="text-right">
+                  <p class="font-semibold text-gray-800" x-text="simDetails.route1"></p>
+                  <p class="text-xs text-gray-400">أولوية <span x-text="simDetails.priority1"></span></p>
+                </div>
+              </div>
+              <div class="flex justify-between text-sm">
+                <span class="text-gray-500">المسار الثاني</span>
+                <div class="text-right">
+                  <p class="font-semibold text-gray-800" x-text="simDetails.route2"></p>
+                  <p class="text-xs text-gray-400">أولوية <span x-text="simDetails.priority2"></span></p>
+                </div>
+              </div>
+              <div class="rounded-lg p-3 text-sm" style="background:#EDE9FE;">
+                <span class="text-gray-500">سيُطبَّق: </span>
+                <span class="font-bold" style="color:#7B2D8B;" x-text="simDetails.applied"></span>
+                <span class="text-gray-500 text-xs"> (الأعلى أولوية)</span>
+              </div>
+            </div>
+            <div class="mt-3 p-3 rounded-lg text-xs text-gray-600" style="background:#F3E8FF;">
+              💡 إذا أردت المسار الثاني — ارفع أولويته
+            </div>
+            <div class="mt-4">
+              <button
+                class="w-full border text-sm font-semibold py-2.5 rounded-xl transition-colors hover:opacity-90"
+                style="border-color:#7B2D8B; color:#7B2D8B; background:white;"
+              >
+                إعادة ترتيب المسارات
+              </button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+      <!-- END Left Column -->
+
+    </div>
+    <!-- END Two Column -->
+
+  </div>
+  <!-- END VIEW B -->
+
+
+  <!-- ═══════════════════════════════════════════ -->
+  <!-- ALPINE DATA                                  -->
+  <!-- ═══════════════════════════════════════════ -->
+  <script>
+    function appData() {
+      return {
+        view: 'builder',
+        toastMsg: '',
+        toastType: '',
+        showToast: false,
+
+        // ── BUILDER STATE ──────────────────────────────────
+        conditions: [
+          { id: 1, type: 'منتجات محددة', operator: 'subset_only', products: ['iPhone 15 Pro', 'AirPods Pro'] }
+        ],
+        routeType: 'شحن سريع',
+        showOperatorDropdown: null,
+
+        allProducts: ['iPhone 15 Pro', 'AirPods Pro', 'Samsung TV', 'كتاب تعلم البرمجة', 'عطر رجالي', 'حذاء رياضي'],
+        productSearch: '',
+
+        operators: [
+          { key: 'in',          badge: '⊇', label: 'كل المنتجات المحددة أو أكثر', desc: 'السلة تحتوي جميع المنتجات المحددة على الأقل', notation: 'A ⊇ S', isNew: false },
+          { key: 'not_in',      badge: '⊄', label: 'لا يحتوي أي منتج محدد',       desc: 'السلة لا تشترك مع القائمة المحددة بأي منتج',    notation: 'A ∩ S = ∅', isNew: false },
+          { key: 'any_in',      badge: '∩', label: 'يحتوي على أي منتج محدد',      desc: 'السلة تحتوي منتجاً واحداً على الأقل من القائمة', notation: 'A ∩ S ≠ ∅', isNew: false },
+          { key: 'subset_only', badge: '⊆', label: 'من القائمة المحددة فقط ✦',    desc: 'الطلب يحتوي فقط على منتجات من القائمة المحددة — لا غيرها', notation: 'A ⊆ S , A ≠ ∅', isNew: true },
+        ],
+
+        // ── SIMULATION STATE ───────────────────────────────
+        cartProducts: [],
+        cartValue: 450,
+        cartWeight: 2.5,
+        cartQty: 2,
+        cartRegion: 'المنطقة الوسطى',
+        simResult: null,
+        simDetails: {},
+
+        defaultRouteEnabled: false,
+
+        sampleRoutes: [
+          { id:1, name:'مسار الأجهزة الإلكترونية', cond:'subset_only', products:['iPhone 15 Pro','AirPods Pro'], minValue:200, shipping:'شحن سريع', price:25, duration:'خلال ٢٤ ساعة', priority:1 },
+          { id:2, name:'مسار القيمة العالية',       cond:'value_gte',  products:[],                              minValue:500, shipping:'شحن مجاني', price:0,  duration:'٢-٣ أيام',      priority:2 },
+          { id:3, name:'مسار الطلبات الاقتصادية',  cond:'value_lt',   products:[],                              maxValue:100, shipping:'شحن اقتصادي', price:15, duration:'٥-٧ أيام',  priority:3 },
+        ],
+
+        scenarios: [
+          { label:'📱 طلب iPhone فقط',    products:['iPhone 15 Pro','AirPods Pro'],         value:450, weight:0.5, qty:2, region:'المنطقة الوسطى',  expected:'match' },
+          { label:'🛍️ طلب مختلط',         products:['iPhone 15 Pro','كتاب تعلم البرمجة'],  value:300, weight:1.2, qty:2, region:'المنطقة الغربية', expected:'no_route' },
+          { label:'💸 طلب قيمة عالية',    products:['عطر رجالي','حذاء رياضي'],             value:650, weight:2.0, qty:2, region:'المنطقة الوسطى',  expected:'match' },
+          { label:'🔄 تعارض مسارين',      products:['iPhone 15 Pro','AirPods Pro'],         value:550, weight:0.5, qty:2, region:'المنطقة الوسطى',  expected:'conflict' },
+        ],
+
+        // ── METHODS ────────────────────────────────────────
+        init() {
+          this.cartProducts = [...this.scenarios[0].products];
+        },
+
+        getOperator(key) {
+          return this.operators.find(o => o.key === key);
+        },
+
+        selectOperator(condId, opKey) {
+          const c = this.conditions.find(c => c.id === condId);
+          if (c) c.operator = opKey;
+          this.showOperatorDropdown = null;
+        },
+
+        removeProduct(condId, prod) {
+          const c = this.conditions.find(c => c.id === condId);
+          if (c) c.products = c.products.filter(p => p !== prod);
+        },
+
+        addCondition() {
+          const id = Date.now();
+          this.conditions.push({ id, type:'منتجات محددة', operator:'in', products:['iPhone 15 Pro'] });
+        },
+
+        removeCondition(id) {
+          this.conditions = this.conditions.filter(c => c.id !== id);
+        },
+
+        loadScenario(s) {
+          this.cartProducts = [...s.products];
+          this.cartValue = s.value;
+          this.cartWeight = s.weight;
+          this.cartQty = s.qty;
+          this.cartRegion = s.region;
+          this.runSimulation();
+        },
+
+        runSimulation() {
+          const cart = { products: this.cartProducts, value: this.cartValue };
+          const matched = [];
+
+          for (const route of this.sampleRoutes) {
+            let match = false;
+            if (route.cond === 'subset_only') {
+              match = cart.products.length > 0 && cart.products.every(p => route.products.includes(p));
+            } else if (route.cond === 'value_gte') {
+              match = cart.value >= route.minValue;
+            } else if (route.cond === 'value_lt') {
+              match = cart.value < route.maxValue;
+            }
+            if (match) matched.push(route);
+          }
+
+          if (matched.length >= 2) {
+            this.simResult = 'conflict';
+            this.simDetails = {
+              route1: matched[0].name, priority1: matched[0].priority,
+              route2: matched[1].name, priority2: matched[1].priority,
+              applied: matched[0].name,
+            };
+          } else if (matched.length === 1) {
+            this.simResult = 'match';
+            this.simDetails = {
+              routeName: matched[0].name,
+              shipping: matched[0].shipping,
+              price: matched[0].price + ' ريال',
+              duration: matched[0].duration,
+              conditionLabel: 'منتجات محددة — من القائمة المحددة فقط',
+            };
+          } else if (!this.defaultRouteEnabled) {
+            this.simResult = 'no_route';
+            this.simDetails = {};
+          } else {
+            this.simResult = 'fallback';
+            this.simDetails = {};
+          }
+        },
+
+        goToSimulation() {
+          this.view = 'simulation';
+        },
+
+        goToBuilder() {
+          const wasMatch = this.simResult === 'match';
+          this.view = 'builder';
+          this.toastMsg = wasMatch
+            ? 'تم حفظ نتيجة المحاكاة — الطلب يطابق المسار ✅'
+            : '⚠️ تحقق من إعدادات المسار — لم يتطابق الطلب';
+          this.toastType = wasMatch ? 'success' : 'warning';
+          this.showToast = true;
+          setTimeout(() => this.showToast = false, 4000);
+        }
+      };
+    }
+  </script>
+
+</body>
+</html>
