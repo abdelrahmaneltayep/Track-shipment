@@ -3,2275 +3,1884 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>مسار شحن جديد — سلة</title>
+<title>مسارات الشحن — سلة</title>
 <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = {
+    theme: {
+      extend: {
+        fontFamily: { tajawal: ['Tajawal', 'sans-serif'] },
+        colors: {
+          teal: { DEFAULT: '#04B49C', dark: '#0E6B5E', light: '#E6F9F7' },
+          amber: { DEFAULT: '#C05621', light: '#FFF3CD' },
+        }
+      }
+    }
+  }
+</script>
+<script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 <style>
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Tajawal', sans-serif; background: #F3F4F6; }
 
-body {
-  font-family: 'Tajawal', sans-serif;
-  background: #F5F5F5;
-  color: #1A1A2E;
-  direction: rtl;
-  min-height: 100vh;
-  font-size: 14px;
-  line-height: 1.6;
-}
+  /* Toggle Switch */
+  .toggle-switch { position: relative; display: inline-block; width: 44px; height: 24px; }
+  .toggle-switch input { opacity: 0; width: 0; height: 0; }
+  .toggle-slider {
+    position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0;
+    background-color: #D1D5DB; border-radius: 24px; transition: 0.3s;
+  }
+  .toggle-slider:before {
+    position: absolute; content: ""; height: 18px; width: 18px;
+    left: 3px; bottom: 3px; background: white; border-radius: 50%; transition: 0.3s;
+  }
+  input:checked + .toggle-slider { background-color: #04B49C; }
+  input:checked + .toggle-slider:before { transform: translateX(20px); }
 
-/* ── TOP NAV ── */
-.top-nav {
-  background: #1A1A2E;
-  color: #fff;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 20px;
-  height: 56px;
-  position: sticky;
-  top: 0;
-  z-index: 200;
-}
-.nav-brand {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-.nav-logo-pill {
-  background: #04B49C;
-  color: #fff;
-  font-weight: 800;
-  font-size: 13px;
-  padding: 3px 10px;
-  border-radius: 20px;
-  letter-spacing: .5px;
-}
-.nav-store-name {
-  font-size: 13px;
-  color: #CBD5E1;
-}
-.nav-links {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  list-style: none;
-}
-.nav-links a {
-  color: #CBD5E1;
-  text-decoration: none;
-  font-size: 13px;
-  padding: 6px 10px;
-  border-radius: 6px;
-  transition: background .15s, color .15s;
-}
-.nav-links a:hover { background: rgba(255,255,255,.08); color: #fff; }
-.nav-icons {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-.nav-icon-btn {
-  background: none;
-  border: none;
-  color: #CBD5E1;
-  cursor: pointer;
-  padding: 6px;
-  border-radius: 6px;
-  font-size: 16px;
-  transition: background .15s;
-  display: flex;
-  align-items: center;
-}
-.nav-icon-btn:hover { background: rgba(255,255,255,.1); color: #fff; }
-.nav-avatar {
-  width: 32px;
-  height: 32px;
-  background: #04B49C;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 12px;
-  font-weight: 700;
-  color: #fff;
-  cursor: pointer;
-}
+  /* Simulation Panel */
+  .sim-panel {
+    position: fixed; left: 0; top: 0; height: 100%; width: 24rem;
+    background: white; box-shadow: 4px 0 24px rgba(0,0,0,0.15);
+    z-index: 50; transition: transform 0.3s ease; overflow-y: auto;
+  }
+  .sim-panel.closed { transform: translateX(-100%); }
+  .sim-panel.open { transform: translateX(0); }
 
-/* ── SUB NAV ── */
-.sub-nav {
-  background: #fff;
-  border-bottom: 1px solid #E5E7EB;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 24px;
-  height: 48px;
-  position: sticky;
-  top: 56px;
-  z-index: 190;
-}
-.sub-nav-section-label {
-  font-size: 14px;
-  font-weight: 700;
-  color: #1A1A2E;
-}
-.sub-nav-links {
-  display: flex;
-  align-items: center;
-  gap: 2px;
-  list-style: none;
-}
-.sub-nav-links a {
-  color: #6B7280;
-  text-decoration: none;
-  font-size: 13px;
-  padding: 5px 10px;
-  border-radius: 6px;
-  transition: background .15s, color .15s;
-}
-.sub-nav-links a:hover { background: #F5F5F5; color: #1A1A2E; }
-.sub-nav-help-btn {
-  background: none;
-  border: 1px solid #D1D5DB;
-  color: #6B7280;
-  padding: 4px 12px;
-  border-radius: 6px;
-  font-size: 12px;
-  cursor: pointer;
-  font-family: 'Tajawal', sans-serif;
-  margin-right: 8px;
-  transition: border-color .15s, color .15s;
-}
-.sub-nav-help-btn:hover { border-color: #9CA3AF; color: #374151; }
+  /* Delete / Migration Modals */
+  .modal-overlay {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.5);
+    z-index: 60; display: flex; align-items: center; justify-content: center;
+  }
 
-/* ── MIGRATION BANNER ── */
-.migration-banner {
-  background: #FFF3CD;
-  border-bottom: 2px solid #C05621;
-  padding: 10px 24px;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  position: relative;
-}
-.migration-banner.hidden { display: none; }
-.migration-banner-text {
-  flex: 1;
-  font-size: 13.5px;
-  color: #7B341E;
-}
-.migration-banner-text strong { font-weight: 700; }
-.migration-start-btn {
-  background: none;
-  border: 1.5px solid #C05621;
-  color: #C05621;
-  padding: 5px 14px;
-  border-radius: 6px;
-  font-size: 13px;
-  cursor: pointer;
-  font-family: 'Tajawal', sans-serif;
-  transition: background .15s;
-  white-space: nowrap;
-}
-.migration-start-btn:hover { background: rgba(192,86,33,.08); }
-.migration-dismiss-btn {
-  background: none;
-  border: none;
-  color: #9CA3AF;
-  font-size: 18px;
-  cursor: pointer;
-  padding: 2px 6px;
-  border-radius: 4px;
-  transition: color .15s;
-  margin-right: 4px;
-}
-.migration-dismiss-btn:hover { color: #C05621; }
+  /* Health Toast */
+  .health-toast {
+    position: fixed; top: 80px; left: 24px; z-index: 55;
+    max-width: 360px;
+  }
 
-/* ── BREADCRUMB ── */
-.breadcrumb {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 14px 24px 0;
-  font-size: 12.5px;
-  color: #6B7280;
-}
-.breadcrumb a { color: #6B7280; text-decoration: none; }
-.breadcrumb a:hover { color: #04B49C; }
-.breadcrumb-sep { color: #D1D5DB; }
-.breadcrumb-current { color: #1A1A2E; font-weight: 500; }
+  /* Drag handle */
+  .drag-handle { cursor: grab; }
+  .drag-handle:active { cursor: grabbing; }
 
-/* ── LAYOUT ── */
-.page-content {
-  padding: 16px 24px 80px;
-  max-width: 1200px;
-  margin: 0 auto;
-}
-.two-col {
-  display: flex;
-  gap: 20px;
-  align-items: flex-start;
-}
-.col-main { flex: 1; min-width: 0; }
-.col-sidebar { width: 280px; flex-shrink: 0; }
+  /* Route type radio cards */
+  .route-type-card { border: 2px solid #E5E7EB; border-radius: 12px; padding: 16px; cursor: pointer; transition: all 0.2s; }
+  .route-type-card.selected { border-color: #04B49C; background: rgba(4,180,156,0.05); }
 
-/* ── CARDS ── */
-.card {
-  background: #fff;
-  border: 1px solid #E5E7EB;
-  border-radius: 12px;
-  padding: 24px;
-  margin-bottom: 16px;
-}
-.card-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 20px;
-}
-.card-title {
-  font-size: 16px;
-  font-weight: 700;
-  color: #1A1A2E;
-}
-.card-title-teal {
-  font-size: 16px;
-  font-weight: 700;
-  color: #0E6B5E;
-}
-.card-subtitle {
-  font-size: 13px;
-  color: #6B7280;
-  margin-top: 3px;
-}
+  /* Coverage bar */
+  .coverage-bar { display: flex; height: 28px; border-radius: 8px; overflow: hidden; width: 100%; }
+  .coverage-segment { display: flex; align-items: center; justify-content: center; font-size: 11px; color: white; font-weight: 600; min-width: 20px; overflow: hidden; }
 
-/* ── TOGGLE SWITCH ── */
-.toggle-wrap {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-.toggle-label-text {
-  font-size: 13px;
-  color: #6B7280;
-}
-.toggle {
-  position: relative;
-  width: 40px;
-  height: 22px;
-}
-.toggle input { opacity: 0; width: 0; height: 0; }
-.toggle-slider {
-  position: absolute;
-  cursor: pointer;
-  top: 0; left: 0; right: 0; bottom: 0;
-  background: #D1D5DB;
-  border-radius: 22px;
-  transition: .2s;
-}
-.toggle-slider:before {
-  content: '';
-  position: absolute;
-  width: 16px; height: 16px;
-  right: 3px; bottom: 3px;
-  background: #fff;
-  border-radius: 50%;
-  transition: .2s;
-}
-.toggle input:checked + .toggle-slider { background: #04B49C; }
-.toggle input:checked + .toggle-slider:before { right: auto; left: 3px; }
+  /* Step indicator */
+  .step-circle {
+    width: 32px; height: 32px; border-radius: 50%; display: flex;
+    align-items: center; justify-content: center; font-weight: 700; font-size: 14px;
+    border: 2px solid #E5E7EB; background: white; color: #9CA3AF;
+  }
+  .step-circle.active { border-color: #04B49C; background: #04B49C; color: white; }
+  .step-circle.done { border-color: #04B49C; background: #04B49C; color: white; }
+  .step-line { flex: 1; height: 2px; background: #E5E7EB; }
+  .step-line.done { background: #04B49C; }
 
-/* ── FORM ELEMENTS ── */
-.form-group { margin-bottom: 18px; }
-.form-label {
-  display: block;
-  font-size: 13.5px;
-  font-weight: 600;
-  color: #374151;
-  margin-bottom: 6px;
-}
-.required { color: #EF4444; }
-.form-input, .form-select {
-  width: 100%;
-  padding: 9px 12px;
-  border: 1px solid #D1D5DB;
-  border-radius: 8px;
-  font-size: 14px;
-  font-family: 'Tajawal', sans-serif;
-  color: #1A1A2E;
-  background: #fff;
-  transition: border-color .15s, box-shadow .15s;
-  outline: none;
-  direction: rtl;
-}
-.form-input:focus, .form-select:focus {
-  border-color: #04B49C;
-  box-shadow: 0 0 0 3px rgba(4,180,156,.12);
-}
-.form-input::placeholder { color: #9CA3AF; }
+  /* Condition negate */
+  .cond-negated-row { border-right: 4px solid #EF4444; background: rgba(254,226,226,0.3); border-radius: 8px; }
 
-/* ── RADIO CARDS ── */
-.radio-cards {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 10px;
-}
-.radio-card {
-  border: 2px solid #E5E7EB;
-  border-radius: 10px;
-  padding: 14px;
-  cursor: pointer;
-  transition: border-color .15s, background .15s;
-  position: relative;
-}
-.radio-card.selected {
-  border-color: #04B49C;
-  background: rgba(4,180,156,.04);
-}
-.radio-card-check {
-  position: absolute;
-  top: 10px;
-  left: 10px;
-  width: 18px; height: 18px;
-  background: #04B49C;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #fff;
-  font-size: 10px;
-  opacity: 0;
-  transition: opacity .15s;
-}
-.radio-card.selected .radio-card-check { opacity: 1; }
-.radio-card-title {
-  font-size: 13.5px;
-  font-weight: 700;
-  color: #1A1A2E;
-  margin-bottom: 5px;
-}
-.radio-card-desc {
-  font-size: 12px;
-  color: #6B7280;
-  line-height: 1.5;
-}
+  /* Carrier tag */
+  .carrier-tag { display: inline-flex; align-items: center; gap: 4px; padding: 2px 10px; border-radius: 20px; font-size: 13px; font-weight: 500; }
 
-/* ── CARRIER TAGS ── */
-.carrier-tags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  margin-bottom: 12px;
-}
-.carrier-tag {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  padding: 4px 10px;
-  border-radius: 20px;
-  font-size: 12.5px;
-  font-weight: 600;
-  cursor: default;
-}
-.carrier-tag .tag-remove {
-  cursor: pointer;
-  font-size: 14px;
-  line-height: 1;
-  margin-right: 2px;
-  opacity: .7;
-}
-.carrier-tag .tag-remove:hover { opacity: 1; }
-.tag-aramex { background: #FFF3E0; color: #E65100; border: 1px solid #FFCC80; }
-.tag-smsa { background: #FFEBEE; color: #C62828; border: 1px solid #EF9A9A; }
-.tag-dhl { background: #FFFDE7; color: #F57F17; border: 1px solid #FFF176; }
-.tag-naqel { background: #EDE7F6; color: #4527A0; border: 1px solid #CE93D8; }
+  /* Custom scrollbar */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: #F3F4F6; }
+  ::-webkit-scrollbar-thumb { background: #D1D5DB; border-radius: 3px; }
 
-/* ── CARRIER ROWS ── */
-.carrier-rows { display: flex; flex-direction: column; gap: 8px; }
-.carrier-row {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  border: 1px solid #E5E7EB;
-  border-radius: 8px;
-  padding: 10px 12px;
-  background: #FAFAFA;
-}
-.carrier-icon {
-  width: 32px; height: 32px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 11px;
-  font-weight: 800;
-  flex-shrink: 0;
-  color: #fff;
-}
-.carrier-icon.aramex { background: #E65100; }
-.carrier-icon.smsa { background: #C62828; }
-.carrier-icon.dhl { background: #F57F17; }
-.carrier-icon.naqel { background: #4527A0; }
-.carrier-name { flex: 1; font-size: 13.5px; font-weight: 600; }
-.carrier-time { font-size: 12px; color: #6B7280; }
-.carrier-price-input {
-  width: 90px;
-  padding: 5px 8px;
-  border: 1px solid #D1D5DB;
-  border-radius: 6px;
-  font-size: 13px;
-  font-family: 'Tajawal', sans-serif;
-  text-align: left;
-  direction: ltr;
-}
-.carrier-price-unit {
-  font-size: 12px;
-  color: #6B7280;
-}
-.carrier-drag {
-  cursor: grab;
-  color: #9CA3AF;
-  font-size: 16px;
-  padding: 0 2px;
-}
-.add-carrier-btn {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  background: none;
-  border: 1.5px dashed #04B49C;
-  color: #04B49C;
-  padding: 8px 16px;
-  border-radius: 8px;
-  font-size: 13px;
-  cursor: pointer;
-  font-family: 'Tajawal', sans-serif;
-  margin-top: 10px;
-  transition: background .15s;
-  width: 100%;
-  justify-content: center;
-}
-.add-carrier-btn:hover { background: rgba(4,180,156,.05); }
+  /* Breadcrumb separator */
+  .breadcrumb-sep { color: #D1D5DB; margin: 0 4px; }
 
-/* ── CONDITIONS SECTION ── */
-.conditions-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 4px;
-}
-.conditions-title-wrap {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-.badge-optional {
-  background: #F3F4F6;
-  color: #6B7280;
-  font-size: 11px;
-  padding: 2px 8px;
-  border-radius: 12px;
-}
-.match-mode-pills {
-  display: flex;
-  gap: 6px;
-  flex-wrap: wrap;
-}
-.match-pill {
-  border: 1.5px solid #E5E7EB;
-  background: #fff;
-  color: #6B7280;
-  padding: 4px 12px;
-  border-radius: 20px;
-  font-size: 12px;
-  cursor: pointer;
-  font-family: 'Tajawal', sans-serif;
-  transition: all .15s;
-  display: flex;
-  align-items: center;
-  gap: 4px;
-}
-.match-pill.active {
-  background: #04B49C;
-  border-color: #04B49C;
-  color: #fff;
-}
-.badge-new {
-  background: #04B49C;
-  color: #fff;
-  font-size: 10px;
-  padding: 1px 5px;
-  border-radius: 8px;
-  font-weight: 700;
-}
-.subset-count-row {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px 12px;
-  background: rgba(4,180,156,.06);
-  border-radius: 8px;
-  margin-top: 8px;
-  font-size: 13px;
-  color: #374151;
-}
-.subset-count-input {
-  width: 50px;
-  padding: 3px 6px;
-  border: 1px solid #D1D5DB;
-  border-radius: 5px;
-  font-size: 13px;
-  text-align: center;
-  font-family: 'Tajawal', sans-serif;
-}
-.conditions-empty {
-  text-align: center;
-  padding: 32px 20px;
-  color: #9CA3AF;
-}
-.conditions-empty-icon { font-size: 36px; margin-bottom: 10px; }
-.conditions-empty-title { font-size: 14px; font-weight: 600; color: #6B7280; margin-bottom: 5px; }
-.conditions-empty-desc { font-size: 12.5px; color: #9CA3AF; margin-bottom: 16px; }
+  /* Card hover elevation */
+  .card-hover { transition: box-shadow 0.2s, transform 0.2s; }
+  .card-hover:hover { box-shadow: 0 4px 24px rgba(4,180,156,0.10); }
 
-/* ── CONDITION ROW ── */
-.condition-row {
-  border: 1px solid #E5E7EB;
-  border-radius: 8px;
-  padding: 12px;
-  margin-bottom: 8px;
-  background: #fff;
-  transition: border-color .15s;
-}
-.condition-row-header {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-.condition-row-fields {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex: 1;
-  flex-wrap: wrap;
-}
-.condition-select {
-  flex: 1;
-  min-width: 160px;
-  padding: 7px 10px;
-  border: 1px solid #D1D5DB;
-  border-radius: 7px;
-  font-size: 13px;
-  font-family: 'Tajawal', sans-serif;
-  direction: rtl;
-  outline: none;
-  background: #fff;
-}
-.condition-select:focus { border-color: #04B49C; }
-.condition-operator-select {
-  width: 150px;
-  padding: 7px 10px;
-  border: 1px solid #D1D5DB;
-  border-radius: 7px;
-  font-size: 13px;
-  font-family: 'Tajawal', sans-serif;
-  direction: rtl;
-  outline: none;
-  background: #fff;
-}
-.condition-operator-select:focus { border-color: #04B49C; }
-.condition-value-input {
-  width: 100px;
-  padding: 7px 10px;
-  border: 1px solid #D1D5DB;
-  border-radius: 7px;
-  font-size: 13px;
-  font-family: 'Tajawal', sans-serif;
-  outline: none;
-  direction: ltr;
-  text-align: left;
-}
-.condition-value-input:focus { border-color: #04B49C; }
-.condition-unit {
-  font-size: 12px;
-  color: #6B7280;
-  white-space: nowrap;
-}
-.trash-btn {
-  background: none;
-  border: none;
-  color: #9CA3AF;
-  cursor: pointer;
-  padding: 5px;
-  border-radius: 5px;
-  font-size: 16px;
-  transition: color .15s, background .15s;
-  flex-shrink: 0;
-}
-.trash-btn:hover { color: #EF4444; background: #FEF2F2; }
+  /* Status dot */
+  .status-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
 
-/* ── NEGATE TOGGLE ── */
-.negate-wrap {
-  position: relative;
-  display: inline-flex;
-  align-items: center;
-}
-.negate-pill {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  padding: 3px 10px;
-  border-radius: 20px;
-  border: 1.5px solid #D1D5DB;
-  background: #F9FAFB;
-  color: #6B7280;
-  font-size: 12px;
-  cursor: pointer;
-  font-family: 'Tajawal', sans-serif;
-  transition: all .15s;
-  white-space: nowrap;
-  user-select: none;
-}
-.negate-pill.active {
-  background: #FDECEC;
-  border-color: #EF4444;
-  color: #B71C1C;
-}
-.negate-dot {
-  width: 8px; height: 8px;
-  border-radius: 50%;
-  background: #9CA3AF;
-  transition: background .15s;
-}
-.negate-pill.active .negate-dot { background: #EF4444; }
-.negate-tooltip {
-  display: none;
-  position: absolute;
-  bottom: calc(100% + 6px);
-  right: 0;
-  background: #1A1A2E;
-  color: #fff;
-  font-size: 11.5px;
-  padding: 6px 10px;
-  border-radius: 6px;
-  white-space: nowrap;
-  z-index: 100;
-  pointer-events: none;
-}
-.negate-tooltip::after {
-  content: '';
-  position: absolute;
-  top: 100%; right: 10px;
-  border: 5px solid transparent;
-  border-top-color: #1A1A2E;
-}
-.negate-wrap:hover .negate-tooltip { display: block; }
+  /* Tooltip */
+  [data-tooltip] { position: relative; }
+  [data-tooltip]:hover::after {
+    content: attr(data-tooltip);
+    position: absolute; bottom: 110%; right: 50%; transform: translateX(50%);
+    background: #1A1A2E; color: white; font-size: 11px; white-space: nowrap;
+    padding: 4px 8px; border-radius: 6px; z-index: 99; pointer-events: none;
+  }
 
-/* ── ZONE CONDITION ── */
-.zone-condition-body {
-  margin-top: 12px;
-  padding-top: 12px;
-  border-top: 1px solid #F3F4F6;
-}
-.zone-section-label {
-  font-size: 13px;
-  font-weight: 600;
-  color: #374151;
-  margin-bottom: 8px;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-.zone-section-label .zone-type-badge {
-  font-size: 11px;
-  padding: 1px 8px;
-  border-radius: 10px;
-}
-.zone-allowed-badge { background: #ECFDF5; color: #065F46; border: 1px solid #A7F3D0; }
-.zone-excluded-badge { background: #FEF2F2; color: #991B1B; border: 1px solid #FECACA; }
-.zone-row {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 6px;
-}
-.zone-add-btn {
-  background: none;
-  border: none;
-  color: #04B49C;
-  font-size: 13px;
-  cursor: pointer;
-  font-family: 'Tajawal', sans-serif;
-  padding: 3px 0;
-}
+  /* Condition connector label */
+  .cond-connector {
+    display: flex; align-items: center; justify-content: center;
+    margin: 2px 0; gap: 8px;
+  }
+  .cond-connector::before, .cond-connector::after {
+    content: ''; flex: 1; height: 1px; background: #E5E7EB;
+  }
 
-/* ── MAP CONDITION ── */
-.map-condition-body {
-  margin-top: 12px;
-}
-.map-instruction {
-  font-size: 12.5px;
-  color: #6B7280;
-  margin-bottom: 8px;
-}
-#leaflet-map-container {
-  width: 100%;
-  height: 300px;
-  border-radius: 8px;
-  overflow: hidden;
-  border: 1px solid #E5E7EB;
-}
-.map-after-actions {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-top: 10px;
-  flex-wrap: wrap;
-}
-.map-save-btn {
-  background: #04B49C;
-  color: #fff;
-  border: none;
-  padding: 7px 18px;
-  border-radius: 7px;
-  font-size: 13px;
-  cursor: pointer;
-  font-family: 'Tajawal', sans-serif;
-}
-.map-badge {
-  background: rgba(4,180,156,.1);
-  color: #0E6B5E;
-  border: 1px solid #04B49C;
-  padding: 4px 10px;
-  border-radius: 12px;
-  font-size: 12px;
-}
-.map-excluded-toggle {
-  background: none;
-  border: 1px solid #D1D5DB;
-  color: #6B7280;
-  padding: 5px 12px;
-  border-radius: 7px;
-  font-size: 13px;
-  cursor: pointer;
-  font-family: 'Tajawal', sans-serif;
-  margin-top: 10px;
-  display: flex;
-  align-items: center;
-  gap: 5px;
-}
-#leaflet-excluded-container {
-  width: 100%;
-  height: 220px;
-  border-radius: 8px;
-  overflow: hidden;
-  border: 1px solid #FECACA;
-  margin-top: 8px;
-  display: none;
-}
+  /* Sim panel result animation */
+  @keyframes slideUp { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+  .slide-up { animation: slideUp 0.25s ease forwards; }
 
-/* ── ADD CONDITION BTN ── */
-.add-condition-btn {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  background: none;
-  border: 1.5px solid #04B49C;
-  color: #04B49C;
-  padding: 8px 18px;
-  border-radius: 8px;
-  font-size: 13px;
-  cursor: pointer;
-  font-family: 'Tajawal', sans-serif;
-  margin-top: 8px;
-  transition: background .15s;
-}
-.add-condition-btn:hover { background: rgba(4,180,156,.06); }
+  /* Table row index */
+  .row-index {
+    width: 24px; height: 24px; border-radius: 50%;
+    background: #04B49C; color: white;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 700; flex-shrink: 0;
+  }
 
-/* ── SUMMARY PANEL ── */
-.summary-panel {
-  background: #fff;
-  border: 1px solid #E5E7EB;
-  border-radius: 12px;
-  padding: 20px;
-  position: sticky;
-  top: 120px;
-}
-.summary-title {
-  font-size: 15px;
-  font-weight: 700;
-  color: #1A1A2E;
-  margin-bottom: 16px;
-  padding-bottom: 12px;
-  border-bottom: 1px solid #F3F4F6;
-}
-.summary-empty {
-  text-align: center;
-  padding: 24px 12px;
-  color: #9CA3AF;
-}
-.summary-empty-icon { font-size: 32px; margin-bottom: 8px; }
-.summary-empty-text { font-size: 13px; }
-.summary-item {
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-  margin-bottom: 14px;
-}
-.summary-item-label {
-  font-size: 11.5px;
-  color: #9CA3AF;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: .5px;
-}
-.summary-item-value {
-  font-size: 13.5px;
-  color: #1A1A2E;
-  font-weight: 500;
-}
-.summary-carriers {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 4px;
-}
-.summary-carrier-dot {
-  width: 8px; height: 8px;
-  border-radius: 50%;
-  display: inline-block;
-  margin-left: 5px;
-}
+  /* Stats chips */
+  .stat-chip {
+    background: #F3F4F6; border-radius: 20px; padding: 2px 10px;
+    font-size: 12px; color: #6B7280; font-weight: 500;
+  }
 
-/* ── BOTTOM ACTIONS ── */
-.bottom-actions {
-  padding: 20px 24px;
-  display: flex;
-  justify-content: flex-end;
-  gap: 10px;
-}
-.btn-save {
-  background: #04B49C;
-  color: #fff;
-  border: none;
-  padding: 11px 32px;
-  border-radius: 8px;
-  font-size: 14px;
-  font-weight: 700;
-  cursor: pointer;
-  font-family: 'Tajawal', sans-serif;
-  transition: background .15s, transform .1s;
-}
-.btn-save:hover { background: #03A48D; }
-.btn-save:active { transform: scale(.98); }
-.btn-cancel {
-  background: none;
-  border: 1px solid #D1D5DB;
-  color: #6B7280;
-  padding: 11px 24px;
-  border-radius: 8px;
-  font-size: 14px;
-  cursor: pointer;
-  font-family: 'Tajawal', sans-serif;
-}
+  /* Form field focus ring */
+  .field-wrap:focus-within label { color: #04B49C; }
 
-/* ── SIMULATION PANEL ── */
-.sim-trigger-btn {
-  position: fixed;
-  bottom: 24px;
-  left: 24px;
-  background: #fff;
-  border: 1.5px solid #04B49C;
-  color: #04B49C;
-  padding: 10px 16px;
-  border-radius: 8px;
-  font-size: 13.5px;
-  cursor: pointer;
-  font-family: 'Tajawal', sans-serif;
-  box-shadow: 0 4px 16px rgba(0,0,0,.12);
-  z-index: 300;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  transition: background .15s, transform .15s;
-}
-.sim-trigger-btn:hover { background: rgba(4,180,156,.05); transform: translateY(-1px); }
+  /* Pulse badge */
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.5} }
+  .pulse-badge { animation: pulse 2s ease infinite; }
 
-.sim-panel {
-  position: fixed;
-  top: 0;
-  left: -400px;
-  width: 380px;
-  height: 100vh;
-  background: #fff;
-  box-shadow: -4px 0 24px rgba(0,0,0,.15);
-  z-index: 500;
-  transition: left .3s ease;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-}
-.sim-panel.open { left: 0; }
-.sim-panel-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 18px 20px;
-  border-bottom: 1px solid #E5E7EB;
-}
-.sim-panel-title {
-  font-size: 15px;
-  font-weight: 700;
-  color: #1A1A2E;
-}
-.sim-close-btn {
-  background: none;
-  border: none;
-  color: #9CA3AF;
-  font-size: 20px;
-  cursor: pointer;
-  padding: 2px 6px;
-  border-radius: 4px;
-}
-.sim-close-btn:hover { color: #EF4444; }
-.sim-body {
-  flex: 1;
-  padding: 20px;
-  overflow-y: auto;
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-}
-.sim-label {
-  font-size: 13px;
-  font-weight: 600;
-  color: #374151;
-  margin-bottom: 5px;
-}
-.sim-input, .sim-select {
-  width: 100%;
-  padding: 8px 12px;
-  border: 1px solid #D1D5DB;
-  border-radius: 7px;
-  font-size: 13px;
-  font-family: 'Tajawal', sans-serif;
-  direction: rtl;
-  outline: none;
-}
-.sim-input:focus, .sim-select:focus { border-color: #04B49C; }
-.sim-run-btn {
-  background: #04B49C;
-  color: #fff;
-  border: none;
-  padding: 10px;
-  border-radius: 8px;
-  font-size: 14px;
-  font-weight: 700;
-  cursor: pointer;
-  font-family: 'Tajawal', sans-serif;
-  width: 100%;
-  margin-top: 4px;
-  transition: background .15s;
-}
-.sim-run-btn:hover { background: #03A48D; }
-.sim-result { display: none; }
-.sim-result-card {
-  padding: 14px 16px;
-  border-radius: 8px;
-  font-size: 13px;
-  line-height: 1.7;
-}
-.sim-result-card.match {
-  background: #ECFDF5;
-  border: 1px solid #A7F3D0;
-  color: #065F46;
-}
-.sim-result-card.no-match {
-  background: #FFFBEB;
-  border: 1px solid #FDE68A;
-  color: #92400E;
-}
+  /* Section divider */
+  .section-divider { height: 1px; background: linear-gradient(to left, transparent, #E5E7EB 20%, #E5E7EB 80%, transparent); margin: 16px 0; }
 
-/* ── MODAL ── */
-.modal-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,.45);
-  z-index: 800;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 20px;
-  display: none;
-}
-.modal-overlay.open { display: flex; }
-.modal-box {
-  background: #fff;
-  border-radius: 14px;
-  padding: 28px;
-  width: 100%;
-  max-width: 620px;
-  max-height: 80vh;
-  overflow-y: auto;
-  box-shadow: 0 12px 40px rgba(0,0,0,.2);
-}
-.modal-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 20px;
-}
-.modal-title { font-size: 17px; font-weight: 700; color: #1A1A2E; }
-.modal-close-btn {
-  background: none;
-  border: none;
-  color: #9CA3AF;
-  font-size: 22px;
-  cursor: pointer;
-}
-.modal-close-btn:hover { color: #EF4444; }
+  /* Carrier dot sizes */
+  .carrier-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; flex-shrink: 0; }
 
-/* Step Indicator */
-.step-indicator {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0;
-  margin-bottom: 24px;
-}
-.step-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 5px;
-  position: relative;
-}
-.step-circle {
-  width: 32px; height: 32px;
-  border-radius: 50%;
-  background: #F3F4F6;
-  border: 2px solid #E5E7EB;
-  color: #9CA3AF;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 13px;
-  font-weight: 700;
-  transition: all .2s;
-}
-.step-circle.active { background: #04B49C; border-color: #04B49C; color: #fff; }
-.step-circle.done { background: #ECFDF5; border-color: #04B49C; color: #04B49C; }
-.step-label { font-size: 11.5px; color: #6B7280; }
-.step-label.active { color: #04B49C; font-weight: 600; }
-.step-line {
-  width: 60px;
-  height: 2px;
-  background: #E5E7EB;
-  margin-bottom: 20px;
-  align-self: flex-start;
-  margin-top: 15px;
-}
-.step-line.done { background: #04B49C; }
+  /* Mapping arrow */
+  .mapping-arrow { width: 32px; text-align: center; color: #9CA3AF; font-size: 18px; flex-shrink: 0; }
 
-/* Step Content */
-.step-content { display: none; }
-.step-content.active { display: block; }
+  /* Modal backdrop blur */
+  .modal-overlay { backdrop-filter: blur(2px); }
 
-/* Table */
-.migration-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 13px;
-  margin-top: 8px;
-}
-.migration-table th {
-  background: #F9FAFB;
-  padding: 10px 12px;
-  text-align: right;
-  font-weight: 600;
-  color: #374151;
-  border-bottom: 1px solid #E5E7EB;
-}
-.migration-table td {
-  padding: 10px 12px;
-  border-bottom: 1px solid #F3F4F6;
-  color: #374151;
-}
-.migration-table tr:hover td { background: #FAFAFA; }
+  /* Page transition */
+  [x-show] { transition-property: opacity; }
 
-/* Map result row */
-.map-result-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 10px 12px;
-  border: 1px solid #E5E7EB;
-  border-radius: 8px;
-  margin-bottom: 8px;
-}
-.map-result-arrow {
-  color: #04B49C;
-  font-size: 16px;
-}
-.map-result-check {
-  color: #04B49C;
-  font-size: 18px;
-  font-weight: 700;
-}
+  /* Sub nav active indicator */
+  .subnav-active { color: #0E6B5E; font-weight: 600; position: relative; }
+  .subnav-active::after {
+    content: ''; position: absolute; bottom: -10px; right: 0; left: 0;
+    height: 2px; background: #04B49C; border-radius: 2px;
+  }
 
-/* Modal Nav Buttons */
-.modal-nav {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 20px;
-  padding-top: 16px;
-  border-top: 1px solid #F3F4F6;
-}
-.modal-btn-back {
-  background: none;
-  border: 1px solid #D1D5DB;
-  color: #6B7280;
-  padding: 8px 20px;
-  border-radius: 7px;
-  cursor: pointer;
-  font-size: 13px;
-  font-family: 'Tajawal', sans-serif;
-}
-.modal-btn-next {
-  background: #04B49C;
-  color: #fff;
-  border: none;
-  padding: 8px 20px;
-  border-radius: 7px;
-  cursor: pointer;
-  font-size: 13px;
-  font-family: 'Tajawal', sans-serif;
-}
-.modal-btn-publish {
-  background: #04B49C;
-  color: #fff;
-  border: none;
-  padding: 10px 28px;
-  border-radius: 8px;
-  cursor: pointer;
-  font-size: 14px;
-  font-weight: 700;
-  font-family: 'Tajawal', sans-serif;
-}
-.success-state {
-  text-align: center;
-  padding: 30px 20px;
-  display: none;
-}
-.success-icon { font-size: 50px; margin-bottom: 12px; }
-.success-text { font-size: 16px; font-weight: 700; color: #065F46; }
+  /* Empty state icon bounce */
+  @keyframes bounce { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-6px)} }
+  .bounce-icon { animation: bounce 2s ease infinite; }
 
-/* Negate row highlight */
-.condition-row.negated {
-  border-right: 3px solid #EF4444;
-  background: #FEF2F2;
-}
+  /* Priority select highlight */
+  select:focus { outline: none; box-shadow: 0 0 0 3px rgba(4,180,156,0.15); }
 
-/* Helper text */
-.helper-text {
-  font-size: 12px;
-  color: #9CA3AF;
-  margin-top: 4px;
-}
+  /* Coverage legend dot */
+  .legend-dot { width: 10px; height: 10px; border-radius: 2px; display: inline-block; }
 
-/* Divider */
-.section-divider {
-  height: 1px;
-  background: #F3F4F6;
-  margin: 16px 0;
-}
+  /* Row hover reveal */
+  .route-row .row-actions { opacity: 0; transition: opacity 0.2s; }
+  .route-row:hover .row-actions { opacity: 1; }
+
+  /* Saving spinner */
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .spinner { animation: spin 0.8s linear infinite; }
+
+  /* Success check */
+  @keyframes pop { 0%{transform:scale(0.5);opacity:0} 70%{transform:scale(1.1)} 100%{transform:scale(1);opacity:1} }
+  .pop-in { animation: pop 0.4s ease forwards; }
+
+  /* Negate pill */
+  .negate-off { background:#F3F4F6; color:#6B7280; border:1px solid #E5E7EB; }
+  .negate-on  { background:#FEF2F2; color:#991B1B; border:1px solid #FECACA; }
+
+  /* Map container */
+  .leaflet-map-container { height: 320px; border-radius: 10px; overflow: hidden; border: 1px solid #E5E7EB; }
 </style>
 </head>
-<body>
+<body class="font-tajawal bg-gray-100 min-h-screen">
 
-<!-- ══════════════════════════════════════════════════════════════
-     TOP NAV
-══════════════════════════════════════════════════════════════ -->
-<nav class="top-nav">
-  <!-- Right: brand -->
-  <div class="nav-brand">
-    <span class="nav-logo-pill">salla</span>
-    <span class="nav-store-name">متجر وليد عيسى</span>
+<div
+  x-data="{
+    page: 'list',
+    defaultRouteEnabled: false,
+    migrationBannerVisible: true,
+    welcomeBannerVisible: true,
+    healthToastVisible: true,
+    search: '',
+    saving: false,
+    saveSuccess: false,
+    deleteModal: { open: false, routeId: null },
+    migrationModal: { open: false, step: 1, migrationSuccess: false },
+    simPanel: { open: false, city: 'الرياض', value: '', weight: '', qty: '', result: null, history: [] },
+    routes: [
+      { id:1, name:'مسار الرياض توصيل في نفس اليوم', market:'سوق المملكة العربية السعودية', type:'تسمية خاصة', enabled:true, orders:45 },
+      { id:2, name:'شحن طلبات نقيلة في الرياض', market:'سوق المملكة العربية السعودية', type:'تعيين تلقائي', enabled:true, orders:30 },
+      { id:3, name:'مسار توصيل في نفس اليوم', market:'سوق المملكة العربية السعودية', type:'تسمية خاصة', enabled:false, orders:15 },
+      { id:4, name:'مسار الرياض', market:'سوق المملكة العربية السعودية', type:'تسمية خاصة', enabled:false, orders:10 },
+    ],
+    formName: '',
+    formMarket: 'المملكة العربية السعودية',
+    formRouteType: 'تحديد الشركات',
+    formCarriers: [],
+    formConditions: [],
+    formMatchMode: 'all',
+    formSubsetN: 2,
+    formEnabled: true,
+    formPriority: '',
+    carrierDropdownOpen: false,
+    availableCarriers: [
+      { name: 'أرامكس', color: '#FF6B00', price: '' },
+      { name: 'SMSA', color: '#CC0000', price: '' },
+      { name: 'DHL', color: '#FFCC00', price: '' },
+      { name: 'Naqel', color: '#003087', price: '' },
+    ],
+    polygonMapInit: false,
+    polygonDrawn: false,
+    get filteredRoutes() {
+      if (!this.search) return this.routes;
+      return this.routes.filter(r => r.name.includes(this.search));
+    },
+    get enabledRoutesCount() {
+      return this.routes.filter(r => r.enabled).length;
+    },
+    get totalEnabledOrders() {
+      return this.routes.filter(r => r.enabled).reduce((s,r)=>s+r.orders,0);
+    },
+    get coverageData() {
+      const total = this.totalEnabledOrders + 10;
+      return this.routes.filter(r=>r.enabled).map(r=>({
+        name: r.name,
+        pct: Math.round((r.orders / total) * 100)
+      }));
+    },
+    get defaultPct() {
+      const total = this.totalEnabledOrders + 10;
+      return Math.round(10 / total * 100);
+    },
+    isCarrierSelected(name) {
+      return this.formCarriers.some(c=>c.name===name);
+    },
+    toggleCarrier(c) {
+      const idx = this.formCarriers.findIndex(x=>x.name===c.name);
+      if (idx > -1) this.formCarriers.splice(idx,1);
+      else this.formCarriers.push({...c});
+    },
+    removeCarrier(name) {
+      this.formCarriers = this.formCarriers.filter(c=>c.name!==name);
+    },
+    addCondition() {
+      this.formConditions.push({type:'قيمة السلة', op:'أكبر من', val:'', negated:false});
+    },
+    removeCondition(idx) {
+      this.formConditions.splice(idx,1);
+    },
+    confirmDelete() {
+      this.routes = this.routes.filter(r=>r.id!==this.deleteModal.routeId);
+      this.deleteModal.open=false; this.deleteModal.routeId=null;
+    },
+    saveRoute() {
+      if (!this.formName) return;
+      this.saving = true;
+      setTimeout(()=>{
+        this.saving = false;
+        this.saveSuccess = true;
+        const newRoute = {
+          id: Date.now(),
+          name: this.formName,
+          market: this.formMarket,
+          type: this.formRouteType,
+          enabled: this.formEnabled,
+          orders: 0
+        };
+        this.routes.push(newRoute);
+        setTimeout(()=>{
+          this.saveSuccess=false;
+          this.page='list';
+          this.formName=''; this.formCarriers=[]; this.formConditions=[];
+          this.formRouteType='تحديد الشركات'; this.formMatchMode='all'; this.formSubsetN=2;
+        }, 800);
+      }, 900);
+    },
+    runSimulation() {
+      const v = parseFloat(this.simPanel.value)||0;
+      const w = parseFloat(this.simPanel.weight)||0;
+      const q = parseFloat(this.simPanel.qty)||0;
+      const city = this.simPanel.city;
+      let result;
+      if (city==='الرياض' || v>100) {
+        result = {
+          match: true,
+          routeName: city==='الرياض' ? 'مسار الرياض توصيل في نفس اليوم' : 'مسار الطلبات عالية القيمة',
+          carriers: city==='الرياض' ? ['أرامكس','SMSA'] : ['DHL','Naqel'],
+          reason: city==='الرياض' ? 'المدينة = الرياض' : 'قيمة السلة > ١٠٠ ريال'
+        };
+      } else if (w < 5 && w > 0) {
+        result = {
+          match: true,
+          routeName: 'مسار الطلبات الخفيفة',
+          carriers: ['Naqel','SMSA'],
+          reason: 'وزن السلة < ٥ كجم'
+        };
+      } else {
+        result = { match: false };
+      }
+      this.simPanel.result = result;
+      // Add to history
+      this.simPanel.history.unshift({
+        city, value: this.simPanel.value, weight: this.simPanel.weight,
+        match: result.match, routeName: result.routeName||null,
+        ts: new Date().toLocaleTimeString('ar-SA', {hour:'2-digit',minute:'2-digit'})
+      });
+      if (this.simPanel.history.length > 5) this.simPanel.history.pop();
+    },
+    scrollToDefaultRoute() {
+      const el = document.getElementById('default-route-card');
+      if (el) { el.scrollIntoView({behavior:'smooth'}); el.style.outline='3px solid #04B49C'; setTimeout(()=>el.style.outline='',2000); }
+      this.healthToastVisible = false;
+    },
+    finishMigration() {
+      const newRoutes = [
+        { id: Date.now()+1, name:'مسار الرياض الجديد', market:'سوق المملكة العربية السعودية', type:'تعيين تلقائي', enabled:true, orders:12 },
+        { id: Date.now()+2, name:'مسار الطلبات الخفيفة', market:'سوق المملكة العربية السعودية', type:'تحديد الشركات', enabled:true, orders:8 },
+        { id: Date.now()+3, name:'مسار خارج الدمام', market:'سوق المملكة العربية السعودية', type:'تسمية خاصة', enabled:true, orders:5 },
+      ];
+      this.routes.push(...newRoutes);
+      this.migrationModal.migrationSuccess = true;
+    },
+  }"
+  x-init="
+    $watch('defaultRouteEnabled', v => { if(v) healthToastVisible=false; });
+    setTimeout(()=>{ healthToastVisible=false; }, 8000);
+  "
+  class="relative"
+>
+
+  <!-- ===================== TOP NAV ===================== -->
+  <nav class="sticky top-0 z-40 bg-[#1A1A2E] h-14 flex items-center px-4 gap-4">
+    <!-- Right: Logo + Store -->
+    <div class="flex items-center gap-2 shrink-0">
+      <span class="bg-teal text-white font-bold px-3 py-1 rounded-full text-sm">salla</span>
+      <span class="text-gray-300 text-sm">متجر وليد عيسى</span>
+    </div>
+    <!-- Center Nav -->
+    <div class="flex-1 flex items-center justify-center gap-6 text-gray-300 text-sm">
+      <a href="#" class="hover:text-white transition">الرئيسية</a>
+      <a href="#" class="hover:text-white transition">الطلبات</a>
+      <a href="#" class="hover:text-white transition">المنتجات</a>
+      <a href="#" class="hover:text-white transition">التسويق</a>
+      <a href="#" class="hover:text-white transition">المتجر وقنوات البيع</a>
+      <a href="#" class="hover:text-white transition">التقارير</a>
+      <a href="#" class="hover:text-white transition">المزيد</a>
+    </div>
+    <!-- Left: Icons + Avatar -->
+    <div class="flex items-center gap-3 shrink-0">
+      <button class="text-gray-300 hover:text-white p-1">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
+      </button>
+      <button class="text-gray-300 hover:text-white p-1">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+      </button>
+      <button class="text-gray-300 hover:text-white p-1">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+      </button>
+      <div class="w-8 h-8 rounded-full bg-teal flex items-center justify-center text-white font-bold text-sm">و</div>
+    </div>
+  </nav>
+
+  <!-- ===================== SUB NAV ===================== -->
+  <div class="bg-white border-b border-gray-200 py-2 px-6 flex items-center gap-6">
+    <span class="font-bold text-gray-800 shrink-0">الشحن والتوصيل</span>
+    <div class="flex-1 flex items-center gap-5 text-sm text-gray-500">
+      <a href="#" class="hover:text-teal transition">إدارة التشغيل</a>
+      <a href="#" class="hover:text-teal transition">مواد التغليف</a>
+      <a href="#" class="hover:text-teal transition">التقارير</a>
+      <a href="#" class="hover:text-teal transition">أرشيف البوليصات</a>
+      <a href="#" class="hover:text-teal transition">جاهزية الشحن الدولي</a>
+      <a href="#" class="hover:text-teal transition font-medium text-teal-dark">الإعدادات</a>
+    </div>
+    <button class="text-xs text-gray-500 border border-gray-300 rounded-lg px-3 py-1 hover:bg-gray-50 shrink-0">
+      مركز المساعدة ⓘ
+    </button>
   </div>
 
-  <!-- Center: links -->
-  <ul class="nav-links">
-    <li><a href="#">الرئيسية</a></li>
-    <li><a href="#">الطلبات</a></li>
-    <li><a href="#">المنتجات</a></li>
-    <li><a href="#">التسويق</a></li>
-    <li><a href="#">المتجر وقنوات البيع</a></li>
-    <li><a href="#">التقارير</a></li>
-    <li><a href="#">المزيد</a></li>
-  </ul>
-
-  <!-- Left: icons -->
-  <div class="nav-icons">
-    <button class="nav-icon-btn" title="الإشعارات">🔔</button>
-    <button class="nav-icon-btn" title="الرسائل">✉️</button>
-    <button class="nav-icon-btn" title="الإعدادات">⚙️</button>
-    <div class="nav-avatar" title="الملف الشخصي">و</div>
-  </div>
-</nav>
-
-<!-- ══════════════════════════════════════════════════════════════
-     SUB NAV
-══════════════════════════════════════════════════════════════ -->
-<nav class="sub-nav">
-  <!-- Right: section label -->
-  <span class="sub-nav-section-label">الشحن والتوصيل</span>
-
-  <!-- Left: links + help -->
-  <div style="display:flex;align-items:center;gap:4px;">
-    <ul class="sub-nav-links">
-      <li><a href="#">إدارة التشغيل</a></li>
-      <li><a href="#">مواد التغليف</a></li>
-      <li><a href="#">التقارير</a></li>
-      <li><a href="#">أرشيف البوليصات</a></li>
-      <li><a href="#">جاهزية الشحن الدولي</a></li>
-      <li><a href="#">الإعدادات</a></li>
-    </ul>
-    <button class="sub-nav-help-btn">مركز المساعدة ⓘ</button>
-  </div>
-</nav>
-
-<!-- ══════════════════════════════════════════════════════════════
-     FEATURE 1: MIGRATION WIZARD BANNER
-══════════════════════════════════════════════════════════════ -->
-<div class="migration-banner" id="migrationBanner">
-  <span style="font-size:20px;">⚠️</span>
-  <div class="migration-banner-text">
-    <strong>لديك ٤,٨١٠ تاجر على نظام القيود القديم</strong> — هل تريد ترحيل قواعدهم للمسارات؟
-  </div>
-  <button class="migration-start-btn" onclick="openMigrationModal()">ابدأ الترحيل</button>
-  <button class="migration-dismiss-btn" onclick="dismissBanner()" title="إغلاق">✕</button>
-</div>
-
-<!-- BREADCRUMB -->
-<div class="breadcrumb">
-  <a href="#">الشحن والتوصيل</a>
-  <span class="breadcrumb-sep">&gt;</span>
-  <a href="#">الإعدادات</a>
-  <span class="breadcrumb-sep">&gt;</span>
-  <a href="#">مسارات الشحن</a>
-  <span class="breadcrumb-sep">&gt;</span>
-  <span class="breadcrumb-current">مسار شحن جديد</span>
-</div>
-
-<!-- ══════════════════════════════════════════════════════════════
-     PAGE CONTENT
-══════════════════════════════════════════════════════════════ -->
-<div class="page-content">
-  <div class="two-col">
-
-    <!-- ── MAIN COLUMN ── -->
-    <div class="col-main">
-
-      <!-- ╔═══════════════════════════════════════╗
-           ║ Card 1: معلومات مسار الشحن           ║
-           ╚═══════════════════════════════════════╝ -->
-      <div class="card">
-        <div class="card-header">
-          <div>
-            <div class="card-title">معلومات مسار الشحن</div>
-          </div>
-          <div class="toggle-wrap">
-            <span class="toggle-label-text">تفعيل المسار</span>
-            <label class="toggle">
-              <input type="checkbox" id="routeToggle" checked onchange="updateSummary()">
-              <span class="toggle-slider"></span>
-            </label>
-          </div>
-        </div>
-
-        <!-- اسم المسار -->
-        <div class="form-group">
-          <label class="form-label">اسم المسار <span class="required">*</span></label>
-          <input type="text" class="form-input" id="routeName"
-            placeholder="اختر اسمًا يسهّل عليك تمييزه، مثال: شحن المناطق التالية"
-            oninput="updateSummary()">
-        </div>
-
-        <!-- السوق -->
-        <div class="form-group">
-          <label class="form-label">السوق <span class="required">*</span></label>
-          <select class="form-select" id="routeMarket" onchange="updateSummary()">
-            <option value="">اختر السوق</option>
-            <option value="sa">المملكة العربية السعودية</option>
-            <option value="ae">الإمارات العربية المتحدة</option>
-            <option value="kw">الكويت</option>
-          </select>
-        </div>
-
-        <!-- نوع المسار -->
-        <div class="form-group">
-          <label class="form-label">نوع المسار <span class="required">*</span></label>
-          <div class="radio-cards">
-            <div class="radio-card selected" id="rt-carriers" onclick="selectRouteType('carriers')">
-              <span class="radio-card-check">✓</span>
-              <div class="radio-card-title">تحديد الشركات</div>
-              <div class="radio-card-desc">تُظهر شركات الشحن المحددة وفق الأولوية في صفحة الدفع للعميل</div>
-            </div>
-            <div class="radio-card" id="rt-auto" onclick="selectRouteType('auto')">
-              <span class="radio-card-check">✓</span>
-              <div class="radio-card-title">تعيين تلقائي</div>
-              <div class="radio-card-desc">تعيين شركة الشحن تلقائيًا للطلب دون أن يراها العميل</div>
-            </div>
-            <div class="radio-card" id="rt-label" onclick="selectRouteType('label')">
-              <span class="radio-card-check">✓</span>
-              <div class="radio-card-title">تسمية خاصة</div>
-              <div class="radio-card-desc">إخفاء أسماء شركات الشحن وإظهار مسمى خاص بك</div>
-            </div>
-          </div>
-        </div>
-
-        <!-- شركات الشحن -->
-        <div class="form-group">
-          <label class="form-label">شركة/ات الشحن <span class="required">*</span></label>
-          <select class="form-select" id="carrierSelect" onchange="addCarrierFromSelect(this)">
-            <option value="">— اختر شركة شحن —</option>
-            <option value="aramex">أرامكس</option>
-            <option value="smsa">SMSA</option>
-            <option value="dhl">DHL</option>
-            <option value="naqel">Naqel</option>
-          </select>
-
-          <!-- Selected carrier tags -->
-          <div class="carrier-tags" id="carrierTags" style="margin-top:10px;">
-            <span class="carrier-tag tag-aramex" data-carrier="aramex">
-              أرامكس <span class="tag-remove" onclick="removeCarrier('aramex')">×</span>
-            </span>
-            <span class="carrier-tag tag-smsa" data-carrier="smsa">
-              SMSA <span class="tag-remove" onclick="removeCarrier('smsa')">×</span>
-            </span>
-            <span class="carrier-tag tag-dhl" data-carrier="dhl">
-              DHL <span class="tag-remove" onclick="removeCarrier('dhl')">×</span>
-            </span>
-            <span class="carrier-tag tag-naqel" data-carrier="naqel">
-              Naqel <span class="tag-remove" onclick="removeCarrier('naqel')">×</span>
-            </span>
-          </div>
-
-          <!-- Carrier rows -->
-          <div class="carrier-rows" id="carrierRows">
-            <div class="carrier-row" data-carrier="aramex">
-              <div class="carrier-icon aramex">AR</div>
-              <div>
-                <div class="carrier-name">أرامكس</div>
-                <div class="carrier-time">1–2 أيام عمل</div>
-              </div>
-              <div style="flex:1;"></div>
-              <input type="number" class="carrier-price-input" placeholder="0.00">
-              <span class="carrier-price-unit">ر.س</span>
-              <span class="carrier-drag" title="سحب لإعادة الترتيب">⠿</span>
-              <label class="toggle" style="width:34px;height:18px;">
-                <input type="checkbox" checked>
-                <span class="toggle-slider"></span>
-              </label>
-            </div>
-            <div class="carrier-row" data-carrier="smsa">
-              <div class="carrier-icon smsa">SM</div>
-              <div>
-                <div class="carrier-name">SMSA</div>
-                <div class="carrier-time">1–2 أيام عمل</div>
-              </div>
-              <div style="flex:1;"></div>
-              <input type="number" class="carrier-price-input" placeholder="0.00">
-              <span class="carrier-price-unit">ر.س</span>
-              <span class="carrier-drag" title="سحب لإعادة الترتيب">⠿</span>
-              <label class="toggle" style="width:34px;height:18px;">
-                <input type="checkbox" checked>
-                <span class="toggle-slider"></span>
-              </label>
-            </div>
-            <div class="carrier-row" data-carrier="dhl">
-              <div class="carrier-icon dhl">DH</div>
-              <div>
-                <div class="carrier-name">DHL</div>
-                <div class="carrier-time">2–4 أيام عمل</div>
-              </div>
-              <div style="flex:1;"></div>
-              <input type="number" class="carrier-price-input" placeholder="0.00">
-              <span class="carrier-price-unit">ر.س</span>
-              <span class="carrier-drag" title="سحب لإعادة الترتيب">⠿</span>
-              <label class="toggle" style="width:34px;height:18px;">
-                <input type="checkbox" checked>
-                <span class="toggle-slider"></span>
-              </label>
-            </div>
-            <div class="carrier-row" data-carrier="naqel">
-              <div class="carrier-icon naqel">NQ</div>
-              <div>
-                <div class="carrier-name">Naqel</div>
-                <div class="carrier-time">2–3 أيام عمل</div>
-              </div>
-              <div style="flex:1;"></div>
-              <input type="number" class="carrier-price-input" placeholder="0.00">
-              <span class="carrier-price-unit">ر.س</span>
-              <span class="carrier-drag" title="سحب لإعادة الترتيب">⠿</span>
-              <label class="toggle" style="width:34px;height:18px;">
-                <input type="checkbox" checked>
-                <span class="toggle-slider"></span>
-              </label>
-            </div>
-          </div>
-
-          <button class="add-carrier-btn" onclick="showCarrierSelect()">
-            <span>+</span> إضافة شركة شحن
+  <!-- =================== HEALTH TOAST =================== -->
+  <div
+    x-show="defaultRouteEnabled === false && healthToastVisible"
+    x-transition:enter="transition ease-out duration-300"
+    x-transition:enter-start="opacity-0 translate-x-4"
+    x-transition:enter-end="opacity-100 translate-x-0"
+    x-transition:leave="transition ease-in duration-200"
+    x-transition:leave-start="opacity-100"
+    x-transition:leave-end="opacity-0"
+    class="health-toast"
+    style="display:none"
+  >
+    <div class="bg-[#FDECEC] border border-[#B71C1C] rounded-lg shadow-lg p-4">
+      <div class="flex items-start gap-2">
+        <span class="text-lg">⚠️</span>
+        <div class="flex-1">
+          <p class="text-sm font-semibold text-red-800">المسار الافتراضي معطّل</p>
+          <p class="text-xs text-red-700 mt-0.5">الطلبات غير المطابقة ستفشل عند الدفع</p>
+          <button @click="scrollToDefaultRoute()" class="text-xs text-red-700 underline font-semibold mt-1 hover:text-red-900">
+            فعّله الآن
           </button>
         </div>
-      </div><!-- /card 1 -->
+        <button @click="healthToastVisible=false" class="text-red-400 hover:text-red-600 text-lg leading-none mt-0.5">✕</button>
+      </div>
+    </div>
+  </div>
 
+  <!-- =================== PAGE 1: LIST =================== -->
+  <div x-show="page==='list'" style="display:none">
 
-      <!-- ╔═══════════════════════════════════════╗
-           ║ Card 2: شروط تطبيق المسار           ║
-           ╚═══════════════════════════════════════╝ -->
-      <div class="card">
-        <!-- Header -->
-        <div class="conditions-header">
-          <div class="conditions-title-wrap">
-            <span class="card-title">شروط تطبيق المسار</span>
-            <span class="badge-optional">اختياري</span>
-          </div>
-          <!-- Match mode pills -->
-          <div class="match-mode-pills">
-            <button class="match-pill active" id="pill-and" onclick="setMatchMode('and')">● عند تحقق جميع الشروط (AND)</button>
-            <button class="match-pill" id="pill-or" onclick="setMatchMode('or')">○ عند تحقق شرط واحد (OR)</button>
-            <button class="match-pill" id="pill-subset" onclick="setMatchMode('subset')">
-              ○ عدد محدد من الشروط <span class="badge-new">جديد</span>
-            </button>
-          </div>
-        </div>
-        <p class="card-subtitle" style="margin-bottom:12px;">حدّد متى يُطبَّق هذا المسار</p>
+    <!-- Migration Banner -->
+    <div
+      x-show="migrationBannerVisible"
+      x-transition:leave="transition ease-in duration-200"
+      x-transition:leave-start="opacity-100 max-h-20"
+      x-transition:leave-end="opacity-0 max-h-0"
+      class="bg-amber-light border-b-2 border-amber px-6 py-3 flex items-center gap-3"
+      style="display:none"
+    >
+      <span class="text-lg">⚠️</span>
+      <p class="flex-1 text-sm text-amber font-medium">
+        لديك <strong>٤,٨١٠ تاجر</strong> على نظام القيود القديم — هل تريد ترحيل قواعدهم للمسارات؟
+      </p>
+      <button
+        @click="migrationModal.open=true; migrationModal.step=1; migrationModal.migrationSuccess=false"
+        class="text-sm text-amber border border-amber rounded-lg px-3 py-1.5 hover:bg-amber/10 font-medium shrink-0"
+      >
+        ابدأ الترحيل
+      </button>
+      <button @click="migrationBannerVisible=false" class="text-amber hover:text-amber/70 text-lg shrink-0">✕</button>
+    </div>
 
-        <!-- Feature 4: Subset count row -->
-        <div class="subset-count-row" id="subsetCountRow" style="display:none;">
-          يكفي تحقق
-          <input type="number" class="subset-count-input" id="subsetCount" value="2" min="1">
-          شروط من أصل <strong id="subsetTotal">0</strong>
-        </div>
-
-        <!-- Conditions list -->
-        <div id="conditionsList">
-          <!-- Empty state -->
-          <div class="conditions-empty" id="conditionsEmpty">
-            <div class="conditions-empty-icon">📋</div>
-            <div class="conditions-empty-title">لم تضف شروطًا بعد</div>
-            <div class="conditions-empty-desc">يمكنك تحديد شروط مثل المدينة أو قيمة السلة أو وزنها لتخصيص تطبيق هذا المسار</div>
-            <button class="add-condition-btn" onclick="addCondition()" style="margin:0 auto;">
-              <span>+</span> إضافة شرط جديد
-            </button>
-          </div>
-        </div>
-
-        <!-- Add condition button (shown when there are conditions) -->
-        <button class="add-condition-btn" id="addConditionBtn" style="display:none;" onclick="addCondition()">
-          <span>+</span> إضافة شرط جديد
+    <!-- Welcome Banner -->
+    <div
+      x-show="welcomeBannerVisible"
+      x-transition:leave="transition ease-in duration-300"
+      x-transition:leave-start="opacity-100 max-h-40"
+      x-transition:leave-end="opacity-0 max-h-0"
+      class="mx-6 mt-4 bg-teal-light border-r-4 border-teal rounded-xl px-6 py-4 flex items-start gap-4"
+      style="display:none"
+    >
+      <div class="flex-1">
+        <h3 class="font-bold text-teal-dark text-base">أهلًا بك في نظام المسارات الجديد لإدارة الشحن</h3>
+        <p class="text-sm text-gray-600 mt-1">
+          جدّدنا نظام إدارة الشحن في متجرك باستبدال القيود بنظام المسارات، لتجربة أكثر مرونة وتحكمًا في قواعد الشحن.
+        </p>
+        <button class="mt-2 text-sm text-teal border border-teal rounded-lg px-3 py-1 hover:bg-teal/10 font-medium">
+          اعرف أكثر
         </button>
-      </div><!-- /card 2 -->
+      </div>
+      <button @click="welcomeBannerVisible=false" class="text-gray-400 hover:text-gray-600 text-xl leading-none mt-0.5">✕</button>
+    </div>
 
+    <!-- Page Header -->
+    <div class="px-6 pt-4 pb-2 flex items-center justify-between">
+      <!-- Breadcrumb -->
+      <nav class="text-sm text-gray-400 flex items-center gap-1">
+        <span class="hover:text-teal cursor-pointer">الشحن والتوصيل</span>
+        <span class="text-gray-300">›</span>
+        <span class="hover:text-teal cursor-pointer">الإعدادات</span>
+        <span class="text-gray-300">›</span>
+        <span class="text-gray-700 font-medium">مسارات الشحن</span>
+      </nav>
+      <!-- Actions -->
+      <div class="flex items-center gap-2">
+        <button class="text-sm text-gray-500 border border-gray-300 rounded-lg px-3 py-1.5 hover:bg-gray-50">
+          مساعدة ؟
+        </button>
+        <button
+          @click="page='form'"
+          class="text-sm text-white bg-teal rounded-lg px-4 py-1.5 hover:bg-teal-dark transition font-medium"
+        >
+          + مسار شحن جديد
+        </button>
+      </div>
+    </div>
 
-      <!-- ╔═══════════════════════════════════════╗
-           ║ Card 3: ترتيب شركات الشحن           ║
-           ╚═══════════════════════════════════════╝ -->
-      <div class="card">
-        <div class="card-header" style="margin-bottom:12px;">
-          <div>
-            <div class="card-title-teal">ترتيب شركات الشحن</div>
-            <div class="card-subtitle">رتّب أولوية ظهور شركات الشحن المعروضة للعملاء</div>
-          </div>
+    <!-- Default Route Card -->
+    <div id="default-route-card" class="mx-6 mt-3 bg-white border border-gray-200 rounded-xl p-5 transition-all duration-300">
+      <!-- Header -->
+      <div class="flex items-center justify-between mb-3">
+        <div class="flex items-center gap-2">
+          <span class="text-2xl">🚚</span>
+          <span class="font-bold text-gray-800 text-base">المسار الافتراضي</span>
+          <!-- Status Badge -->
+          <span
+            x-show="!defaultRouteEnabled"
+            class="text-xs px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 font-medium"
+          >معطل</span>
+          <span
+            x-show="defaultRouteEnabled && enabledRoutesCount > 0"
+            class="text-xs px-2 py-0.5 rounded-full bg-green-100 text-green-800 font-medium"
+          >مفعّل</span>
+          <span
+            x-show="defaultRouteEnabled && enabledRoutesCount === 0"
+            class="text-xs px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 font-medium"
+          >مفعّل — يُطبَّق على كل الطلبات</span>
         </div>
-        <div class="form-group" style="margin-bottom:0;">
-          <label class="form-label">خيارات الأولوية <span class="required">*</span></label>
-          <select class="form-select">
-            <option value="salla">توصيات سلة</option>
-            <option value="price">الأقل سعرًا أولًا</option>
-            <option value="speed">الأسرع توصيلًا أولًا</option>
-            <option value="manual">ترتيب يدوي</option>
-          </select>
+        <div class="flex items-center gap-3">
+          <label class="toggle-switch">
+            <input type="checkbox" x-model="defaultRouteEnabled">
+            <span class="toggle-slider"></span>
+          </label>
+          <button class="text-sm text-gray-600 border border-gray-300 rounded-lg px-3 py-1.5 hover:bg-gray-50">
+            تخصيص ⚙️
+          </button>
         </div>
-      </div><!-- /card 3 -->
-
-
-      <!-- ╔═══════════════════════════════════════╗
-           ║ Card 4: أولوية تطبيق المسار         ║
-           ╚═══════════════════════════════════════╝ -->
-      <div class="card">
-        <div class="card-header" style="margin-bottom:12px;">
-          <div>
-            <div class="card-title">
-              أولوية تطبيق المسار
-              <span class="badge-optional" style="margin-right:6px;font-size:12px;">اختياري</span>
-            </div>
-            <div class="card-subtitle">حدّد المسار السابق أو سيُضاف في نهاية القائمة</div>
-          </div>
-        </div>
-        <div class="form-group" style="margin-bottom:0;">
-          <label class="form-label">إضافة هذا المسار بعد</label>
-          <select class="form-select">
-            <option value="">اختر المسار</option>
-            <option value="1">مسار الرياض الرئيسي</option>
-            <option value="2">مسار جدة والغرب</option>
-            <option value="3">مسار المناطق النائية</option>
-          </select>
-          <div class="helper-text">إذا لم تختر مسارًا سيُضاف في نهاية قائمة المسارات</div>
-        </div>
-      </div><!-- /card 4 -->
-
-      <!-- Bottom actions -->
-      <div class="bottom-actions" style="padding:0;">
-        <button class="btn-cancel">إلغاء</button>
-        <button class="btn-save" onclick="saveRoute()">حفظ المسار</button>
       </div>
 
-    </div><!-- /col-main -->
+      <!-- Description -->
+      <p class="text-sm text-gray-500 leading-relaxed mb-3">
+        عند التفعيل، تُعرض شركات الشحن المدعومة حسب عنوان العميل إذا لم ينطابق الطلب مع أي مسار، بينما يؤدي تعطيله إلى عدم ظهور أي خيارات شحن للعميل ومنع إتمام الطلب.
+      </p>
 
+      <!-- State A: Disabled Warning -->
+      <div x-show="!defaultRouteEnabled" class="bg-[#FDECEC] border border-[#B71C1C] rounded-lg p-3 flex items-start gap-2">
+        <span>⚠️</span>
+        <div class="flex-1">
+          <p class="text-sm font-semibold text-red-800">تحذير: المسار الافتراضي معطّل</p>
+          <p class="text-xs text-red-700 mt-0.5">أي طلب لا يطابق مساراتك سيُوقف عند الدفع ولن يرى العميل أي خيار شحن.</p>
+        </div>
+        <button @click="defaultRouteEnabled=true" class="text-xs text-red-700 border border-red-400 rounded-lg px-3 py-1 hover:bg-red-50 font-medium shrink-0">
+          فعّله الآن
+        </button>
+      </div>
 
-    <!-- ── SIDEBAR: Summary Panel ── -->
-    <div class="col-sidebar">
-      <div class="summary-panel">
-        <div class="summary-title">ملخص المسار</div>
-        <div id="summaryContent">
-          <div class="summary-empty" id="summaryEmpty">
-            <div class="summary-empty-icon">📄</div>
-            <div class="summary-empty-text">لا توجد بيانات لعرضها</div>
-          </div>
-          <div id="summaryData" style="display:none;">
-            <div class="summary-item">
-              <div class="summary-item-label">اسم المسار</div>
-              <div class="summary-item-value" id="sum-name">—</div>
-            </div>
-            <div class="summary-item" id="sum-market-wrap">
-              <div class="summary-item-label">السوق</div>
-              <div class="summary-item-value" id="sum-market">—</div>
-            </div>
-            <div class="summary-item" id="sum-type-wrap">
-              <div class="summary-item-label">نوع المسار</div>
-              <div class="summary-item-value" id="sum-type">تحديد الشركات</div>
-            </div>
-            <div class="section-divider"></div>
-            <div class="summary-item">
-              <div class="summary-item-label">شركات الشحن</div>
-              <div class="summary-carriers" id="sum-carriers">
-                <span style="font-size:13px;color:#1A1A2E;">أرامكس · SMSA · DHL · Naqel</span>
+      <!-- State B: Enabled with routes -->
+      <div x-show="defaultRouteEnabled && enabledRoutesCount > 0">
+        <div class="bg-teal-light border border-teal/30 rounded-lg p-3 mb-3 flex items-center gap-2">
+          <span>✅</span>
+          <p class="text-sm text-teal-dark font-medium">
+            سيُطبَّق على الطلبات التي لا تطابق مساراتك الـ
+            <strong x-text="enabledRoutesCount"></strong>
+          </p>
+        </div>
+        <!-- Coverage Bar -->
+        <div>
+          <p class="text-xs font-semibold text-gray-600 mb-2">تغطية مساراتك</p>
+          <div class="coverage-bar">
+            <template x-for="(seg, i) in coverageData" :key="i">
+              <div
+                class="coverage-segment"
+                :style="`width:${seg.pct}%; background:#04B49C; opacity:${0.6+0.4*(i/Math.max(coverageData.length-1,1))}`"
+                :title="seg.name"
+              >
+                <span x-show="seg.pct > 8" x-text="seg.pct+'%'" class="text-white text-xs"></span>
               </div>
-            </div>
-            <div class="section-divider"></div>
-            <div class="summary-item">
-              <div class="summary-item-label">الشروط</div>
-              <div class="summary-item-value" id="sum-conditions">لا توجد شروط</div>
-            </div>
-            <div class="summary-item">
-              <div class="summary-item-label">الحالة</div>
-              <div class="summary-item-value" id="sum-status" style="color:#04B49C;">✅ مفعّل</div>
+            </template>
+            <div
+              class="coverage-segment"
+              :style="`width:${defaultPct}%; background:#9CA3AF`"
+              :title="'المسار الافتراضي'"
+            >
+              <span x-show="defaultPct > 8" x-text="defaultPct+'%'" class="text-white text-xs"></span>
             </div>
           </div>
+          <p class="text-xs text-gray-400 mt-1">~١٠٪ من طلباتك تصل للمسار الافتراضي شهرياً</p>
         </div>
       </div>
-    </div>
 
-  </div><!-- /two-col -->
-</div><!-- /page-content -->
-
-
-<!-- ══════════════════════════════════════════════════════════════
-     FEATURE 5: SIMULATION PANEL
-══════════════════════════════════════════════════════════════ -->
-<button class="sim-trigger-btn" onclick="toggleSimPanel()">
-  🔍 جرّب المسار
-</button>
-
-<div class="sim-panel" id="simPanel">
-  <div class="sim-panel-header">
-    <div class="sim-panel-title">محاكاة تطبيق المسار</div>
-    <button class="sim-close-btn" onclick="toggleSimPanel()">✕</button>
-  </div>
-  <div class="sim-body">
-    <div>
-      <div class="sim-label">قيمة السلة (ريال)</div>
-      <input type="number" class="sim-input" id="sim-value" placeholder="مثال: 150">
-    </div>
-    <div>
-      <div class="sim-label">وزن السلة (كجم)</div>
-      <input type="number" class="sim-input" id="sim-weight" placeholder="مثال: 2.5">
-    </div>
-    <div>
-      <div class="sim-label">كمية المنتجات</div>
-      <input type="number" class="sim-input" id="sim-qty" placeholder="مثال: 3">
-    </div>
-    <div>
-      <div class="sim-label">المدينة</div>
-      <select class="sim-select" id="sim-city">
-        <option value="">اختر المدينة</option>
-        <option value="riyadh">الرياض</option>
-        <option value="jeddah">جدة</option>
-        <option value="dammam">الدمام</option>
-        <option value="abha">أبها</option>
-      </select>
-    </div>
-    <button class="sim-run-btn" onclick="runSimulation()">شغّل المحاكاة ▶</button>
-    <div class="sim-result" id="simResult">
-      <div class="sim-result-card" id="simResultCard"></div>
-    </div>
-  </div>
-</div>
-
-
-<!-- ══════════════════════════════════════════════════════════════
-     MIGRATION WIZARD MODAL
-══════════════════════════════════════════════════════════════ -->
-<div class="modal-overlay" id="migrationModal">
-  <div class="modal-box">
-    <!-- Header -->
-    <div class="modal-header">
-      <div class="modal-title">معالج ترحيل القيود القديمة</div>
-      <button class="modal-close-btn" onclick="closeMigrationModal()">✕</button>
-    </div>
-
-    <!-- Step Indicator -->
-    <div class="step-indicator" id="stepIndicator">
-      <div class="step-item">
-        <div class="step-circle active" id="step-circle-1">١</div>
-        <div class="step-label active" id="step-label-1">قواعدك القديمة</div>
-      </div>
-      <div class="step-line" id="step-line-1"></div>
-      <div class="step-item">
-        <div class="step-circle" id="step-circle-2">٢</div>
-        <div class="step-label" id="step-label-2">المطابقة التلقائية</div>
-      </div>
-      <div class="step-line" id="step-line-2"></div>
-      <div class="step-item">
-        <div class="step-circle" id="step-circle-3">٣</div>
-        <div class="step-label" id="step-label-3">مراجعة ونشر</div>
+      <!-- State C: Enabled, no custom routes -->
+      <div x-show="defaultRouteEnabled && enabledRoutesCount === 0" class="bg-amber-light border border-amber/30 rounded-lg p-3">
+        <p class="text-sm text-amber font-medium">⚠️ ليس لديك أي مسارات خاصة — المسار الافتراضي يُطبَّق على كل طلباتك</p>
       </div>
     </div>
 
-    <!-- Success State -->
-    <div class="success-state" id="migrationSuccess">
-      <div class="success-icon">✅</div>
-      <div class="success-text">تم الترحيل بنجاح!</div>
-      <div style="font-size:13px;color:#6B7280;margin-top:8px;">تم إنشاء المسارات ونشرها بنجاح في متجرك</div>
-      <button class="modal-btn-publish" style="margin-top:20px;" onclick="closeMigrationModal()">إغلاق</button>
+    <!-- Search Bar -->
+    <div class="mx-6 mt-4">
+      <input
+        x-model="search"
+        type="text"
+        placeholder="ابحث باسم المسار 🔍"
+        class="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal/30 focus:border-teal bg-white"
+      >
     </div>
 
-    <!-- Step 1: Old Rules -->
-    <div class="step-content active" id="step-1">
-      <p style="font-size:13px;color:#6B7280;margin-bottom:12px;">القواعد التالية موجودة في نظامك القديم وسيتم ترحيلها:</p>
-      <table class="migration-table">
-        <thead>
+    <!-- Routes Table -->
+    <div class="mx-6 mt-4 mb-4 bg-white rounded-xl overflow-hidden border border-gray-200 shadow-sm">
+      <!-- Table toolbar -->
+      <div class="flex items-center justify-between px-4 py-3 border-b border-gray-100 bg-gray-50/50">
+        <div class="flex items-center gap-3">
+          <span class="text-xs text-gray-500 font-medium">
+            إجمالي المسارات:
+            <strong class="text-gray-700" x-text="routes.length"></strong>
+          </span>
+          <span class="text-gray-200">|</span>
+          <span class="text-xs text-gray-500">
+            مفعّلة:
+            <strong class="text-green-600" x-text="routes.filter(r=>r.enabled).length"></strong>
+          </span>
+          <span class="text-gray-200">|</span>
+          <span class="text-xs text-gray-500">
+            معطّلة:
+            <strong class="text-gray-400" x-text="routes.filter(r=>!r.enabled).length"></strong>
+          </span>
+        </div>
+        <div class="flex items-center gap-2">
+          <span class="text-xs text-gray-400">الترتيب يحدد أولوية المطابقة</span>
+          <span class="text-gray-300 cursor-help text-xs" data-tooltip="المسار الأعلى في القائمة يُطبَّق أولاً عند تطابق شروط متعددة">ⓘ</span>
+        </div>
+      </div>
+
+      <table class="w-full text-sm">
+        <thead class="bg-gray-50 border-b border-gray-200">
           <tr>
-            <th>اسم القاعدة</th>
-            <th>الشروط</th>
-            <th>الشركة</th>
+            <th class="px-4 py-3 text-right text-xs font-semibold text-gray-500 w-24">
+              ترتيب المسارات
+              <span class="text-gray-400 cursor-help" title="اسحب للترتيب">ⓘ</span>
+            </th>
+            <th class="px-4 py-3 text-right text-xs font-semibold text-gray-500">المسار</th>
+            <th class="px-4 py-3 text-right text-xs font-semibold text-gray-500">السوق</th>
+            <th class="px-4 py-3 text-right text-xs font-semibold text-gray-500">نوع المسار</th>
+            <th class="px-4 py-3 text-right text-xs font-semibold text-gray-500">الطلبات / شهر</th>
+            <th class="px-4 py-3 text-right text-xs font-semibold text-gray-500">الحالة</th>
+            <th class="px-4 py-3 w-32"></th>
           </tr>
         </thead>
         <tbody>
-          <tr>
-            <td>شحن الرياض</td>
-            <td>المدينة = الرياض</td>
-            <td>أرامكس</td>
-          </tr>
-          <tr>
-            <td>شحن جدة الممتاز</td>
-            <td>قيمة السلة &gt; 500 ر.س</td>
-            <td>DHL</td>
-          </tr>
-          <tr>
-            <td>شحن المناطق البعيدة</td>
-            <td>وزن السلة &lt; 5 كجم</td>
-            <td>SMSA</td>
-          </tr>
+          <template x-if="filteredRoutes.length === 0">
+            <tr>
+              <td colspan="7" class="px-4 py-12 text-center">
+                <div class="bounce-icon text-3xl mb-2">🔍</div>
+                <p class="text-gray-400 text-sm">لا توجد مسارات مطابقة للبحث</p>
+                <button @click="search=''" class="text-xs text-teal mt-2 underline">مسح البحث</button>
+              </td>
+            </tr>
+          </template>
+          <template x-for="(route, idx) in filteredRoutes" :key="route.id">
+            <tr
+              class="route-row border-b border-gray-100 last:border-0 hover:bg-gray-50/70 transition-colors"
+              :class="!route.enabled ? 'opacity-60' : ''"
+            >
+              <!-- Order -->
+              <td class="px-4 py-3">
+                <div class="flex items-center gap-2">
+                  <span
+                    class="drag-handle text-gray-300 text-xl select-none"
+                    title="اسحب لإعادة الترتيب"
+                  >≡</span>
+                  <span
+                    class="row-index"
+                    x-text="idx+1"
+                  ></span>
+                </div>
+              </td>
+              <!-- Name -->
+              <td class="px-4 py-3">
+                <div class="flex flex-col gap-0.5">
+                  <span class="font-semibold text-gray-800 text-sm" x-text="route.name"></span>
+                  <span class="text-xs text-gray-400">شروط التطبيق: مدينة، وزن</span>
+                </div>
+              </td>
+              <!-- Market -->
+              <td class="px-4 py-3">
+                <div class="flex items-center gap-1.5">
+                  <span class="text-sm">🇸🇦</span>
+                  <span class="text-gray-500 text-xs" x-text="route.market"></span>
+                </div>
+              </td>
+              <!-- Type -->
+              <td class="px-4 py-3">
+                <span
+                  class="text-xs px-2.5 py-1 rounded-full font-medium"
+                  :class="{
+                    'bg-teal-light text-teal-dark': route.type==='تعيين تلقائي',
+                    'bg-purple-50 text-purple-700': route.type==='تسمية خاصة',
+                    'bg-blue-50 text-blue-700': route.type==='تحديد الشركات'
+                  }"
+                  x-text="route.type"
+                ></span>
+              </td>
+              <!-- Orders -->
+              <td class="px-4 py-3">
+                <div class="flex items-center gap-1">
+                  <span class="stat-chip" x-text="route.orders"></span>
+                  <span class="text-xs text-gray-400">طلب</span>
+                </div>
+              </td>
+              <!-- Status -->
+              <td class="px-4 py-3">
+                <div class="flex items-center gap-2">
+                  <label class="toggle-switch">
+                    <input type="checkbox" x-model="route.enabled">
+                    <span class="toggle-slider"></span>
+                  </label>
+                  <span
+                    class="text-xs"
+                    :class="route.enabled ? 'text-green-600' : 'text-gray-400'"
+                    x-text="route.enabled ? 'مفعّل' : 'معطّل'"
+                  ></span>
+                </div>
+              </td>
+              <!-- Actions -->
+              <td class="px-4 py-3">
+                <div class="row-actions flex items-center gap-2 justify-end">
+                  <button
+                    @click="page='form'"
+                    class="text-xs text-teal border border-teal/40 rounded-lg px-2.5 py-1 hover:bg-teal-light font-medium transition"
+                  >
+                    تعديل ✏️
+                  </button>
+                  <button
+                    @click="deleteModal.open=true; deleteModal.routeId=route.id"
+                    class="text-xs text-red-500 border border-red-200 rounded-lg px-2.5 py-1 hover:bg-red-50 font-medium transition"
+                  >
+                    🗑 حذف
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </template>
         </tbody>
       </table>
-      <div class="modal-nav">
-        <span></span>
-        <button class="modal-btn-next" onclick="goToStep(2)">التالي ←</button>
+
+      <!-- Table footer -->
+      <div class="px-4 py-3 border-t border-gray-100 bg-gray-50/30 flex items-center justify-between">
+        <span class="text-xs text-gray-400">
+          المسار الأول في القائمة له الأولوية الأعلى في المطابقة
+        </span>
+        <button
+          @click="page='form'"
+          class="text-xs text-teal hover:text-teal-dark font-medium flex items-center gap-1"
+        >
+          <span>+ إضافة مسار</span>
+        </button>
       </div>
     </div>
 
-    <!-- Step 2: Auto Match -->
-    <div class="step-content" id="step-2">
-      <p style="font-size:13px;color:#6B7280;margin-bottom:12px;">تم مطابقة القواعد القديمة بمسارات جديدة تلقائيًا:</p>
-      <div class="map-result-row">
-        <span style="font-size:13px;font-weight:600;">شحن الرياض</span>
-        <span class="map-result-arrow">←</span>
-        <span style="font-size:13px;color:#04B49C;">مسار: المدن الرئيسية</span>
-        <span class="map-result-check">✓</span>
-      </div>
-      <div class="map-result-row">
-        <span style="font-size:13px;font-weight:600;">شحن جدة الممتاز</span>
-        <span class="map-result-arrow">←</span>
-        <span style="font-size:13px;color:#04B49C;">مسار: طلبات ذات قيمة عالية</span>
-        <span class="map-result-check">✓</span>
-      </div>
-      <div class="map-result-row">
-        <span style="font-size:13px;font-weight:600;">شحن المناطق البعيدة</span>
-        <span class="map-result-arrow">←</span>
-        <span style="font-size:13px;color:#04B49C;">مسار: الشحن الخفيف</span>
-        <span class="map-result-check">✓</span>
-      </div>
-      <div class="modal-nav">
-        <button class="modal-btn-back" onclick="goToStep(1)">→ السابق</button>
-        <button class="modal-btn-next" onclick="goToStep(3)">التالي ←</button>
-      </div>
-    </div>
-
-    <!-- Step 3: Review & Publish -->
-    <div class="step-content" id="step-3">
-      <p style="font-size:13px;color:#6B7280;margin-bottom:16px;">مراجعة المسارات قبل النشر:</p>
-      <div style="background:#F9FAFB;border:1px solid #E5E7EB;border-radius:8px;padding:14px;margin-bottom:12px;">
-        <div style="font-weight:700;margin-bottom:6px;font-size:14px;">ملخص الترحيل</div>
-        <div style="font-size:13px;color:#374151;line-height:2;">
-          📦 عدد القواعد المرحّلة: <strong>3</strong><br>
-          🛣️ عدد المسارات الجديدة: <strong>3</strong><br>
-          ✅ نسبة المطابقة: <strong>100%</strong>
+    <!-- Coverage Legend (below table) -->
+    <div x-show="defaultRouteEnabled && routes.filter(r=>r.enabled).length > 0" class="mx-6 mb-4">
+      <div class="bg-white rounded-xl border border-gray-200 p-4 shadow-sm">
+        <p class="text-xs font-semibold text-gray-600 mb-3">توزيع الطلبات على المسارات (هذا الشهر)</p>
+        <div class="flex flex-wrap gap-3">
+          <template x-for="seg in coverageData" :key="seg.name">
+            <div class="flex items-center gap-1.5">
+              <span class="legend-dot" style="background:#04B49C"></span>
+              <span class="text-xs text-gray-600" x-text="seg.name.length>20 ? seg.name.slice(0,20)+'…' : seg.name"></span>
+              <span class="text-xs font-bold text-teal" x-text="seg.pct+'%'"></span>
+            </div>
+          </template>
+          <div class="flex items-center gap-1.5">
+            <span class="legend-dot" style="background:#9CA3AF"></span>
+            <span class="text-xs text-gray-600">المسار الافتراضي</span>
+            <span class="text-xs font-bold text-gray-500" x-text="defaultPct+'%'"></span>
+          </div>
         </div>
       </div>
-      <div style="background:#ECFDF5;border:1px solid #A7F3D0;border-radius:8px;padding:12px;font-size:13px;color:#065F46;">
-        ✅ جميع القواعد تمت مطابقتها بنجاح — يمكنك النشر بأمان
-      </div>
-      <div class="modal-nav">
-        <button class="modal-btn-back" onclick="goToStep(2)">→ السابق</button>
-        <button class="modal-btn-publish" onclick="publishMigration()">نشر المسارات ✓</button>
+    </div>
+
+    <!-- Tips / Help Card -->
+    <div class="mx-6 mb-8">
+      <div class="bg-white rounded-xl border border-gray-200 p-5 shadow-sm">
+        <div class="flex items-start gap-3">
+          <span class="text-2xl">💡</span>
+          <div>
+            <h4 class="font-semibold text-gray-800 text-sm mb-2">نصائح لإدارة مسارات الشحن</h4>
+            <ul class="text-xs text-gray-500 space-y-1.5 list-none">
+              <li class="flex items-start gap-2">
+                <span class="text-teal font-bold mt-0.5">•</span>
+                <span>رتّب المسارات بحيث تكون الأكثر تحديداً في الأعلى لضمان المطابقة الصحيحة.</span>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="text-teal font-bold mt-0.5">•</span>
+                <span>فعّل المسار الافتراضي دائماً لضمان عدم انقطاع الطلبات غير المصنّفة.</span>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="text-teal font-bold mt-0.5">•</span>
+                <span>استخدم "جرّب المسار" في الزاوية السفلية لاختبار سيناريوهات الشحن قبل النشر.</span>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="text-teal font-bold mt-0.5">•</span>
+                <span>يمكنك رسم مناطق جغرافية على الخريطة لتحديد نطاق التوصيل بدقة.</span>
+              </li>
+            </ul>
+          </div>
+        </div>
       </div>
     </div>
 
-  </div>
-</div>
+  </div><!-- end page list -->
 
 
-<!-- ══════════════════════════════════════════════════════════════
-     JAVASCRIPT
-══════════════════════════════════════════════════════════════ -->
-<script>
-// ─── State ───────────────────────────────────────────────
-let currentRouteType = 'carriers';
-let matchMode = 'and';
-let conditionCount = 0;
-let selectedCarriers = ['aramex', 'smsa', 'dhl', 'naqel'];
-let leafletMap = null;
-let leafletExcludedMap = null;
-let polygonPoints = [];
-let polygonLayer = null;
-let mapConditionCreated = false;
+  <!-- =================== PAGE 2: FORM =================== -->
+  <div x-show="page==='form'" style="display:none">
 
-// ─── Route Type ───────────────────────────────────────────
-function selectRouteType(type) {
-  currentRouteType = type;
-  ['carriers','auto','label'].forEach(t => {
-    document.getElementById('rt-' + t).classList.remove('selected');
-  });
-  document.getElementById('rt-' + type).classList.add('selected');
-  updateSummary();
-}
+    <!-- Page Header -->
+    <div class="px-6 pt-4 pb-2 flex items-center justify-between">
+      <!-- Breadcrumb -->
+      <nav class="text-sm text-gray-400 flex items-center gap-1">
+        <span class="hover:text-teal cursor-pointer">الشحن والتوصيل</span>
+        <span class="text-gray-300">›</span>
+        <span class="hover:text-teal cursor-pointer">الإعدادات</span>
+        <span class="text-gray-300">›</span>
+        <button @click="page='list'" class="text-teal hover:text-teal-dark transition">مسارات الشحن</button>
+        <span class="text-gray-300">›</span>
+        <span class="text-gray-700 font-medium">مسار شحن جديد</span>
+      </nav>
+    </div>
 
-// ─── Carrier Management ──────────────────────────────────
-const carrierData = {
-  aramex: { label: 'أرامكس', cls: 'aramex', tagCls: 'tag-aramex', abbr: 'AR', time: '1–2 أيام عمل' },
-  smsa:   { label: 'SMSA',   cls: 'smsa',   tagCls: 'tag-smsa',   abbr: 'SM', time: '1–2 أيام عمل' },
-  dhl:    { label: 'DHL',    cls: 'dhl',     tagCls: 'tag-dhl',    abbr: 'DH', time: '2–4 أيام عمل' },
-  naqel:  { label: 'Naqel',  cls: 'naqel',  tagCls: 'tag-naqel',  abbr: 'NQ', time: '2–3 أيام عمل' },
-};
+    <!-- 2-Column Layout -->
+    <div class="px-6 py-4 grid grid-cols-4 gap-4 items-start">
 
-function addCarrierFromSelect(sel) {
-  const val = sel.value;
-  if (!val || selectedCarriers.includes(val)) { sel.value = ''; return; }
-  selectedCarriers.push(val);
-  renderCarriers();
-  sel.value = '';
-  updateSummary();
-}
+      <!-- Right: Form (3/4) -->
+      <div class="col-span-3 flex flex-col gap-4">
 
-function removeCarrier(id) {
-  selectedCarriers = selectedCarriers.filter(c => c !== id);
-  renderCarriers();
-  updateSummary();
-}
+        <!-- Section 1: Route Info -->
+        <div class="bg-white rounded-xl p-6 border border-gray-200 shadow-sm">
+          <div class="flex items-center justify-between mb-5">
+            <h2 class="font-bold text-gray-800 text-base">معلومات مسار الشحن</h2>
+            <label class="toggle-switch">
+              <input type="checkbox" x-model="formEnabled">
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
 
-function renderCarriers() {
-  const tagsEl = document.getElementById('carrierTags');
-  const rowsEl = document.getElementById('carrierRows');
-  tagsEl.innerHTML = '';
-  rowsEl.innerHTML = '';
-  selectedCarriers.forEach(id => {
-    const d = carrierData[id];
-    // Tag
-    const tag = document.createElement('span');
-    tag.className = 'carrier-tag ' + d.tagCls;
-    tag.setAttribute('data-carrier', id);
-    tag.innerHTML = `${d.label} <span class="tag-remove" onclick="removeCarrier('${id}')">×</span>`;
-    tagsEl.appendChild(tag);
-    // Row
-    const row = document.createElement('div');
-    row.className = 'carrier-row';
-    row.setAttribute('data-carrier', id);
-    row.innerHTML = `
-      <div class="carrier-icon ${d.cls}">${d.abbr}</div>
-      <div>
-        <div class="carrier-name">${d.label}</div>
-        <div class="carrier-time">${d.time}</div>
-      </div>
-      <div style="flex:1;"></div>
-      <input type="number" class="carrier-price-input" placeholder="0.00">
-      <span class="carrier-price-unit">ر.س</span>
-      <span class="carrier-drag" title="سحب لإعادة الترتيب">⠿</span>
-      <label class="toggle" style="width:34px;height:18px;">
-        <input type="checkbox" checked>
-        <span class="toggle-slider"></span>
-      </label>`;
-    rowsEl.appendChild(row);
-  });
-}
+          <!-- Route Name -->
+          <div class="mb-4">
+            <label class="block text-sm font-semibold text-gray-700 mb-1">اسم المسار <span class="text-red-500">*</span></label>
+            <input
+              x-model="formName"
+              type="text"
+              placeholder="اختر اسمًا يسهّل عليك تمييزه، مثال: شحن المناطق التالية"
+              class="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal/30 focus:border-teal"
+            >
+          </div>
 
-function showCarrierSelect() {
-  document.getElementById('carrierSelect').focus();
-}
+          <!-- Market -->
+          <div class="mb-4">
+            <label class="block text-sm font-semibold text-gray-700 mb-1">السوق <span class="text-red-500">*</span></label>
+            <select
+              x-model="formMarket"
+              class="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal/30 focus:border-teal bg-white"
+            >
+              <option>المملكة العربية السعودية</option>
+              <option>الإمارات</option>
+              <option>الكويت</option>
+            </select>
+          </div>
 
-// ─── Match Mode ───────────────────────────────────────────
-function setMatchMode(mode) {
-  matchMode = mode;
-  ['and','or','subset'].forEach(m => {
-    const pill = document.getElementById('pill-' + m);
-    pill.classList.remove('active');
-    pill.textContent = pill.textContent.replace('●','○');
-  });
-  const activePill = document.getElementById('pill-' + mode);
-  activePill.classList.add('active');
-  // Restore badge-new for subset
-  if (mode === 'subset') {
-    activePill.innerHTML = '● عدد محدد من الشروط <span class="badge-new">جديد</span>';
-  }
-  const subsetRow = document.getElementById('subsetCountRow');
-  subsetRow.style.display = mode === 'subset' ? 'flex' : 'none';
-  updateSummary();
-}
+          <!-- Route Type -->
+          <div class="mb-4">
+            <label class="block text-sm font-semibold text-gray-700 mb-3">نوع المسار <span class="text-red-500">*</span></label>
+            <div class="flex gap-3">
+              <!-- Card 1 -->
+              <div
+                class="route-type-card flex-1"
+                :class="formRouteType==='تحديد الشركات' ? 'selected' : ''"
+                @click="formRouteType='تحديد الشركات'"
+              >
+                <div class="text-2xl mb-2">🏪</div>
+                <p class="font-bold text-gray-800 text-sm mb-1">تحديد الشركات</p>
+                <p class="text-xs text-gray-500 leading-relaxed">أعط عميلك حرية اختيار شركة الشحن من بين شركات محددة وفق شروطك والترتيب الذي تختاره.</p>
+              </div>
+              <!-- Card 2 -->
+              <div
+                class="route-type-card flex-1"
+                :class="formRouteType==='تعيين تلقائي' ? 'selected' : ''"
+                @click="formRouteType='تعيين تلقائي'"
+              >
+                <div class="text-2xl mb-2">⚡</div>
+                <p class="font-bold text-gray-800 text-sm mb-1">تعيين تلقائي</p>
+                <p class="text-xs text-gray-500 leading-relaxed">عيّن شركة الشحن المناسبة تلقائيًا دون الحاجة إلى أي إجراء من العميل.</p>
+              </div>
+              <!-- Card 3 -->
+              <div
+                class="route-type-card flex-1"
+                :class="formRouteType==='تسمية خاصة' ? 'selected' : ''"
+                @click="formRouteType='تسمية خاصة'"
+              >
+                <div class="text-2xl mb-2">🏷️</div>
+                <p class="font-bold text-gray-800 text-sm mb-1">تسمية خاصة</p>
+                <p class="text-xs text-gray-500 leading-relaxed">أخفِ أسماء شركات الشحن، وأظهر اسمًا يعكس علامتك التجارية.</p>
+              </div>
+            </div>
+          </div>
 
-// ─── Conditions ──────────────────────────────────────────
-const conditionTypes = [
-  { value: 'zone',    label: 'الطلب من مناطق محددة' },
-  { value: 'value',   label: 'قيمة السلة' },
-  { value: 'weight',  label: 'وزن السلة' },
-  { value: 'qty',     label: 'كمية المنتجات في السلة' },
-  { value: 'branches',label: 'عدد الفروع والمستودعات' },
-  { value: 'map',     label: '🗺️ رسم منطقة بالخريطة' },
-];
-const numericOperators = [
-  { value: 'eq',   label: 'يساوي' },
-  { value: 'gt',   label: 'أكبر من' },
-  { value: 'gte',  label: 'أكبر من أو يساوي' },
-  { value: 'lt',   label: 'أصغر من' },
-  { value: 'lte',  label: 'أصغر من أو يساوي' },
-  { value: 'between', label: 'ما بين' },
-];
-const conditionUnits = {
-  value: 'ريال', weight: 'كجم', qty: 'منتج', branches: 'فرع'
-};
+          <!-- Carrier Multi-Select -->
+          <div class="mb-2">
+            <label class="block text-sm font-semibold text-gray-700 mb-1">اختر شركات الشحن <span class="text-red-500">*</span></label>
 
-function addCondition() {
-  conditionCount++;
-  const id = 'cond-' + conditionCount;
+            <!-- Selected tags -->
+            <div class="flex flex-wrap gap-2 mb-2" x-show="formCarriers.length > 0">
+              <template x-for="c in formCarriers" :key="c.name">
+                <span
+                  class="carrier-tag text-white"
+                  :style="`background:${c.color}`"
+                >
+                  <span x-text="c.name"></span>
+                  <button @click="removeCarrier(c.name)" class="opacity-80 hover:opacity-100 text-xs">✕</button>
+                </span>
+              </template>
+            </div>
 
-  // Hide empty state, show add btn
-  document.getElementById('conditionsEmpty').style.display = 'none';
-  document.getElementById('addConditionBtn').style.display = 'flex';
+            <!-- Dropdown toggle -->
+            <div class="relative">
+              <button
+                @click="carrierDropdownOpen=!carrierDropdownOpen"
+                type="button"
+                class="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-right bg-white flex items-center justify-between hover:border-teal transition"
+              >
+                <span class="text-gray-400" x-show="formCarriers.length===0">اختر شركات الشحن...</span>
+                <span class="text-gray-700" x-show="formCarriers.length>0" x-text="formCarriers.length + ' شركة محددة'"></span>
+                <svg class="w-4 h-4 text-gray-400" :class="carrierDropdownOpen?'rotate-180':''" style="transition:transform 0.2s" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+              </button>
+              <div
+                x-show="carrierDropdownOpen"
+                @click.away="carrierDropdownOpen=false"
+                class="absolute z-20 w-full mt-1 bg-white border border-gray-200 rounded-xl shadow-lg overflow-hidden"
+                style="display:none"
+              >
+                <template x-for="c in availableCarriers" :key="c.name">
+                  <div
+                    @click="toggleCarrier(c)"
+                    class="flex items-center gap-3 px-4 py-2.5 hover:bg-gray-50 cursor-pointer"
+                  >
+                    <span class="w-3 h-3 rounded-full shrink-0" :style="`background:${c.color}`"></span>
+                    <span class="text-sm flex-1" x-text="c.name"></span>
+                    <span x-show="isCarrierSelected(c.name)" class="text-teal text-sm">✓</span>
+                  </div>
+                </template>
+              </div>
+            </div>
 
-  const list = document.getElementById('conditionsList');
-  const row = document.createElement('div');
-  row.className = 'condition-row';
-  row.id = id;
+            <!-- Carrier rows (selected only) -->
+            <div class="mt-3 flex flex-col gap-2" x-show="formCarriers.length>0">
+              <template x-for="(c, ci) in formCarriers" :key="c.name">
+                <div class="flex items-center gap-3 border border-gray-100 rounded-xl p-3 bg-gray-50">
+                  <span class="drag-handle text-gray-300">≡</span>
+                  <span class="w-3 h-3 rounded-full shrink-0" :style="`background:${c.color}`"></span>
+                  <span class="text-sm font-medium flex-1" x-text="c.name"></span>
+                  <span class="text-xs text-gray-400">1-2 أيام عمل</span>
+                  <div class="flex items-center gap-1">
+                    <input
+                      type="number"
+                      x-model="formCarriers[ci].price"
+                      placeholder="السعر"
+                      class="w-20 border border-gray-200 rounded-lg px-2 py-1 text-xs text-left focus:outline-none focus:border-teal"
+                    >
+                    <span class="text-xs text-gray-400">ريال</span>
+                  </div>
+                  <label class="toggle-switch scale-75">
+                    <input type="checkbox" checked>
+                    <span class="toggle-slider"></span>
+                  </label>
+                </div>
+              </template>
+            </div>
+          </div>
+        </div>
 
-  // Build type options
-  const typeOptions = conditionTypes.map(t =>
-    `<option value="${t.value}">${t.label}</option>`
-  ).join('');
+        <!-- Section 2: Conditions -->
+        <div class="bg-white rounded-xl p-6 border border-gray-200 shadow-sm">
+          <div class="flex items-center justify-between mb-1">
+            <h2 class="font-bold text-gray-800 text-base">شروط تطبيق المسار</h2>
+            <span class="text-xs text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full">اختياري</span>
+          </div>
+          <p class="text-xs text-gray-400 mb-4">حدّد متى يُطبَّق هذا المسار</p>
 
-  // Build operator options
-  const opOptions = numericOperators.map(o =>
-    `<option value="${o.value}">${o.label}</option>`
-  ).join('');
+          <!-- Match Mode Pills -->
+          <div class="flex gap-2 mb-4 flex-wrap">
+            <button
+              @click="formMatchMode='all'"
+              :class="formMatchMode==='all' ? 'bg-teal text-white border-teal' : 'bg-gray-100 text-gray-600 border-gray-200'"
+              class="text-xs px-3 py-1.5 rounded-full border font-medium transition"
+            >● عند تحقق جميع الشروط</button>
+            <button
+              @click="formMatchMode='any'"
+              :class="formMatchMode==='any' ? 'bg-teal text-white border-teal' : 'bg-gray-100 text-gray-600 border-gray-200'"
+              class="text-xs px-3 py-1.5 rounded-full border font-medium transition"
+            >○ عند تحقق شرط واحد</button>
+            <button
+              @click="formMatchMode='subset'"
+              :class="formMatchMode==='subset' ? 'bg-teal text-white border-teal' : 'bg-gray-100 text-gray-600 border-gray-200'"
+              class="text-xs px-3 py-1.5 rounded-full border font-medium transition flex items-center gap-1"
+            >
+              ○ عند تحقق عدد محدد
+              <span class="bg-teal/20 text-teal-dark text-[10px] px-1.5 py-0.5 rounded-full font-bold">جديد</span>
+              ▾
+            </button>
+          </div>
 
-  row.innerHTML = `
-    <div class="condition-row-header">
-      <div class="condition-row-fields">
-        <select class="condition-select" onchange="onConditionTypeChange('${id}', this.value)">
-          <option value="">— اختر الشرط —</option>
-          ${typeOptions}
-        </select>
-        <select class="condition-operator-select" id="${id}-op" style="display:none;">
-          ${opOptions}
-        </select>
-        <input type="number" class="condition-value-input" id="${id}-val" placeholder="القيمة" style="display:none;" oninput="updateSummary()">
-        <span class="condition-unit" id="${id}-unit"></span>
-        <div class="negate-wrap" id="${id}-negate" style="display:none;" title="">
-          <button class="negate-pill" onclick="toggleNegate('${id}', this)">
-            <span class="negate-dot"></span> اعكس الشرط
+          <!-- Subset N -->
+          <div x-show="formMatchMode==='subset'" class="mb-4 bg-teal-light border border-teal/20 rounded-xl p-3 text-sm">
+            <div class="flex items-center gap-2 flex-wrap">
+              <span class="text-gray-600">يكفي تحقق</span>
+              <input
+                type="number"
+                x-model="formSubsetN"
+                min="1"
+                :max="formConditions.length||1"
+                class="w-12 border border-gray-200 rounded-lg px-2 py-1 text-center focus:outline-none focus:border-teal text-sm"
+              >
+              <span class="text-gray-600">شروط من أصل</span>
+              <strong x-text="formConditions.length||0" class="text-teal-dark"></strong>
+            </div>
+            <p class="text-xs text-gray-400 mt-1">مثال: يُطبَّق المسار إذا تحقق شرطان من بين ٣ شروط</p>
+          </div>
+
+          <!-- Empty State -->
+          <div x-show="formConditions.length===0" class="flex flex-col items-center py-8 text-center">
+            <span class="text-4xl mb-2">🎯</span>
+            <p class="font-semibold text-gray-600 text-sm">لم تضف شروطًا بعد</p>
+            <p class="text-xs text-gray-400 mt-1 mb-4">اختر أحد شروط الشحن للبدء</p>
+            <button
+              @click="addCondition()"
+              class="text-sm text-teal border border-teal rounded-xl px-4 py-2 hover:bg-teal-light transition font-medium"
+            >
+              + إضافة شرط جديد
+            </button>
+          </div>
+
+          <!-- Condition Rows -->
+          <div x-show="formConditions.length>0" class="flex flex-col gap-2">
+            <template x-for="(cond, ci) in formConditions" :key="ci">
+              <div
+                class="rounded-xl p-3 border transition-all"
+                :class="cond.negated ? 'cond-negated-row border-red-200' : 'border-gray-200 bg-gray-50'"
+              >
+                <!-- Normal condition row -->
+                <div x-show="cond.type !== '🗺️ رسم منطقة بالخريطة'" class="flex items-center gap-2 flex-wrap">
+                  <!-- Condition type -->
+                  <select
+                    x-model="cond.type"
+                    class="text-xs border border-gray-200 rounded-lg px-2 py-1.5 bg-white focus:outline-none focus:border-teal"
+                  >
+                    <option>قيمة السلة</option>
+                    <option>وزن السلة</option>
+                    <option>كمية المنتجات في السلة</option>
+                    <option>عدد الفروع والمستودعات</option>
+                    <option>🗺️ رسم منطقة بالخريطة</option>
+                  </select>
+
+                  <!-- Negate toggle -->
+                  <button
+                    @click="cond.negated=!cond.negated"
+                    class="text-xs px-2 py-1 rounded-lg border font-medium transition"
+                    :class="cond.negated ? 'negate-on' : 'negate-off'"
+                    title="يُطبَّق على الطلبات التي لا تحقق هذا الشرط"
+                  >
+                    <span x-show="!cond.negated">اعكس الشرط</span>
+                    <span x-show="cond.negated">↩ معكوس</span>
+                  </button>
+
+                  <!-- Operator -->
+                  <select
+                    x-model="cond.op"
+                    class="text-xs border border-gray-200 rounded-lg px-2 py-1.5 bg-white focus:outline-none focus:border-teal"
+                  >
+                    <option>يساوي</option>
+                    <option>أكبر من</option>
+                    <option>أكبر من أو يساوي</option>
+                    <option>أصغر من</option>
+                    <option>أصغر من أو يساوي</option>
+                    <option>ما بين</option>
+                  </select>
+
+                  <!-- Value input(s) -->
+                  <template x-if="cond.op !== 'ما بين'">
+                    <input
+                      type="number"
+                      x-model="cond.val"
+                      placeholder="القيمة"
+                      class="w-24 text-xs border border-gray-200 rounded-lg px-2 py-1.5 focus:outline-none focus:border-teal"
+                    >
+                  </template>
+                  <template x-if="cond.op === 'ما بين'">
+                    <div class="flex items-center gap-1">
+                      <input
+                        type="number"
+                        x-model="cond.val"
+                        placeholder="من"
+                        class="w-16 text-xs border border-gray-200 rounded-lg px-2 py-1.5 focus:outline-none focus:border-teal"
+                      >
+                      <span class="text-xs text-gray-400">—</span>
+                      <input
+                        type="number"
+                        x-model="cond.val2"
+                        placeholder="إلى"
+                        class="w-16 text-xs border border-gray-200 rounded-lg px-2 py-1.5 focus:outline-none focus:border-teal"
+                      >
+                    </div>
+                  </template>
+
+                  <!-- Delete condition -->
+                  <button
+                    @click="removeCondition(ci)"
+                    class="text-red-400 hover:text-red-600 mr-auto"
+                    title="حذف الشرط"
+                  >🗑</button>
+                </div>
+
+                <!-- Polygon Map Row -->
+                <div x-show="cond.type === '🗺️ رسم منطقة بالخريطة'">
+                  <div class="flex items-center justify-between mb-2">
+                    <div class="flex items-center gap-2">
+                      <span class="text-sm font-medium text-gray-700">🗺️ رسم منطقة التوصيل</span>
+                      <span class="text-xs bg-teal/10 text-teal-dark px-2 py-0.5 rounded-full">مناسب لـ Quick Commerce ⚡</span>
+                    </div>
+                    <button @click="removeCondition(ci)" class="text-red-400 hover:text-red-600">🗑</button>
+                  </div>
+                  <p class="text-xs text-gray-400 mb-2">انقر على الخريطة لرسم منطقة التوصيل — انقر مرتين لإغلاق المنطقة</p>
+                  <div
+                    :id="'polygon-map-'+ci"
+                    class="leaflet-map-container"
+                    x-init="$nextTick(()=>{ initPolygonMap('polygon-map-'+ci, ci) })"
+                  ></div>
+                  <div x-show="cond.polygonSaved" class="mt-2 flex items-center gap-2">
+                    <span class="text-xs text-green-700 bg-green-50 border border-green-200 rounded-lg px-3 py-1">✅ تم حفظ المنطقة</span>
+                  </div>
+                  <!-- Excluded zones collapsible -->
+                  <details class="mt-2">
+                    <summary class="text-xs text-gray-500 cursor-pointer hover:text-gray-700">مناطق مستثناة ▾</summary>
+                    <div
+                      :id="'polygon-map-excl-'+ci"
+                      class="leaflet-map-container mt-2"
+                      x-init="$nextTick(()=>{ initPolygonMap('polygon-map-excl-'+ci, 'excl-'+ci) })"
+                    ></div>
+                  </details>
+                </div>
+              </div>
+            </template>
+
+            <!-- Add condition button -->
+            <button
+              @click="addCondition()"
+              class="text-sm text-teal border border-teal border-dashed rounded-xl px-4 py-2 hover:bg-teal-light transition font-medium mt-1"
+            >
+              + إضافة شرط جديد
+            </button>
+          </div>
+        </div>
+
+        <!-- Section 3: Carrier Order -->
+        <div class="bg-white rounded-xl p-6 border border-gray-200 shadow-sm">
+          <h2 class="font-bold text-teal-dark text-base mb-1">
+            ترتيب شركات الشحن
+            <span class="text-gray-400 cursor-help font-normal text-sm">ⓘ</span>
+          </h2>
+          <p class="text-xs text-gray-400 mb-4">رتّب أولوية ظهور شركات الشحن المعروضة للعملاء أو المستخدمة داخليًا وفقًا لمسار الشحن.</p>
+          <div>
+            <label class="block text-sm font-semibold text-gray-700 mb-1">خيارات الأولوية <span class="text-red-500">*</span></label>
+            <select class="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal/30 focus:border-teal bg-white">
+              <option selected>توصيات سلة</option>
+              <option>الأسرع أولاً</option>
+              <option>الأرخص أولاً</option>
+              <option>ترتيب يدوي</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Section 4: Route Priority -->
+        <div class="bg-white rounded-xl p-6 border border-gray-200 shadow-sm">
+          <div class="flex items-center justify-between mb-4">
+            <h2 class="font-bold text-gray-800 text-base">أولوية تطبيق المسار</h2>
+            <span class="text-xs text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full">اختياري</span>
+          </div>
+          <label class="block text-sm font-semibold text-gray-700 mb-1">إضافة هذا المسار بعد</label>
+          <p class="text-xs text-gray-400 mb-2">حدّد المسار السابق أو سيُضاف في نهاية القائمة</p>
+          <select
+            x-model="formPriority"
+            class="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal/30 focus:border-teal bg-white"
+          >
+            <option value="">اختر المسار</option>
+            <template x-for="r in routes" :key="r.id">
+              <option :value="r.id" x-text="r.name"></option>
+            </template>
+          </select>
+        </div>
+
+        <!-- Bottom Action Row -->
+        <div class="flex justify-start pb-8">
+          <button
+            @click="saveRoute()"
+            :disabled="saving || !formName"
+            class="flex items-center gap-2 text-sm text-white bg-teal rounded-xl px-6 py-2.5 hover:bg-teal-dark transition font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <svg x-show="saving" class="spinner w-4 h-4" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="white" stroke-width="4"></circle>
+              <path class="opacity-75" fill="white" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+            </svg>
+            <svg x-show="saveSuccess" class="pop-in w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/>
+            </svg>
+            <span x-show="!saving && !saveSuccess">حفظ المسار</span>
+            <span x-show="saving && !saveSuccess">جاري الحفظ...</span>
+            <span x-show="saveSuccess">تم الحفظ ✅</span>
           </button>
-          <div class="negate-tooltip">يُطبَّق المسار على الطلبات التي لا تحقق هذا الشرط</div>
+        </div>
+
+      </div><!-- end form left col -->
+
+      <!-- Left: Summary Panel (1/4) -->
+      <div class="col-span-1">
+        <div class="bg-white rounded-xl p-5 border border-gray-200 shadow-sm sticky top-20">
+          <h3 class="font-bold text-gray-800 text-sm mb-4 pb-3 border-b border-gray-100">ملخص المسار</h3>
+
+          <!-- Empty state -->
+          <div x-show="!formName && formCarriers.length===0 && formConditions.length===0" class="py-6 text-center">
+            <div class="text-3xl mb-2">📋</div>
+            <p class="text-xs text-gray-400">لا توجد بيانات لعرضها</p>
+          </div>
+
+          <!-- Summary items -->
+          <div x-show="formName || formCarriers.length>0 || formConditions.length>0" class="flex flex-col gap-3">
+            <!-- Name -->
+            <div>
+              <p class="text-xs text-gray-400 mb-0.5">اسم المسار</p>
+              <p class="text-sm font-medium text-gray-700" x-text="formName || '—'"></p>
+            </div>
+            <!-- Market -->
+            <div>
+              <p class="text-xs text-gray-400 mb-0.5">السوق</p>
+              <p class="text-sm font-medium text-gray-700" x-text="formMarket"></p>
+            </div>
+            <!-- Route type -->
+            <div>
+              <p class="text-xs text-gray-400 mb-0.5">نوع المسار</p>
+              <p class="text-sm font-medium text-gray-700" x-text="formRouteType"></p>
+            </div>
+            <!-- Conditions -->
+            <div>
+              <p class="text-xs text-gray-400 mb-0.5">الشروط</p>
+              <p class="text-sm font-medium text-gray-700">
+                <span x-show="formConditions.length>0" x-text="formConditions.length + ' شرط'"></span>
+                <span x-show="formConditions.length===0" class="text-gray-400">لا شروط</span>
+              </p>
+            </div>
+            <!-- Carriers -->
+            <div>
+              <p class="text-xs text-gray-400 mb-0.5">شركات الشحن</p>
+              <p class="text-sm font-medium text-gray-700">
+                <span x-show="formCarriers.length>0" x-text="formCarriers.map(c=>c.name).join('، ')"></span>
+                <span x-show="formCarriers.length===0" class="text-gray-400">—</span>
+              </p>
+            </div>
+            <!-- Status -->
+            <div>
+              <p class="text-xs text-gray-400 mb-0.5">الحالة</p>
+              <span
+                :class="formEnabled ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-500'"
+                class="text-xs px-2 py-0.5 rounded-full font-medium"
+              >
+                <span x-text="formEnabled ? 'مفعّل' : 'معطّل'"></span>
+              </span>
+            </div>
+          </div>
         </div>
       </div>
-      <button class="trash-btn" onclick="removeCondition('${id}')">🗑️</button>
+
+    </div><!-- end 2-col grid -->
+  </div><!-- end page form -->
+
+
+  <!-- =================== DELETE MODAL =================== -->
+  <div
+    x-show="deleteModal.open"
+    class="modal-overlay"
+    @click.self="deleteModal.open=false"
+    style="display:none"
+    x-transition:enter="transition ease-out duration-200"
+    x-transition:enter-start="opacity-0"
+    x-transition:enter-end="opacity-100"
+    x-transition:leave="transition ease-in duration-150"
+    x-transition:leave-start="opacity-100"
+    x-transition:leave-end="opacity-0"
+  >
+    <div
+      class="bg-white rounded-xl shadow-2xl max-w-md w-full mx-4 p-6"
+      x-transition:enter="transition ease-out duration-200"
+      x-transition:enter-start="opacity-0 scale-95"
+      x-transition:enter-end="opacity-100 scale-100"
+    >
+      <div class="flex items-center gap-3 mb-4">
+        <div class="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center text-xl">🗑</div>
+        <h3 class="font-bold text-gray-800 text-base">تأكيد حذف المسار</h3>
+      </div>
+      <div class="bg-amber-light border border-amber/30 rounded-xl p-3 mb-4 flex items-start gap-2">
+        <span>⚠️</span>
+        <p class="text-sm text-amber font-medium">الطلبات التي كانت تنتقل لهذا المسار ستنتقل للمسار الافتراضي</p>
+      </div>
+      <p class="text-xs text-gray-400 mb-5">~١٥ طلباً شهرياً سيتأثر</p>
+      <div class="flex gap-3 justify-end">
+        <button
+          @click="deleteModal.open=false"
+          class="text-sm text-gray-500 border border-gray-200 rounded-xl px-4 py-2 hover:bg-gray-50"
+        >إلغاء</button>
+        <button
+          @click="confirmDelete()"
+          class="text-sm text-white bg-red-500 rounded-xl px-4 py-2 hover:bg-red-600 font-semibold"
+        >تأكيد الحذف</button>
+      </div>
     </div>
-    <div id="${id}-extra"></div>
-  `;
+  </div>
 
-  list.appendChild(row);
-  updateSubsetTotal();
-  updateSummary();
-}
 
-function onConditionTypeChange(id, type) {
-  const row = document.getElementById(id);
-  const opEl = document.getElementById(id + '-op');
-  const valEl = document.getElementById(id + '-val');
-  const unitEl = document.getElementById(id + '-unit');
-  const negateEl = document.getElementById(id + '-negate');
-  const extraEl = document.getElementById(id + '-extra');
-
-  // Reset
-  opEl.style.display = 'none';
-  valEl.style.display = 'none';
-  unitEl.textContent = '';
-  negateEl.style.display = 'none';
-  extraEl.innerHTML = '';
-  row.classList.remove('negated');
-
-  if (type === 'zone') {
-    extraEl.innerHTML = buildZoneConditionHTML(id);
-  } else if (type === 'map') {
-    extraEl.innerHTML = buildMapConditionHTML(id);
-    setTimeout(() => initLeafletMap(id), 100);
-  } else if (['value','weight','qty','branches'].includes(type)) {
-    opEl.style.display = '';
-    valEl.style.display = '';
-    unitEl.textContent = conditionUnits[type];
-    negateEl.style.display = 'flex';
-  }
-  updateSummary();
-}
-
-function buildZoneConditionHTML(id) {
-  return `
-    <div class="zone-condition-body">
-      <div class="zone-section-label">
-        مناطق مسموحة <span class="zone-type-badge zone-allowed-badge">مسموحة</span>
+  <!-- =================== MIGRATION WIZARD MODAL =================== -->
+  <div
+    x-show="migrationModal.open"
+    class="modal-overlay"
+    @click.self="migrationModal.open=false"
+    style="display:none"
+    x-transition:enter="transition ease-out duration-200"
+    x-transition:enter-start="opacity-0"
+    x-transition:enter-end="opacity-100"
+  >
+    <div
+      class="bg-white rounded-2xl shadow-2xl max-w-2xl w-full mx-4 p-6 max-h-[90vh] overflow-y-auto"
+      x-transition:enter="transition ease-out duration-200"
+      x-transition:enter-start="opacity-0 scale-95"
+      x-transition:enter-end="opacity-100 scale-100"
+    >
+      <!-- Modal Header -->
+      <div class="flex items-center justify-between mb-6">
+        <h3 class="font-bold text-gray-800 text-lg">ترحيل قواعد الشحن القديمة</h3>
+        <button @click="migrationModal.open=false" class="text-gray-400 hover:text-gray-600 text-xl">✕</button>
       </div>
-      <div class="zone-row">
-        <select class="condition-select" style="flex:0 0 140px;">
-          <option>المملكة العربية السعودية</option>
-          <option>الإمارات</option>
-          <option>الكويت</option>
-        </select>
-        <select class="condition-select" style="flex:0 0 140px;">
-          <option value="">المدينة</option>
-          <option>الرياض</option>
-          <option>جدة</option>
-          <option>الدمام</option>
-          <option>أبها</option>
-          <option>مكة المكرمة</option>
-        </select>
-        <button class="zone-add-btn" onclick="addZoneRow(this, 'allowed')">+ إضافة منطقة مسموحة</button>
-      </div>
-      <div id="${id}-allowed-rows"></div>
-      <div class="section-divider"></div>
-      <div class="zone-section-label">
-        مناطق مستثناة <span class="zone-type-badge zone-excluded-badge">مستثناة</span>
-      </div>
-      <div class="zone-row">
-        <select class="condition-select" style="flex:0 0 140px;">
-          <option>المملكة العربية السعودية</option>
-          <option>الإمارات</option>
-          <option>الكويت</option>
-        </select>
-        <select class="condition-select" style="flex:0 0 140px;">
-          <option value="">المدينة</option>
-          <option>الرياض</option>
-          <option>جدة</option>
-          <option>الدمام</option>
-          <option>أبها</option>
-        </select>
-        <button class="zone-add-btn" onclick="addZoneRow(this, 'excluded')">+ إضافة منطقة مستثناة</button>
-      </div>
-      <div id="${id}-excluded-rows"></div>
-    </div>`;
-}
 
-function addZoneRow(btn, type) {
-  const label = type === 'allowed' ? 'مسموحة' : 'مستثناة';
-  const cls = type === 'allowed' ? 'zone-allowed-badge' : 'zone-excluded-badge';
-  const tag = document.createElement('div');
-  tag.className = 'zone-row';
-  tag.style.marginTop = '6px';
-  tag.innerHTML = `
-    <span class="zone-type-badge ${cls}" style="padding:3px 8px;border-radius:8px;font-size:12px;">${label}</span>
-    <select class="condition-select" style="flex:0 0 130px;"><option>المملكة العربية السعودية</option></select>
-    <select class="condition-select" style="flex:0 0 130px;"><option>الرياض</option><option>جدة</option><option>الدمام</option></select>
-    <button class="trash-btn" onclick="this.parentElement.remove()" style="font-size:13px;">🗑️</button>`;
-  btn.parentElement.parentElement.appendChild(tag);
-}
-
-function buildMapConditionHTML(id) {
-  return `
-    <div class="map-condition-body">
-      <p class="map-instruction">انقر على الخريطة لرسم منطقة التوصيل — انقر مرتين لإغلاق المنطقة</p>
-      <div id="leaflet-map-${id}" style="width:100%;height:300px;border-radius:8px;overflow:hidden;border:1px solid #E5E7EB;"></div>
-      <div class="map-after-actions" id="map-actions-${id}" style="display:none;">
-        <button class="map-save-btn" onclick="savePolygon('${id}')">حفظ المنطقة</button>
-        <span class="map-badge">مناسب لتجار Quick Commerce</span>
+      <!-- Step Indicator -->
+      <div x-show="!migrationModal.migrationSuccess" class="flex items-center justify-center mb-8 gap-0">
+        <!-- Step 1 -->
+        <div class="flex flex-col items-center gap-1">
+          <div class="step-circle" :class="migrationModal.step===1 ? 'active' : (migrationModal.step>1 ? 'done' : '')">
+            <span x-show="migrationModal.step<=1">١</span>
+            <span x-show="migrationModal.step>1">✓</span>
+          </div>
+          <span class="text-xs text-gray-500">القواعد القديمة</span>
+        </div>
+        <div class="step-line mx-2 mt-0" :class="migrationModal.step>1 ? 'done' : ''"></div>
+        <!-- Step 2 -->
+        <div class="flex flex-col items-center gap-1">
+          <div class="step-circle" :class="migrationModal.step===2 ? 'active' : (migrationModal.step>2 ? 'done' : '')">
+            <span x-show="migrationModal.step<=2">٢</span>
+            <span x-show="migrationModal.step>2">✓</span>
+          </div>
+          <span class="text-xs text-gray-500">المطابقة التلقائية</span>
+        </div>
+        <div class="step-line mx-2" :class="migrationModal.step>2 ? 'done' : ''"></div>
+        <!-- Step 3 -->
+        <div class="flex flex-col items-center gap-1">
+          <div class="step-circle" :class="migrationModal.step===3 ? 'active' : ''">٣</div>
+          <span class="text-xs text-gray-500">مراجعة ونشر</span>
+        </div>
       </div>
-      <button class="map-excluded-toggle" onclick="toggleExcludedMap('${id}')">
-        ▼ مناطق مستثناة
+
+      <!-- Step 1 -->
+      <div x-show="migrationModal.step===1 && !migrationModal.migrationSuccess">
+        <h4 class="font-semibold text-gray-700 mb-3">قواعدك القديمة</h4>
+        <div class="overflow-hidden border border-gray-200 rounded-xl mb-5">
+          <table class="w-full text-sm">
+            <thead class="bg-gray-50 border-b border-gray-200">
+              <tr>
+                <th class="px-4 py-2.5 text-right text-xs text-gray-500">المعرّف</th>
+                <th class="px-4 py-2.5 text-right text-xs text-gray-500">النوع</th>
+                <th class="px-4 py-2.5 text-right text-xs text-gray-500">القيمة</th>
+                <th class="px-4 py-2.5 text-right text-xs text-gray-500">الحالة</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="border-b border-gray-100">
+                <td class="px-4 py-2.5 font-mono text-xs text-gray-600">Q-1023</td>
+                <td class="px-4 py-2.5 text-xs">الشحن للرياض فقط</td>
+                <td class="px-4 py-2.5 text-xs text-gray-500">مدينة = الرياض</td>
+                <td class="px-4 py-2.5"><span class="text-xs">عالقة 🔴</span></td>
+              </tr>
+              <tr class="border-b border-gray-100">
+                <td class="px-4 py-2.5 font-mono text-xs text-gray-600">Q-1047</td>
+                <td class="px-4 py-2.5 text-xs">حد وزن الشحن</td>
+                <td class="px-4 py-2.5 text-xs text-gray-500">وزن &lt; 5 كجم</td>
+                <td class="px-4 py-2.5"><span class="text-xs">عالقة 🔴</span></td>
+              </tr>
+              <tr>
+                <td class="px-4 py-2.5 font-mono text-xs text-gray-600">Q-1089</td>
+                <td class="px-4 py-2.5 text-xs">استثناء الدمام</td>
+                <td class="px-4 py-2.5 text-xs text-gray-500">مدينة ≠ الدمام</td>
+                <td class="px-4 py-2.5"><span class="text-xs">عالقة 🔴</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="flex justify-start">
+          <button @click="migrationModal.step=2" class="text-sm text-white bg-teal rounded-xl px-6 py-2.5 hover:bg-teal-dark font-semibold">
+            التالي ←
+          </button>
+        </div>
+      </div>
+
+      <!-- Step 2 -->
+      <div x-show="migrationModal.step===2 && !migrationModal.migrationSuccess">
+        <h4 class="font-semibold text-gray-700 mb-3">المطابقة التلقائية</h4>
+        <div class="flex flex-col gap-3 mb-5">
+          <!-- Mapping 1 -->
+          <div class="flex items-center gap-3">
+            <div class="flex-1 border border-gray-200 rounded-xl p-3 bg-gray-50">
+              <p class="text-xs text-gray-400">Q-1023</p>
+              <p class="text-sm font-medium text-gray-700">الشحن للرياض فقط</p>
+            </div>
+            <span class="text-gray-400 text-lg">→</span>
+            <div class="flex-1 border-2 border-teal rounded-xl p-3 bg-teal-light">
+              <p class="text-xs text-teal">مسار جديد</p>
+              <p class="text-sm font-semibold text-teal-dark">مسار الرياض الجديد</p>
+              <span class="text-xs bg-teal/10 text-teal-dark px-1.5 py-0.5 rounded-full">تعيين تلقائي</span>
+            </div>
+          </div>
+          <!-- Mapping 2 -->
+          <div class="flex items-center gap-3">
+            <div class="flex-1 border border-gray-200 rounded-xl p-3 bg-gray-50">
+              <p class="text-xs text-gray-400">Q-1047</p>
+              <p class="text-sm font-medium text-gray-700">حد وزن الشحن</p>
+            </div>
+            <span class="text-gray-400 text-lg">→</span>
+            <div class="flex-1 border-2 border-teal rounded-xl p-3 bg-teal-light">
+              <p class="text-xs text-teal">مسار جديد</p>
+              <p class="text-sm font-semibold text-teal-dark">مسار الطلبات الخفيفة</p>
+              <span class="text-xs bg-teal/10 text-teal-dark px-1.5 py-0.5 rounded-full">تحديد الشركات</span>
+            </div>
+          </div>
+          <!-- Mapping 3 -->
+          <div class="flex items-center gap-3">
+            <div class="flex-1 border border-gray-200 rounded-xl p-3 bg-gray-50">
+              <p class="text-xs text-gray-400">Q-1089</p>
+              <p class="text-sm font-medium text-gray-700">استثناء الدمام</p>
+            </div>
+            <span class="text-gray-400 text-lg">→</span>
+            <div class="flex-1 border-2 border-teal rounded-xl p-3 bg-teal-light">
+              <p class="text-xs text-teal">مسار جديد</p>
+              <p class="text-sm font-semibold text-teal-dark">مسار خارج الدمام</p>
+              <span class="text-xs bg-teal/10 text-teal-dark px-1.5 py-0.5 rounded-full">تسمية خاصة</span>
+            </div>
+          </div>
+        </div>
+        <div class="flex justify-start gap-3">
+          <button @click="migrationModal.step=1" class="text-sm text-gray-500 border border-gray-200 rounded-xl px-5 py-2.5 hover:bg-gray-50">
+            → السابق
+          </button>
+          <button @click="migrationModal.step=3" class="text-sm text-white bg-teal rounded-xl px-6 py-2.5 hover:bg-teal-dark font-semibold">
+            التالي ←
+          </button>
+        </div>
+      </div>
+
+      <!-- Step 3 -->
+      <div x-show="migrationModal.step===3 && !migrationModal.migrationSuccess">
+        <h4 class="font-semibold text-gray-700 mb-3">مراجعة ونشر</h4>
+        <div class="border border-gray-200 rounded-xl overflow-hidden mb-5">
+          <div class="p-3 border-b border-gray-100 flex items-center gap-3">
+            <span class="w-6 h-6 rounded-full bg-teal text-white text-xs flex items-center justify-center font-bold">١</span>
+            <div>
+              <p class="text-sm font-medium text-gray-700">مسار الرياض الجديد</p>
+              <p class="text-xs text-gray-400">تعيين تلقائي · مدينة = الرياض</p>
+            </div>
+          </div>
+          <div class="p-3 border-b border-gray-100 flex items-center gap-3">
+            <span class="w-6 h-6 rounded-full bg-teal text-white text-xs flex items-center justify-center font-bold">٢</span>
+            <div>
+              <p class="text-sm font-medium text-gray-700">مسار الطلبات الخفيفة</p>
+              <p class="text-xs text-gray-400">تحديد الشركات · وزن &lt; 5 كجم</p>
+            </div>
+          </div>
+          <div class="p-3 flex items-center gap-3">
+            <span class="w-6 h-6 rounded-full bg-teal text-white text-xs flex items-center justify-center font-bold">٣</span>
+            <div>
+              <p class="text-sm font-medium text-gray-700">مسار خارج الدمام</p>
+              <p class="text-xs text-gray-400">تسمية خاصة · مدينة ≠ الدمام</p>
+            </div>
+          </div>
+        </div>
+        <div class="flex justify-start gap-3">
+          <button @click="migrationModal.step=2" class="text-sm text-gray-500 border border-gray-200 rounded-xl px-5 py-2.5 hover:bg-gray-50">
+            → السابق
+          </button>
+          <button
+            @click="finishMigration()"
+            class="text-sm text-white bg-teal rounded-xl px-6 py-2.5 hover:bg-teal-dark font-semibold"
+          >
+            نشر المسارات 🚀
+          </button>
+        </div>
+      </div>
+
+      <!-- Success State -->
+      <div x-show="migrationModal.migrationSuccess" class="py-8 text-center">
+        <div class="pop-in text-6xl mb-4">✅</div>
+        <h4 class="font-bold text-green-700 text-lg mb-2">تم إنشاء ٣ مسارات جديدة بنجاح</h4>
+        <p class="text-sm text-gray-500 mb-6">يمكنك الآن إدارة مساراتك الجديدة من قائمة المسارات</p>
+        <button
+          @click="migrationModal.open=false; migrationModal.migrationSuccess=false; migrationBannerVisible=false;"
+          class="text-sm text-white bg-teal rounded-xl px-6 py-2.5 hover:bg-teal-dark font-semibold"
+        >إغلاق</button>
+      </div>
+
+    </div>
+  </div>
+
+
+  <!-- =================== SIMULATION PANEL =================== -->
+
+  <!-- Trigger button -->
+  <button
+    @click="simPanel.open=!simPanel.open"
+    class="fixed bottom-6 left-6 z-40 bg-white border-2 border-teal text-teal rounded-xl px-4 py-2 shadow-lg font-medium text-sm hover:bg-teal-light transition"
+  >
+    🔍 جرّب المسار
+  </button>
+
+  <!-- Panel -->
+  <div
+    class="sim-panel"
+    :class="simPanel.open ? 'open' : 'closed'"
+    style="transform:translateX(-100%)"
+    :style="simPanel.open ? 'transform:translateX(0)' : 'transform:translateX(-100%)'"
+  >
+    <div class="p-5">
+      <!-- Header -->
+      <div class="flex items-center justify-between mb-4">
+        <h3 class="font-bold text-gray-800 text-base">محاكاة تطبيق المسار</h3>
+        <button @click="simPanel.open=false" class="text-gray-400 hover:text-gray-600 text-xl">✕</button>
+      </div>
+      <div class="border-b border-gray-100 mb-4"></div>
+
+      <!-- Inputs -->
+      <div class="flex flex-col gap-3 mb-4">
+        <div>
+          <label class="block text-xs font-semibold text-gray-600 mb-1">قيمة السلة</label>
+          <div class="flex items-center gap-1">
+            <input
+              type="number"
+              x-model="simPanel.value"
+              placeholder="0"
+              class="flex-1 border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-teal"
+            >
+            <span class="text-xs text-gray-400 shrink-0">ريال</span>
+          </div>
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-gray-600 mb-1">وزن السلة</label>
+          <div class="flex items-center gap-1">
+            <input
+              type="number"
+              x-model="simPanel.weight"
+              placeholder="0"
+              class="flex-1 border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-teal"
+            >
+            <span class="text-xs text-gray-400 shrink-0">كجم</span>
+          </div>
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-gray-600 mb-1">كمية المنتجات</label>
+          <input
+            type="number"
+            x-model="simPanel.qty"
+            placeholder="0"
+            class="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-teal"
+          >
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-gray-600 mb-1">المدينة</label>
+          <select
+            x-model="simPanel.city"
+            class="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-teal bg-white"
+          >
+            <option>الرياض</option>
+            <option>جدة</option>
+            <option>الدمام</option>
+            <option>أبها</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Run Button -->
+      <button
+        @click="runSimulation()"
+        class="w-full text-sm text-white bg-teal rounded-xl px-4 py-2.5 hover:bg-teal-dark font-semibold mb-4 transition"
+      >
+        شغّل المحاكاة ▶
       </button>
-      <div id="leaflet-excluded-${id}" style="width:100%;height:220px;border-radius:8px;overflow:hidden;border:1px solid #FECACA;margin-top:8px;display:none;"></div>
-    </div>`;
-}
 
-function initLeafletMap(condId) {
-  const mapEl = document.getElementById('leaflet-map-' + condId);
-  if (!mapEl || mapEl._leaflet_id) return;
+      <!-- Result -->
+      <div x-show="simPanel.result !== null" class="slide-up">
+        <!-- Match -->
+        <div x-show="simPanel.result && simPanel.result.match" class="bg-green-50 border border-green-200 rounded-xl p-3 mb-3">
+          <p class="text-sm font-semibold text-green-800 mb-1.5">✅ المسار سيُطبَّق على هذا الطلب</p>
+          <div class="flex flex-col gap-1">
+            <div class="flex items-center gap-2">
+              <span class="text-xs text-green-600 w-16 shrink-0">المسار:</span>
+              <strong class="text-xs text-green-800" x-text="simPanel.result && simPanel.result.routeName"></strong>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="text-xs text-green-600 w-16 shrink-0">السبب:</span>
+              <span class="text-xs text-green-700" x-text="simPanel.result && simPanel.result.reason"></span>
+            </div>
+            <div class="flex items-start gap-2">
+              <span class="text-xs text-green-600 w-16 shrink-0 mt-0.5">الشركات:</span>
+              <div class="flex flex-wrap gap-1">
+                <template x-for="c in (simPanel.result && simPanel.result.carriers||[])" :key="c">
+                  <span class="text-xs bg-green-100 text-green-800 px-2 py-0.5 rounded-full font-medium" x-text="c"></span>
+                </template>
+              </div>
+            </div>
+          </div>
+        </div>
 
-  const map = L.map('leaflet-map-' + condId).setView([24.7136, 46.6753], 11);
+        <!-- No match -->
+        <div x-show="simPanel.result && !simPanel.result.match">
+          <div class="bg-amber-light border border-amber/30 rounded-xl p-3 mb-2">
+            <p class="text-sm font-semibold text-amber">⚠️ لا مسار مطابق</p>
+            <p class="text-xs text-amber/80 mt-0.5">سيُطبَّق المسار الافتراضي</p>
+          </div>
+          <!-- Default disabled warning -->
+          <div x-show="!defaultRouteEnabled" class="bg-[#FDECEC] border border-[#B71C1C] rounded-xl p-3">
+            <p class="text-sm font-semibold text-red-800">⛔ المسار الافتراضي معطّل</p>
+            <p class="text-xs text-red-700 mt-0.5">الطلب سيفشل عند الدفع ولن يرى العميل أي خيار شحن</p>
+            <button
+              @click="defaultRouteEnabled=true; simPanel.open=false"
+              class="text-xs text-red-700 underline font-semibold mt-1.5 hover:text-red-900 block"
+            >
+              فعّل المسار الافتراضي الآن ←
+            </button>
+          </div>
+          <div x-show="defaultRouteEnabled" class="bg-teal-light border border-teal/20 rounded-xl p-3">
+            <p class="text-xs text-teal-dark">سيُطبَّق المسار الافتراضي بشكل طبيعي</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Simulation History -->
+      <div x-show="simPanel.history.length > 0" class="mt-4">
+        <div class="section-divider"></div>
+        <p class="text-xs font-semibold text-gray-500 mb-2">السجل الأخير</p>
+        <div class="flex flex-col gap-1.5">
+          <template x-for="(h, hi) in simPanel.history" :key="hi">
+            <div class="flex items-center gap-2 py-1.5 px-2 rounded-lg bg-gray-50 border border-gray-100">
+              <span x-text="h.match ? '✅' : '⚠️'" class="text-sm"></span>
+              <div class="flex-1 min-w-0">
+                <p class="text-xs text-gray-700 truncate" x-text="h.match ? (h.routeName||'مطابق') : 'لا مسار مطابق'"></p>
+                <p class="text-[10px] text-gray-400" x-text="h.city + (h.value ? ' · ' + h.value + ' ريال' : '')"></p>
+              </div>
+              <span class="text-[10px] text-gray-300 shrink-0" x-text="h.ts"></span>
+            </div>
+          </template>
+        </div>
+        <button
+          @click="simPanel.history=[]; simPanel.result=null"
+          class="text-[10px] text-gray-400 hover:text-red-400 mt-1.5 w-full text-center"
+        >
+          مسح السجل
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+</div><!-- end x-data wrapper -->
+
+<script>
+// Polygon map initializer (Leaflet, vanilla JS)
+const polygonMaps = {};
+
+function initPolygonMap(mapId, condIdx) {
+  if (polygonMaps[mapId]) return;
+  const el = document.getElementById(mapId);
+  if (!el) return;
+  polygonMaps[mapId] = true;
+
+  const map = L.map(mapId, { zoomControl: true }).setView([24.7136, 46.6753], 11);
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: '© OpenStreetMap'
+    attribution: '© OpenStreetMap',
+    maxZoom: 18,
   }).addTo(map);
 
   let points = [];
-  let tempMarkers = [];
-  let poly = null;
+  let polyline = null;
+  let polygon = null;
+  let markers = [];
+
+  function redrawPolyline() {
+    if (polyline) { map.removeLayer(polyline); polyline = null; }
+    if (points.length >= 2) {
+      polyline = L.polyline(points, { color: '#7B2D8B', weight: 2 }).addTo(map);
+    }
+  }
 
   map.on('click', function(e) {
+    if (polygon) return; // already closed
     points.push([e.latlng.lat, e.latlng.lng]);
     const marker = L.circleMarker([e.latlng.lat, e.latlng.lng], {
-      radius: 4, color: '#7B2D8B', fillColor: '#7B2D8B', fillOpacity: 1
+      radius: 5, color: '#7B2D8B', fillColor: '#7B2D8B', fillOpacity: 1
     }).addTo(map);
-    tempMarkers.push(marker);
-
-    if (poly) map.removeLayer(poly);
-    if (points.length >= 2) {
-      poly = L.polygon(points, {
-        color: '#7B2D8B', weight: 2,
-        fillColor: '#7B2D8B', fillOpacity: 0.2
-      }).addTo(map);
-    }
+    markers.push(marker);
+    redrawPolyline();
   });
 
   map.on('dblclick', function(e) {
     if (points.length < 3) return;
-    map.doubleClickZoom.disable();
-    points.push(points[0]); // close
-    if (poly) map.removeLayer(poly);
-    poly = L.polygon(points, {
-      color: '#7B2D8B', weight: 2,
-      fillColor: '#7B2D8B', fillOpacity: 0.2
+    if (polygon) return;
+    // Remove last click (dblclick fires two clicks first)
+    // Close polygon
+    if (polyline) { map.removeLayer(polyline); polyline = null; }
+    polygon = L.polygon(points, {
+      color: '#7B2D8B',
+      fillColor: '#7B2D8B',
+      fillOpacity: 0.2,
+      weight: 2
     }).addTo(map);
-    const actionsEl = document.getElementById('map-actions-' + condId);
-    if (actionsEl) actionsEl.style.display = 'flex';
+
+    // Show save button by setting Alpine data
+    // Use custom event
+    el.dispatchEvent(new CustomEvent('polygon-drawn', { bubbles: true, detail: { mapId, condIdx } }));
   });
 }
 
-function savePolygon(condId) {
-  const actionsEl = document.getElementById('map-actions-' + condId);
-  if (actionsEl) {
-    actionsEl.innerHTML = '<span style="color:#04B49C;font-weight:600;font-size:13px;">✅ تم حفظ المنطقة</span><span class="map-badge">مناسب لتجار Quick Commerce</span>';
+// Listen for polygon-drawn events to update Alpine state
+document.addEventListener('polygon-drawn', function(e) {
+  const wrapper = document.querySelector('[x-data]');
+  if (wrapper && wrapper._x_dataStack) {
+    const data = wrapper._x_dataStack[0];
+    const ci = e.detail.condIdx;
+    if (typeof ci === 'number' && data.formConditions && data.formConditions[ci]) {
+      data.formConditions[ci].polygonSaved = true;
+    }
   }
-  updateSummary();
-}
+});
 
-function toggleExcludedMap(condId) {
-  const el = document.getElementById('leaflet-excluded-' + condId);
-  if (!el) return;
-  if (el.style.display === 'none') {
-    el.style.display = 'block';
-    setTimeout(() => {
-      if (el._leaflet_id) return;
-      const exMap = L.map('leaflet-excluded-' + condId).setView([24.7136, 46.6753], 10);
-      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '© OpenStreetMap'
-      }).addTo(exMap);
-    }, 100);
-  } else {
-    el.style.display = 'none';
-  }
-}
+// =============================================
+// Drag-to-reorder for routes table
+// =============================================
+(function() {
+  let dragSrcIdx = null;
+  let dragSrcEl = null;
 
-// ─── Feature 2: Negate Toggle ────────────────────────────
-function toggleNegate(condId, btn) {
-  const row = document.getElementById(condId);
-  btn.classList.toggle('active');
-  if (btn.classList.contains('active')) {
-    row.classList.add('negated');
-  } else {
-    row.classList.remove('negated');
-  }
-}
-
-// ─── Remove Condition ─────────────────────────────────────
-function removeCondition(id) {
-  const el = document.getElementById(id);
-  if (el) el.remove();
-  const list = document.getElementById('conditionsList');
-  const remaining = list.querySelectorAll('.condition-row');
-  if (remaining.length === 0) {
-    document.getElementById('conditionsEmpty').style.display = '';
-    document.getElementById('addConditionBtn').style.display = 'none';
-  }
-  updateSubsetTotal();
-  updateSummary();
-}
-
-function updateSubsetTotal() {
-  const rows = document.getElementById('conditionsList').querySelectorAll('.condition-row');
-  document.getElementById('subsetTotal').textContent = rows.length;
-}
-
-// ─── Summary Panel ────────────────────────────────────────
-function updateSummary() {
-  const name = document.getElementById('routeName').value.trim();
-  const marketSel = document.getElementById('routeMarket');
-  const marketLabel = marketSel.options[marketSel.selectedIndex].text;
-  const routeOn = document.getElementById('routeToggle').checked;
-
-  const hasData = name || selectedCarriers.length > 0;
-
-  if (!hasData) {
-    document.getElementById('summaryEmpty').style.display = '';
-    document.getElementById('summaryData').style.display = 'none';
-    return;
+  function getAlpineData() {
+    const wrapper = document.querySelector('[x-data]');
+    return wrapper ? wrapper._x_dataStack && wrapper._x_dataStack[0] : null;
   }
 
-  document.getElementById('summaryEmpty').style.display = 'none';
-  document.getElementById('summaryData').style.display = '';
-
-  document.getElementById('sum-name').textContent = name || 'لم يُدخل اسم بعد';
-  document.getElementById('sum-market').textContent = marketSel.value ? marketLabel : '—';
-
-  const typeLabels = { carriers: 'تحديد الشركات', auto: 'تعيين تلقائي', label: 'تسمية خاصة' };
-  document.getElementById('sum-type').textContent = typeLabels[currentRouteType];
-
-  // Carriers
-  const carrierNames = selectedCarriers.map(c => carrierData[c].label);
-  document.getElementById('sum-carriers').textContent = carrierNames.join(' · ') || '—';
-
-  // Conditions
-  const condRows = document.getElementById('conditionsList').querySelectorAll('.condition-row');
-  document.getElementById('sum-conditions').textContent =
-    condRows.length > 0 ? condRows.length + ' شرط' : 'لا توجد شروط';
-
-  document.getElementById('sum-status').textContent = routeOn ? '✅ مفعّل' : '⛔ معطّل';
-  document.getElementById('sum-status').style.color = routeOn ? '#04B49C' : '#EF4444';
-}
-
-// ─── Save Route ───────────────────────────────────────────
-function saveRoute() {
-  const name = document.getElementById('routeName').value.trim();
-  if (!name) {
-    alert('يرجى إدخال اسم المسار أولًا');
-    document.getElementById('routeName').focus();
-    return;
-  }
-  const btn = document.querySelector('.btn-save');
-  btn.textContent = '✅ تم الحفظ!';
-  btn.style.background = '#065F46';
-  setTimeout(() => {
-    btn.textContent = 'حفظ المسار';
-    btn.style.background = '#04B49C';
-  }, 2000);
-}
-
-// ─── Simulation Panel ─────────────────────────────────────
-function toggleSimPanel() {
-  const panel = document.getElementById('simPanel');
-  panel.classList.toggle('open');
-}
-
-function runSimulation() {
-  const value = parseFloat(document.getElementById('sim-value').value) || 0;
-  const city = document.getElementById('sim-city').value;
-  const resultEl = document.getElementById('simResult');
-  const cardEl = document.getElementById('simResultCard');
-
-  resultEl.style.display = 'block';
-
-  const isMatch = city === 'riyadh' || value > 100;
-
-  if (isMatch) {
-    cardEl.className = 'sim-result-card match';
-    let reason = [];
-    if (city === 'riyadh') reason.push('المدينة = الرياض');
-    if (value > 100) reason.push('قيمة السلة > ١٠٠ ريال');
-    cardEl.innerHTML = `✅ المسار سيُطبَّق<br><strong>الشرط المحقق:</strong> ${reason.join(' ، ')}`;
-  } else {
-    cardEl.className = 'sim-result-card no-match';
-    cardEl.innerHTML = `⚠️ لا يوجد مسار يطابق<br>سيُطبَّق <strong>المسار الافتراضي</strong>`;
-  }
-}
-
-// ─── Migration Banner ─────────────────────────────────────
-function dismissBanner() {
-  document.getElementById('migrationBanner').classList.add('hidden');
-}
-
-// ─── Migration Modal ──────────────────────────────────────
-let currentStep = 1;
-
-function openMigrationModal() {
-  document.getElementById('migrationModal').classList.add('open');
-  goToStep(1);
-  document.getElementById('migrationSuccess').style.display = 'none';
-  ['step-1','step-2','step-3'].forEach(s => {
-    document.getElementById(s).style.display = '';
-  });
-}
-
-function closeMigrationModal() {
-  document.getElementById('migrationModal').classList.remove('open');
-}
-
-function goToStep(step) {
-  currentStep = step;
-  ['step-1','step-2','step-3'].forEach((s, i) => {
-    const el = document.getElementById(s);
-    el.className = 'step-content' + (i + 1 === step ? ' active' : '');
+  document.addEventListener('mousedown', function(e) {
+    const handle = e.target.closest('.drag-handle');
+    if (!handle) return;
+    const row = handle.closest('tr');
+    if (!row) return;
+    dragSrcEl = row;
+    // Find row index in tbody
+    const tbody = row.closest('tbody');
+    if (!tbody) return;
+    dragSrcIdx = Array.from(tbody.rows).indexOf(row);
+    row.style.opacity = '0.5';
+    row.style.cursor = 'grabbing';
+    e.preventDefault();
   });
 
-  // Update circles and lines
-  for (let i = 1; i <= 3; i++) {
-    const circle = document.getElementById('step-circle-' + i);
-    const label = document.getElementById('step-label-' + i);
-    circle.classList.remove('active','done');
-    label.classList.remove('active');
-    if (i < step) { circle.classList.add('done'); circle.textContent = '✓'; }
-    else if (i === step) { circle.classList.add('active'); label.classList.add('active'); circle.textContent = ['١','٢','٣'][i-1]; }
-    else { circle.textContent = ['١','٢','٣'][i-1]; }
-  }
-  for (let i = 1; i <= 2; i++) {
-    const line = document.getElementById('step-line-' + i);
-    line.classList.toggle('done', i < step);
-  }
-}
-
-function publishMigration() {
-  ['step-1','step-2','step-3'].forEach(s => {
-    document.getElementById(s).style.display = 'none';
+  document.addEventListener('mousemove', function(e) {
+    if (dragSrcEl === null || dragSrcIdx === null) return;
+    const tbody = dragSrcEl.closest('tbody');
+    if (!tbody) return;
+    const rows = Array.from(tbody.rows);
+    let targetRow = null;
+    let targetIdx = null;
+    rows.forEach((r, i) => {
+      const rect = r.getBoundingClientRect();
+      if (e.clientY >= rect.top && e.clientY < rect.bottom && r !== dragSrcEl) {
+        targetRow = r;
+        targetIdx = i;
+      }
+    });
+    if (targetRow && targetIdx !== dragSrcIdx) {
+      // Visual only: swap background
+      rows.forEach(r => r.style.background = '');
+      if (targetRow) targetRow.style.background = 'rgba(4,180,156,0.06)';
+    }
   });
-  document.getElementById('migrationSuccess').style.display = 'block';
-  document.getElementById('stepIndicator').style.display = 'none';
-  setTimeout(() => {
-    document.getElementById('stepIndicator').style.display = 'flex';
-  }, 100);
+
+  document.addEventListener('mouseup', function(e) {
+    if (dragSrcEl === null || dragSrcIdx === null) return;
+    const tbody = dragSrcEl.closest('tbody');
+    if (tbody) {
+      const rows = Array.from(tbody.rows);
+      rows.forEach(r => r.style.background = '');
+      let targetIdx = null;
+      rows.forEach((r, i) => {
+        const rect = r.getBoundingClientRect();
+        if (e.clientY >= rect.top && e.clientY < rect.bottom && r !== dragSrcEl) {
+          targetIdx = i;
+        }
+      });
+      if (targetIdx !== null && targetIdx !== dragSrcIdx) {
+        const data = getAlpineData();
+        if (data && data.routes) {
+          const arr = data.routes;
+          const item = arr.splice(dragSrcIdx, 1)[0];
+          arr.splice(targetIdx, 0, item);
+          // Force Alpine reactivity
+          data.routes = [...arr];
+        }
+      }
+    }
+    dragSrcEl.style.opacity = '';
+    dragSrcEl.style.cursor = '';
+    dragSrcEl = null;
+    dragSrcIdx = null;
+  });
+})();
+
+// =============================================
+// Keyboard shortcut: Escape closes modals/panels
+// =============================================
+document.addEventListener('keydown', function(e) {
+  if (e.key !== 'Escape') return;
+  const wrapper = document.querySelector('[x-data]');
+  if (!wrapper || !wrapper._x_dataStack) return;
+  const data = wrapper._x_dataStack[0];
+  if (data.deleteModal && data.deleteModal.open) { data.deleteModal.open = false; return; }
+  if (data.migrationModal && data.migrationModal.open) { data.migrationModal.open = false; return; }
+  if (data.simPanel && data.simPanel.open) { data.simPanel.open = false; return; }
+});
+
+// =============================================
+// Utility: format numbers in Arabic-Indic
+// =============================================
+function toArabicNumerals(n) {
+  return String(n).replace(/\d/g, d => '٠١٢٣٤٥٦٧٨٩'[d]);
 }
 
-// ─── Init ─────────────────────────────────────────────────
+// =============================================
+// Animate coverage bar on page load
+// =============================================
 document.addEventListener('DOMContentLoaded', function() {
-  updateSummary();
-  // Close modal on overlay click
-  document.getElementById('migrationModal').addEventListener('click', function(e) {
-    if (e.target === this) closeMigrationModal();
+  // Staggered entrance for nav links
+  const navLinks = document.querySelectorAll('nav a');
+  navLinks.forEach((el, i) => {
+    el.style.opacity = '0';
+    el.style.transform = 'translateY(-4px)';
+    setTimeout(() => {
+      el.style.transition = 'opacity 0.3s, transform 0.3s';
+      el.style.opacity = '';
+      el.style.transform = '';
+    }, 80 + i * 40);
   });
 });
 </script>
+
+<!-- =============================================
+     Inline SVG icons (reusable via <use>)
+     =============================================  -->
+<svg style="display:none" xmlns="http://www.w3.org/2000/svg">
+  <symbol id="icon-truck" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/>
+  </symbol>
+  <symbol id="icon-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+    <polyline points="20 6 9 17 4 12"/>
+  </symbol>
+  <symbol id="icon-warning" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+  </symbol>
+  <symbol id="icon-map" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/>
+  </symbol>
+</svg>
+
 </body>
 </html>
