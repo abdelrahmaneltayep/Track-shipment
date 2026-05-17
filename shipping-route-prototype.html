@@ -333,6 +333,80 @@
     .wiz-step-btn.inactive .wiz-step-num { background: #E5E7EB; color: var(--muted); }
     .wiz-arrow { color: #D1D5DB; padding: 0 4px; font-size: 14px; }
 
+    /* ─── CITY PICKER ────────────────────────────────── */
+    .city-picker { position: relative; flex: 1; }
+    .city-picker-trigger {
+      display: flex; align-items: center; flex-wrap: wrap; gap: 5px;
+      border: 1.5px solid var(--border); border-radius: 8px;
+      padding: 6px 10px; min-height: 38px; background: #fff;
+      cursor: text; transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .city-picker-trigger:focus-within {
+      border-color: var(--teal); box-shadow: 0 0 0 3px rgba(4,180,156,0.10);
+    }
+    .city-picker-trigger.open { border-color: var(--teal); box-shadow: 0 0 0 3px rgba(4,180,156,0.10); border-radius: 8px 8px 0 0; }
+    .city-chip {
+      display: inline-flex; align-items: center; gap: 3px;
+      border-radius: 20px; padding: 2px 8px;
+      font-size: 11.5px; font-weight: 600; line-height: 1.5;
+    }
+    .city-chip-single { background: var(--teal-10); color: var(--teal); border: 1px solid rgba(4,180,156,0.3); }
+    .city-chip-group  { background: #EEF2FF; color: #3730A3; border: 1px solid #C7D2FE; }
+    .city-chip-x { cursor: pointer; opacity: 0.55; font-size: 14px; line-height: 1; margin-right: -1px; }
+    .city-chip-x:hover { opacity: 1; }
+    .city-picker-input {
+      border: none; outline: none; font-family: 'Tajawal', sans-serif;
+      font-size: 12px; min-width: 80px; flex: 1; background: transparent;
+      color: var(--text);
+    }
+    .city-picker-input::placeholder { color: #9CA3AF; }
+    .city-dropdown {
+      position: absolute; top: 100%; right: 0; left: 0; z-index: 120;
+      background: #fff; border: 1.5px solid var(--teal);
+      border-top: none; border-radius: 0 0 10px 10px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+      max-height: 260px; overflow-y: auto;
+    }
+    .city-dropdown.hidden { display: none; }
+    .city-dd-search {
+      padding: 8px 12px; border-bottom: 1px solid var(--border);
+      position: sticky; top: 0; background: #fff; z-index: 1;
+    }
+    .city-dd-search-input {
+      width: 100%; border: 1.5px solid var(--border); border-radius: 7px;
+      padding: 6px 10px; font-family: 'Tajawal', sans-serif; font-size: 12px;
+      outline: none; background: #F9FAFB;
+    }
+    .city-dd-search-input:focus { border-color: var(--teal); }
+    .city-dd-section {
+      padding: 6px 12px 3px; font-size: 10px; font-weight: 700;
+      letter-spacing: 0.5px; text-transform: uppercase; color: var(--muted);
+      background: #F9FAFB; border-bottom: 1px solid var(--border);
+      border-top: 1px solid var(--border); margin-top: 2px;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .city-dd-item {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 8px 14px; font-size: 13px; cursor: pointer;
+      transition: background 0.12s; border-bottom: 1px solid #F9FAFB;
+    }
+    .city-dd-item:hover { background: var(--teal-10); }
+    .city-dd-item.selected { background: var(--teal-10); color: var(--teal); }
+    .city-dd-item-left { display: flex; align-items: center; gap: 8px; }
+    .city-dd-item-count { font-size: 11px; color: var(--muted); background: #F3F4F6; padding: 1px 7px; border-radius: 20px; }
+    .city-dd-item-count.sel { background: var(--teal-10); color: var(--teal); }
+    .city-dd-item-check { font-size: 12px; color: var(--teal); opacity: 0; }
+    .city-dd-item.selected .city-dd-item-check { opacity: 1; }
+    .city-coverage {
+      display: flex; align-items: center; gap: 8px; margin-top: 7px;
+      padding: 7px 10px; background: #F9FAFB; border: 1px solid var(--border);
+      border-radius: 7px; font-size: 11px; color: var(--muted);
+    }
+    .city-cov-bar { flex: 1; height: 5px; background: var(--border); border-radius: 3px; overflow: hidden; }
+    .city-cov-fill { height: 100%; background: var(--teal); border-radius: 3px; transition: width 0.3s; }
+    .city-cov-pct { font-size: 11px; font-weight: 700; color: var(--teal); white-space: nowrap; }
+    .city-cov-warn { color: var(--orange); font-weight: 600; }
+
     /* ─── CONDITIONS ──────────────────────────────────── */
     .logic-toggle {
       display: inline-flex; border: 1.5px solid var(--border);
@@ -1031,7 +1105,20 @@
 
 <script>
 /* ── MOCK DATA ─────────────────────────────────────────── */
-const CITIES_ALL = ["الرياض","جدة","الدمام","مكة المكرمة","المدينة المنورة","الخبر","أبها","تبوك","الطائف","بريدة","حائل","ينبع","القطيف","الجبيل","عرعر"];
+const CITIES_ALL = ["الرياض","جدة","الدمام","مكة المكرمة","المدينة المنورة","الخبر","أبها","تبوك","الطائف","بريدة","حائل","ينبع","القطيف","الجبيل","عرعر","طريف","نجران","جازان","الباحة","الجوف"];
+const CITY_GROUPS = [
+  {id:'g1', icon:'⭐', label:'مدن أرامكس',            cities:['الرياض','جدة','الدمام','الخبر','مكة المكرمة','المدينة المنورة','الطائف','أبها','تبوك','القطيف','حائل','ينبع','عرعر','الجوف']},
+  {id:'g2', icon:'⭐', label:'المدن الكبرى',            cities:['الرياض','جدة','الدمام','مكة المكرمة','المدينة المنورة']},
+  {id:'g3', icon:'⭐', label:'منطقة المخزن الغربي',     cities:['جدة','مكة المكرمة','الطائف','ينبع','رابغ']},
+];
+const CITY_REGIONS = [
+  {id:'r1', icon:'🗺️', label:'كل المدن (20+)',         cities: CITIES_ALL},
+  {id:'r2', icon:'🏙️', label:'المنطقة الوسطى',         cities:['الرياض','الخرج','القصيم','بريدة','عنيزة']},
+  {id:'r3', icon:'🌊', label:'المنطقة الغربية',         cities:['جدة','مكة المكرمة','المدينة المنورة','الطائف','ينبع']},
+  {id:'r4', icon:'⛽', label:'المنطقة الشرقية',         cities:['الدمام','الخبر','الجبيل','القطيف','الأحساء']},
+  {id:'r5', icon:'🏔️', label:'المنطقة الجنوبية',        cities:['أبها','خميس مشيط','نجران','جازان','الباحة']},
+  {id:'r6', icon:'🏜️', label:'المنطقة الشمالية',        cities:['تبوك','حائل','عرعر','الجوف','طريف']},
+];
 const COND_TYPES = ["المدينة / المنطقة","المنتجات","الفئات","وزن الطلب","قيمة الطلب","الكمية"];
 const OPERATORS = {
   "المدينة / المنطقة": ["تساوي","لا تساوي"],
@@ -1241,9 +1328,11 @@ function renderConds(){
     const opOpts=(OPERATORS[cond.type]||[]).map(o=>`<option ${o===cond.operator?'selected':''}>${o}</option>`).join('');
     const isChip=['المدينة / المنطقة','المنتجات','الفئات'].includes(cond.type);
     let valHtml='';
-    if(isChip){
+    if(cond.type === 'المدينة / المنطقة'){
+      valHtml = buildCityPicker(cond);
+    } else if(isChip){
       const chips=cond.values.map(v=>`<div class="chip">${v}<span class="chip-x" onclick="delCondVal(${cond.id},'${v}')">×</span></div>`).join('');
-      const ph=cond.type==='المدينة / المنطقة'?'اكتب مدينة...':'اكتب للبحث...';
+      const ph='اكتب للبحث...';
       valHtml=`<div class="chip-wrap" onclick="this.querySelector('input').focus()">${chips}<input class="chip-input" placeholder="${ph}" onkeydown="addCondVal(event,${cond.id})"></div>`;
     } else {
       const unit=cond.type==='وزن الطلب'?'كغ':cond.type==='قيمة الطلب'?'ريال':'';
@@ -1259,6 +1348,295 @@ function renderConds(){
   });
   lucide.createIcons(); checkConflict();
 }
+
+/* ── CITY PICKER ─────────────────────────────────────────── */
+// State per condition: which selections are "groups" (for collapsed chip display)
+const cityPickerGroupSel = {}; // condId → Set of group ids selected
+
+function buildCityPicker(cond) {
+  const id = cond.id;
+  if (!cityPickerGroupSel[id]) cityPickerGroupSel[id] = new Set();
+  const total = CITIES_ALL.length;
+  const selCount = cond.values.length;
+  const pct = total ? Math.round(selCount / total * 100) : 0;
+
+  // Build selected chips
+  const groupSel = cityPickerGroupSel[id];
+  let chipsHtml = '';
+  // Group chips first
+  groupSel.forEach(gid => {
+    const g = [...CITY_GROUPS, ...CITY_REGIONS].find(x => x.id === gid);
+    if (!g) return;
+    const isRegion = CITY_REGIONS.some(r => r.id === gid);
+    chipsHtml += `<div class="city-chip city-chip-group">${isRegion ? g.icon : '⭐'} ${g.label}<span class="city-chip-x" onclick="removeGroupFromCond(${id},'${gid}')">×</span></div>`;
+  });
+  // Individual city chips (not in any selected group)
+  const groupCities = new Set();
+  groupSel.forEach(gid => {
+    const g = [...CITY_GROUPS, ...CITY_REGIONS].find(x => x.id === gid);
+    if (g) g.cities.forEach(c => groupCities.add(c));
+  });
+  cond.values.filter(v => !groupCities.has(v)).forEach(city => {
+    chipsHtml += `<div class="city-chip city-chip-single">${city}<span class="city-chip-x" onclick="delCondVal(${id},'${city}')">×</span></div>`;
+  });
+
+  const placeholder = selCount === 0 ? 'اختر المدن أو المناطق...' : '';
+  const covColor = pct >= 60 ? 'var(--teal)' : pct >= 30 ? 'var(--orange)' : 'var(--red)';
+  const covLabel = selCount === 0 ? '' : pct >= 60 ? `تغطية ${pct}%` : pct >= 30 ? `تغطية منخفضة ${pct}%` : `⚠️ تغطية ضعيفة ${pct}%`;
+  const covClass = pct >= 60 ? 'city-cov-pct' : pct >= 30 ? 'city-cov-pct city-cov-warn' : 'city-cov-pct city-cov-warn';
+
+  return `
+    <div class="city-picker" id="cp${id}">
+      <div class="city-picker-trigger" id="cpt${id}" onclick="openCityPicker(${id},event)">
+        ${chipsHtml}
+        <input class="city-picker-input" id="cpIn${id}" placeholder="${placeholder}"
+          oninput="filterCityDD(${id},this.value)"
+          onkeydown="cityInputKey(event,${id})"
+          onclick="event.stopPropagation();openCityPicker(${id},event)">
+      </div>
+      <!-- Dropdown -->
+      <div class="city-dropdown hidden" id="cpDD${id}">
+        <div class="city-dd-search">
+          <input class="city-dd-search-input" id="cpSearch${id}" placeholder="🔍  ابحث عن مدينة أو منطقة..."
+            oninput="filterCityDD(${id},this.value)" onclick="event.stopPropagation()">
+        </div>
+        <div id="cpList${id}">
+          ${buildCityDDContent(id, cond.values, groupSel, '')}
+        </div>
+      </div>
+      ${selCount > 0 ? `
+      <div class="city-coverage">
+        <div class="city-cov-bar"><div class="city-cov-fill" style="width:${pct}%;background:${covColor}"></div></div>
+        <span class="${covClass}">${covLabel}</span>
+        <span style="color:var(--muted)">${selCount} من ${total} مدينة</span>
+      </div>` : ''}
+    </div>`;
+}
+
+function buildCityDDContent(id, selectedVals, groupSel, query) {
+  const q = query.trim().toLowerCase();
+  let html = '';
+
+  // ── Saved Groups ──
+  const filteredGroups = CITY_GROUPS.filter(g => !q || g.label.includes(query));
+  if (filteredGroups.length && !q) {
+    html += `<div class="city-dd-section">⭐ مجموعاتك المحفوظة</div>`;
+    filteredGroups.forEach(g => {
+      const sel = groupSel.has(g.id);
+      html += `<div class="city-dd-item ${sel?'selected':''}" onclick="toggleGroupInCond(${id},'${g.id}','saved');event.stopPropagation()">
+        <div class="city-dd-item-left">
+          <span>⭐</span>
+          <span>${g.label}</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:6px">
+          <span class="city-dd-item-count ${sel?'sel':''}">${g.cities.length} مدينة</span>
+          <span class="city-dd-item-check">✓</span>
+        </div>
+      </div>`;
+    });
+  }
+
+  // ── Geographic Regions ──
+  const filteredRegions = CITY_REGIONS.filter(r => !q || r.label.includes(query) || r.cities.some(c => c.includes(query)));
+  if (filteredRegions.length) {
+    if (!q) html += `<div class="city-dd-section">📍 اختصارات جغرافية</div>`;
+    filteredRegions.forEach(r => {
+      const sel = groupSel.has(r.id);
+      html += `<div class="city-dd-item ${sel?'selected':''}" onclick="toggleGroupInCond(${id},'${r.id}','region');event.stopPropagation()">
+        <div class="city-dd-item-left">
+          <span>${r.icon}</span>
+          <span>${r.label}</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:6px">
+          <span class="city-dd-item-count ${sel?'sel':''}">${r.cities.length} مدن</span>
+          <span class="city-dd-item-check">✓</span>
+        </div>
+      </div>`;
+    });
+  }
+
+  // ── Individual Cities ──
+  const filteredCities = CITIES_ALL.filter(c => !q || c.includes(query));
+  if (filteredCities.length) {
+    if (!q) html += `<div class="city-dd-section">🏙️ مدن فردية</div>`;
+    filteredCities.forEach(city => {
+      const sel = selectedVals.includes(city);
+      html += `<div class="city-dd-item ${sel?'selected':''}" onclick="toggleCityInCond(${id},'${city}');event.stopPropagation()">
+        <div class="city-dd-item-left"><span>📍</span><span>${city}</span></div>
+        <span class="city-dd-item-check">✓</span>
+      </div>`;
+    });
+  }
+
+  if (!html) html = `<div style="text-align:center;padding:16px;font-size:12px;color:var(--muted)">لا توجد نتائج</div>`;
+  return html;
+}
+
+function openCityPicker(id, event) {
+  event.stopPropagation();
+  // Close all other dropdowns
+  document.querySelectorAll('.city-dropdown').forEach(dd => {
+    if (dd.id !== 'cpDD' + id) dd.classList.add('hidden');
+  });
+  const dd = document.getElementById('cpDD' + id);
+  const trig = document.getElementById('cpt' + id);
+  if (!dd) return;
+  const isOpen = !dd.classList.contains('hidden');
+  if (isOpen) { dd.classList.add('hidden'); trig.classList.remove('open'); return; }
+  dd.classList.remove('hidden');
+  trig.classList.add('open');
+  const searchEl = document.getElementById('cpSearch' + id);
+  if (searchEl) { searchEl.value = ''; setTimeout(() => searchEl.focus(), 50); }
+}
+
+function filterCityDD(id, query) {
+  const cond = S.conditions.find(c => c.id === id);
+  if (!cond) return;
+  const listEl = document.getElementById('cpList' + id);
+  if (listEl) listEl.innerHTML = buildCityDDContent(id, cond.values, cityPickerGroupSel[id] || new Set(), query);
+  // Also sync the search in the trigger input
+  const searchEl = document.getElementById('cpSearch' + id);
+  const trigIn = document.getElementById('cpIn' + id);
+  if (searchEl && document.activeElement === trigIn) searchEl.value = query;
+}
+
+function cityInputKey(event, id) {
+  if (event.key === 'Enter') {
+    const v = event.target.value.trim();
+    if (v && CITIES_ALL.some(c => c.includes(v))) {
+      const match = CITIES_ALL.find(c => c.includes(v));
+      if (match) toggleCityInCond(id, match);
+      event.target.value = '';
+    } else if (v) {
+      // Add as-is
+      toggleCityInCond(id, v);
+      event.target.value = '';
+    }
+    event.preventDefault();
+  } else if (event.key === 'Escape') {
+    closeCityPicker(id);
+  }
+}
+
+function toggleCityInCond(id, city) {
+  const cond = S.conditions.find(c => c.id === id);
+  if (!cond) return;
+  if (cond.values.includes(city)) {
+    cond.values = cond.values.filter(v => v !== city);
+  } else {
+    cond.values.push(city);
+  }
+  const searchEl = document.getElementById('cpSearch' + id);
+  const q = searchEl ? searchEl.value : '';
+  const listEl = document.getElementById('cpList' + id);
+  if (listEl) listEl.innerHTML = buildCityDDContent(id, cond.values, cityPickerGroupSel[id] || new Set(), q);
+  rebuildCityPickerChips(id, cond);
+  runSim(); renderSummary();
+}
+
+function toggleGroupInCond(id, gid, kind) {
+  const cond = S.conditions.find(c => c.id === id);
+  if (!cond) return;
+  if (!cityPickerGroupSel[id]) cityPickerGroupSel[id] = new Set();
+  const src = kind === 'saved' ? CITY_GROUPS : CITY_REGIONS;
+  const g = src.find(x => x.id === gid);
+  if (!g) return;
+  if (cityPickerGroupSel[id].has(gid)) {
+    // Deselect group → remove its cities
+    cityPickerGroupSel[id].delete(gid);
+    cond.values = cond.values.filter(v => !g.cities.includes(v));
+  } else {
+    // Select group → add its cities (deduplicated)
+    cityPickerGroupSel[id].add(gid);
+    g.cities.forEach(city => { if (!cond.values.includes(city)) cond.values.push(city); });
+  }
+  const searchEl = document.getElementById('cpSearch' + id);
+  const q = searchEl ? searchEl.value : '';
+  const listEl = document.getElementById('cpList' + id);
+  if (listEl) listEl.innerHTML = buildCityDDContent(id, cond.values, cityPickerGroupSel[id], q);
+  rebuildCityPickerChips(id, cond);
+  runSim(); renderSummary();
+}
+
+function removeGroupFromCond(id, gid) {
+  const cond = S.conditions.find(c => c.id === id);
+  if (!cond) return;
+  if (!cityPickerGroupSel[id]) cityPickerGroupSel[id] = new Set();
+  const g = [...CITY_GROUPS, ...CITY_REGIONS].find(x => x.id === gid);
+  if (g) { cityPickerGroupSel[id].delete(gid); cond.values = cond.values.filter(v => !g.cities.includes(v)); }
+  rebuildCityPickerChips(id, cond);
+  runSim(); renderSummary();
+}
+
+function rebuildCityPickerChips(id, cond) {
+  const trigger = document.getElementById('cpt' + id);
+  const inp = document.getElementById('cpIn' + id);
+  if (!trigger || !inp) return;
+  // Remove existing chips
+  trigger.querySelectorAll('.city-chip').forEach(c => c.remove());
+
+  const groupSel = cityPickerGroupSel[id] || new Set();
+  const groupCities = new Set();
+  const frag = document.createDocumentFragment();
+
+  // Group chips
+  groupSel.forEach(gid => {
+    const g = [...CITY_GROUPS, ...CITY_REGIONS].find(x => x.id === gid);
+    if (!g) return;
+    g.cities.forEach(c => groupCities.add(c));
+    const isRegion = CITY_REGIONS.some(r => r.id === gid);
+    const chip = document.createElement('div');
+    chip.className = 'city-chip city-chip-group';
+    chip.innerHTML = `${isRegion ? g.icon : '⭐'} ${g.label}<span class="city-chip-x" onclick="removeGroupFromCond(${id},'${gid}')">×</span>`;
+    frag.appendChild(chip);
+  });
+  // Individual chips
+  cond.values.filter(v => !groupCities.has(v)).forEach(city => {
+    const chip = document.createElement('div');
+    chip.className = 'city-chip city-chip-single';
+    chip.innerHTML = `${city}<span class="city-chip-x" onclick="delCondVal(${id},'${city}')">×</span>`;
+    frag.appendChild(chip);
+  });
+  trigger.insertBefore(frag, inp);
+
+  // Update placeholder
+  inp.placeholder = cond.values.length === 0 ? 'اختر المدن أو المناطق...' : '';
+
+  // Update coverage bar
+  const total = CITIES_ALL.length;
+  const pct = total ? Math.round(cond.values.length / total * 100) : 0;
+  const covEl = document.querySelector(`#cp${id} .city-coverage`);
+  if (covEl) {
+    const fill = covEl.querySelector('.city-cov-fill');
+    const label = covEl.querySelector('.city-cov-pct');
+    const countEl = covEl.querySelectorAll('span')[2];
+    const col = pct >= 60 ? 'var(--teal)' : pct >= 30 ? 'var(--orange)' : 'var(--red)';
+    if (fill) { fill.style.width = pct + '%'; fill.style.background = col; }
+    if (label) { label.textContent = pct >= 60 ? `تغطية ${pct}%` : `⚠️ تغطية ${pct}%`; }
+    if (countEl) countEl.textContent = `${cond.values.length} من ${total} مدينة`;
+    if (cond.values.length === 0) covEl.remove();
+  } else if (cond.values.length > 0) {
+    // Add coverage bar
+    const col = pct >= 60 ? 'var(--teal)' : pct >= 30 ? 'var(--orange)' : 'var(--red)';
+    const bar = document.createElement('div');
+    bar.className = 'city-coverage';
+    bar.innerHTML = `<div class="city-cov-bar"><div class="city-cov-fill" style="width:${pct}%;background:${col}"></div></div><span class="city-cov-pct">${pct >= 60 ? `تغطية ${pct}%` : `⚠️ تغطية ${pct}%`}</span><span style="color:var(--muted)">${cond.values.length} من ${total} مدينة</span>`;
+    document.getElementById('cp' + id).appendChild(bar);
+  }
+}
+
+function closeCityPicker(id) {
+  const dd = document.getElementById('cpDD' + id);
+  const trig = document.getElementById('cpt' + id);
+  if (dd) dd.classList.add('hidden');
+  if (trig) trig.classList.remove('open');
+}
+
+// Close all city pickers on outside click
+document.addEventListener('click', () => {
+  document.querySelectorAll('.city-dropdown').forEach(dd => dd.classList.add('hidden'));
+  document.querySelectorAll('.city-picker-trigger').forEach(t => t.classList.remove('open'));
+});
 
 function checkConflict(){
   const cc=S.conditions.filter(c=>c.type==='المدينة / المنطقة');
