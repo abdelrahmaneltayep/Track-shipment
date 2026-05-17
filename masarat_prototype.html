@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html dir="rtl" lang="ar">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>المسارات — نموذج تفاعلي</title>
-  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -12,8 +12,7 @@
         extend: {
           fontFamily: { tajawal: ['Tajawal','sans-serif'] },
           colors: {
-            teal: { DEFAULT:'#04B49C', dark:'#0E6B5E', light:'#E6F7F5' },
-            purple: { DEFAULT:'#7B2D8B', light:'#F9F0FF' },
+            teal: { DEFAULT:'#04B49C', dark:'#0E6B5E', light:'#E6F7F5', xlight:'#F0FBF9' },
           }
         }
       }
@@ -23,984 +22,967 @@
   <style>
     body { font-family: 'Tajawal', sans-serif; }
     [x-cloak] { display: none !important; }
-
-    /* Smooth fade for x-show elements */
-    [x-show] { transition: opacity 0.2s ease; }
-
-    /* Scrollbar styling */
-    ::-webkit-scrollbar { width: 6px; height: 6px; }
-    ::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 4px; }
-    ::-webkit-scrollbar-thumb { background: #c1c1c1; border-radius: 4px; }
-    ::-webkit-scrollbar-thumb:hover { background: #a1a1a1; }
-
-    /* Custom toggle underline tab */
-    .nav-tab-active {
-      border-bottom: 3px solid #04B49C;
-      color: #04B49C;
-    }
-
-    /* Operator badge circle */
-    .op-badge {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      width: 32px;
-      height: 32px;
-      border-radius: 50%;
-      font-family: monospace;
-      font-weight: bold;
-      font-size: 16px;
-      flex-shrink: 0;
-    }
-
-    /* Step circle */
-    .step-circle {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      width: 28px;
-      height: 28px;
-      border-radius: 50%;
-      font-size: 13px;
-      font-weight: 700;
-      flex-shrink: 0;
-    }
-
-    /* Product tag */
-    .product-tag {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      background: #E6F7F5;
-      color: #04B49C;
-      border: 1px solid #04B49C;
-      border-radius: 20px;
-      padding: 3px 10px;
-      font-size: 13px;
-      font-weight: 500;
-    }
-
-    /* Range slider teal */
-    input[type="range"] {
-      -webkit-appearance: none;
-      appearance: none;
-      width: 100%;
-      height: 6px;
-      background: #E6F7F5;
-      border-radius: 4px;
-      outline: none;
-    }
-    input[type="range"]::-webkit-slider-thumb {
-      -webkit-appearance: none;
-      appearance: none;
-      width: 18px;
-      height: 18px;
-      border-radius: 50%;
-      background: #04B49C;
-      cursor: pointer;
-      border: 2px solid white;
-      box-shadow: 0 1px 4px rgba(0,0,0,0.2);
-    }
-
-    /* Segmented control selected */
-    .seg-selected {
-      background: #04B49C;
-      color: white;
-    }
-
-    /* Floating btn pulse */
-    @keyframes soft-pulse {
-      0%, 100% { box-shadow: 0 0 0 0 rgba(4,180,156,0.4); }
-      50% { box-shadow: 0 0 0 8px rgba(4,180,156,0); }
-    }
-    .floating-btn { animation: soft-pulse 2.5s infinite; }
-
-    /* Dropdown animation handled via x-transition */
+    .op-badge { display:inline-flex; align-items:center; justify-content:center; width:28px; height:28px; border-radius:50%; font-family:monospace; font-weight:700; font-size:14px; flex-shrink:0; }
+    .slide-in { transition: transform 0.2s ease, opacity 0.2s ease; }
+    .notation { font-family: 'Courier New', monospace; font-size: 11px; }
   </style>
 </head>
-<body class="bg-[#F8F9FB] text-[#1A1A2E] min-h-screen font-tajawal" x-data="appData()" x-cloak>
+<body class="bg-[#F8F9FB] text-[#1A1A2E] font-tajawal min-h-screen" x-data="appData()" x-cloak>
 
-  <!-- ═══ TOAST ═══ -->
-  <div
-    x-show="showToast"
-    x-transition:enter="transition ease-out duration-300"
-    x-transition:enter-start="opacity-0 -translate-y-2"
-    x-transition:enter-end="opacity-100 translate-y-0"
-    x-transition:leave="transition ease-in duration-200"
-    x-transition:leave-end="opacity-0 -translate-y-2"
-    :class="toastType==='success' ? 'bg-green-50 border-green-500 text-green-800' : 'bg-amber-50 border-amber-500 text-amber-800'"
-    class="fixed top-4 left-4 z-50 border rounded-xl px-4 py-3 shadow-lg text-sm font-medium max-w-xs"
-    style="direction:rtl"
-  >
-    <span x-text="toastMsg"></span>
+  <!-- TOAST -->
+  <div x-show="showToast" x-transition
+       :class="toastSuccess ? 'bg-green-50 border-green-400 text-green-800' : 'bg-amber-50 border-amber-400 text-amber-800'"
+       class="fixed top-4 left-4 z-50 border rounded-xl px-4 py-3 shadow-xl text-sm font-medium max-w-xs"
+       x-text="toastMsg">
   </div>
 
-  <!-- ═══ TOP NAV ═══ -->
-  <nav class="bg-[#1A1A2E] h-14 flex items-center justify-between px-6 sticky top-0 z-30">
-    <!-- Right: Brand -->
+  <!-- TOP NAV -->
+  <nav class="bg-[#1A1A2E] sticky top-0 z-40 h-14 px-6 flex items-center justify-between">
+    <!-- Right side -->
     <div class="flex items-center gap-3">
-      <span class="bg-teal text-white text-xs font-bold px-3 py-1 rounded-full tracking-wide">salla</span>
-      <span class="text-gray-400 text-xs">متجر وليد عيسى</span>
+      <span class="bg-teal text-white px-2 py-1 rounded-lg text-sm font-bold">salla</span>
+      <span class="text-gray-400 text-sm">متجر وليد عيسى</span>
     </div>
-
-    <!-- Center: View Toggle Tabs -->
-    <div class="flex items-center gap-0 border-b border-gray-700 h-14">
-      <button
-        @click="view='builder'"
-        :class="view==='builder' ? 'nav-tab-active text-teal' : 'text-gray-400 hover:text-gray-200'"
-        class="px-5 h-full text-sm font-medium transition-colors"
-      >
-        🛠 بناء المسار
+    <!-- Center tabs -->
+    <div class="flex gap-1 bg-white/10 rounded-lg p-1">
+      <button @click="view='builder'"
+              :class="view==='builder' ? 'bg-teal text-white' : 'text-gray-400 hover:text-white'"
+              class="px-4 py-1.5 rounded-md text-sm font-medium transition-all">
+        إنشاء المسار
       </button>
-      <button
-        @click="view='simulation'"
-        :class="view==='simulation' ? 'nav-tab-active text-teal' : 'text-gray-400 hover:text-gray-200'"
-        class="px-5 h-full text-sm font-medium transition-colors"
-      >
-        🧪 وضع المحاكاة
+      <button @click="goSim()"
+              :class="view==='simulation' ? 'bg-teal text-white' : 'text-gray-400 hover:text-white'"
+              class="px-4 py-1.5 rounded-md text-sm font-medium transition-all">
+        🧪 المحاكاة
       </button>
     </div>
-
-    <!-- Left: Info + Avatar -->
-    <div class="flex items-center gap-3">
-      <span class="text-gray-500 text-xs hidden md:block">نموذج تفاعلي — للاختبار الداخلي فقط | المسارات v2</span>
-      <div class="w-8 h-8 rounded-full bg-teal flex items-center justify-center text-white text-xs font-bold">و</div>
-    </div>
+    <!-- Left side -->
+    <div class="text-gray-500 text-xs">نموذج تفاعلي | المسارات v2</div>
   </nav>
 
-  <!-- ══════════════════════════════════════════════════════ -->
-  <!-- VIEW A — ROUTE BUILDER                                 -->
-  <!-- ══════════════════════════════════════════════════════ -->
-  <div
-    x-show="view === 'builder'"
-    x-transition:enter="transition ease-out duration-200"
-    x-transition:enter-start="opacity-0"
-    x-transition:enter-end="opacity-100"
-    x-transition:leave="transition ease-in duration-150"
-    x-transition:leave-end="opacity-0"
-    class="max-w-3xl mx-auto px-4 py-8"
-  >
-    <!-- Page Header -->
-    <div class="flex items-center justify-between mb-2">
-      <div class="flex items-center gap-2">
-        <button class="text-gray-500 hover:text-gray-700 text-sm">←</button>
-        <h1 class="text-xl font-bold">إنشاء مسار جديد</h1>
-      </div>
-      <button class="bg-teal text-white text-sm font-semibold px-5 py-2 rounded-xl hover:bg-teal-dark transition-colors shadow-sm">
-        حفظ المسار
-      </button>
-    </div>
-    <!-- Breadcrumb -->
-    <p class="text-xs text-gray-400 mb-6 me-1">الشحن &rsaquo; الإعدادات &rsaquo; مسارات الشحن &rsaquo; مسار جديد</p>
+  <!-- ═══════════════════════════════════════════════════════════════
+       VIEW A — ROUTE BUILDER
+  ═══════════════════════════════════════════════════════════════ -->
+  <div x-show="view==='builder'"
+       x-transition:enter="transition ease-out duration-200"
+       x-transition:enter-start="opacity-0"
+       x-transition:enter-end="opacity-100">
 
-    <!-- ── CONDITIONS CARD ── -->
-    <div class="bg-white rounded-2xl shadow-sm p-6 mb-5">
-      <div class="flex items-center justify-between mb-5">
-        <h2 class="text-base font-bold">شروط المسار</h2>
-        <button
-          @click="addCondition()"
-          class="text-teal border border-teal text-sm font-semibold px-4 py-1.5 rounded-lg hover:bg-teal-light transition-colors"
-        >
-          + إضافة شرط
+    <div class="max-w-4xl mx-auto px-4 py-6">
+
+      <!-- Page Header -->
+      <div class="flex items-center justify-between mb-6">
+        <div class="flex items-center gap-3">
+          <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+          </svg>
+          <span class="text-gray-400 text-sm">إنشاء مسار جديد</span>
+        </div>
+        <button class="bg-teal text-white px-5 py-2 rounded-lg text-sm font-medium hover:bg-teal-dark transition-colors">
+          حفظ المسار
         </button>
       </div>
 
-      <!-- Condition Rows -->
-      <div class="space-y-6">
-        <template x-for="cond in conditions" :key="cond.id">
-          <div class="border border-gray-100 rounded-xl p-4 bg-gray-50/50">
+      <!-- Universal Operators Explainer Banner -->
+      <div class="bg-teal-xlight border border-teal/20 rounded-2xl p-4 mb-6 flex gap-3 items-start">
+        <span class="text-2xl">🧩</span>
+        <div>
+          <p class="font-bold text-teal-dark text-sm">نظام المشغّلات الموحّد</p>
+          <p class="text-sm text-gray-600 mt-1">نفس المنطق، نفس الـ 4 خيارات — تعمل على المنتجات، التصنيفات، والفروع معاً.
+          المشغّل الرابع <strong class="text-teal">⊆ من القائمة المحددة فقط</strong> هو الجديد في هذا النظام.</p>
+        </div>
+      </div>
 
-            <!-- Row: Delete + Type badge + Operator dropdown -->
-            <div class="flex items-center gap-3 flex-wrap">
-              <!-- Delete -->
-              <button
-                @click="removeCondition(cond.id)"
-                class="text-red-400 hover:text-red-600 hover:bg-red-50 w-7 h-7 rounded-lg flex items-center justify-center text-sm transition-colors flex-shrink-0"
-                title="حذف الشرط"
-              >×</button>
+      <!-- Conditions Card -->
+      <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
 
-              <!-- Type badge -->
-              <span class="bg-gray-100 text-gray-600 text-xs font-medium px-3 py-1 rounded-full flex-shrink-0">
-                منتجات محددة
-              </span>
-
-              <!-- Operator Dropdown Trigger -->
-              <div class="relative flex-shrink-0">
-                <button
-                  @click="showOperatorDropdown = showOperatorDropdown === cond.id ? null : cond.id"
-                  class="flex items-center gap-2 border border-gray-200 bg-white text-sm font-medium px-3 py-1.5 rounded-lg hover:border-teal hover:text-teal transition-colors"
-                >
-                  <span
-                    class="font-mono text-xs font-bold"
-                    :class="getOperator(cond.operator)?.key === 'subset_only' ? 'text-teal' : 'text-gray-600'"
-                    x-text="getOperator(cond.operator)?.badge"
-                  ></span>
-                  <span x-text="getOperator(cond.operator)?.label"></span>
-                  <svg class="w-3 h-3 text-gray-400" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clip-rule="evenodd"/></svg>
-                </button>
-
-                <!-- Operator Dropdown Panel -->
-                <div
-                  x-show="showOperatorDropdown === cond.id"
-                  @click.outside="showOperatorDropdown = null"
-                  x-transition:enter="transition ease-out duration-100"
-                  x-transition:enter-start="opacity-0 scale-95"
-                  x-transition:enter-end="opacity-100 scale-100"
-                  x-transition:leave="transition ease-in duration-75"
-                  x-transition:leave-start="opacity-100 scale-100"
-                  x-transition:leave-end="opacity-0 scale-95"
-                  class="absolute top-full mt-2 z-20 bg-white rounded-xl shadow-xl border border-gray-100 w-80 overflow-hidden"
-                  style="right:0"
-                >
-                  <div class="p-2">
-                    <template x-for="op in operators" :key="op.key">
-                      <button
-                        @click="selectOperator(cond.id, op.key)"
-                        :class="{
-                          'border-r-[3px] border-teal bg-teal-light/50': op.key === 'subset_only',
-                          'bg-gray-50': cond.operator !== op.key && op.key !== 'subset_only'
-                        }"
-                        class="w-full text-right flex items-start gap-3 px-3 py-2.5 rounded-lg hover:bg-gray-50 transition-colors relative mb-1"
-                        :style="op.key === 'subset_only' ? 'border-right: 3px solid #04B49C;' : ''"
-                      >
-                        <!-- Badge circle -->
-                        <span
-                          class="op-badge mt-0.5"
-                          :class="op.key === 'subset_only' ? 'bg-teal/10 text-teal' : 'bg-gray-100 text-gray-600'"
-                          x-text="op.badge"
-                        ></span>
-
-                        <!-- Text -->
-                        <div class="flex-1 min-w-0">
-                          <div class="flex items-center gap-2">
-                            <span class="font-bold text-sm text-gray-800" x-text="op.label"></span>
-                            <!-- "جديد" pill -->
-                            <span x-show="op.isNew" class="bg-teal text-white text-[10px] font-bold px-2 py-0.5 rounded-full">✦ جديد</span>
-                          </div>
-                          <p class="text-xs text-gray-500 mt-0.5" x-text="op.desc"></p>
-                        </div>
-
-                        <!-- Notation + checkmark -->
-                        <div class="flex flex-col items-end gap-1 flex-shrink-0">
-                          <span
-                            class="font-mono text-xs"
-                            :class="op.key === 'subset_only' ? 'text-teal' : 'text-gray-400'"
-                            x-text="op.notation"
-                          ></span>
-                          <span x-show="cond.operator === op.key" class="text-teal text-sm">✓</span>
-                        </div>
-                      </button>
-                    </template>
-                  </div>
-                </div>
-              </div>
+        <!-- Header Row -->
+        <div class="flex items-center justify-between mb-5">
+          <div>
+            <h2 class="font-bold text-base">شروط المسار</h2>
+            <p class="text-xs text-gray-500 mt-0.5">حدّد متى يُطبَّق هذا المسار</p>
+          </div>
+          <!-- Add Condition button with dropdown -->
+          <div class="relative">
+            <button @click="showAddMenu=!showAddMenu" @click.outside="showAddMenu=false"
+                    class="flex items-center gap-1.5 border border-teal text-teal px-3 py-1.5 rounded-lg text-sm hover:bg-teal-xlight transition-colors">
+              + إضافة شرط
+            </button>
+            <div x-show="showAddMenu" x-transition
+                 class="absolute left-0 top-full mt-1 w-52 bg-white rounded-xl shadow-xl border border-gray-100 py-1 z-30">
+              <div class="px-3 py-1.5 text-xs text-gray-400 font-medium border-b border-gray-50">شروط القوائم (٤ مشغّلات)</div>
+              <button @click="addCondition('products')"
+                      class="w-full text-right px-3 py-2 text-sm hover:bg-gray-50 flex items-center gap-2">
+                <span class="text-teal text-xs font-mono">⊆</span>منتجات محددة
+              </button>
+              <button @click="addCondition('categories')"
+                      class="w-full text-right px-3 py-2 text-sm hover:bg-gray-50 flex items-center gap-2">
+                <span class="text-teal text-xs font-mono">⊆</span>تصنيف المنتجات
+              </button>
+              <button @click="addCondition('branches')"
+                      class="w-full text-right px-3 py-2 text-sm hover:bg-gray-50 flex items-center gap-2">
+                <span class="text-teal text-xs font-mono">⊆</span>الفروع والمستودعات
+              </button>
+              <div class="px-3 py-1.5 text-xs text-gray-400 font-medium border-t border-gray-50">شروط رقمية (≥ ≤ = بين)</div>
+              <button @click="addCondition('value')"
+                      class="w-full text-right px-3 py-2 text-sm hover:bg-gray-50 flex items-center gap-2">
+                <span class="text-gray-400 text-xs">≥</span>قيمة السلة
+              </button>
+              <button @click="addCondition('weight')"
+                      class="w-full text-right px-3 py-2 text-sm hover:bg-gray-50 flex items-center gap-2">
+                <span class="text-gray-400 text-xs">≥</span>وزن السلة
+              </button>
             </div>
+          </div>
+        </div>
 
-            <!-- Product Tags Row -->
-            <div class="mt-3 flex flex-wrap gap-2 items-center">
-              <template x-for="prod in cond.products" :key="prod">
-                <span class="product-tag">
-                  <span x-text="prod"></span>
-                  <button @click="removeProduct(cond.id, prod)" class="text-teal hover:text-teal-dark font-bold leading-none">×</button>
-                </span>
-              </template>
+        <!-- Condition Rows -->
+        <template x-for="cond in conditions" :key="cond.id">
+          <div class="mb-4">
+            <!-- ROW BOX -->
+            <div :class="cond.operator==='subset_only' && cond.isListType ? 'border-teal' : 'border-gray-200'"
+                 class="border rounded-xl p-3 transition-all">
 
-              <!-- Add Product mini dropdown -->
-              <div class="relative" x-data="{ open: false, search: '' }">
-                <button
-                  @click="open = !open"
-                  class="text-gray-500 border border-dashed border-gray-300 hover:border-teal hover:text-teal text-xs px-3 py-1.5 rounded-full transition-colors"
-                >
-                  + إضافة منتج
-                </button>
-                <div
-                  x-show="open"
-                  @click.outside="open = false; search = ''"
-                  x-transition:enter="transition ease-out duration-100"
-                  x-transition:enter-start="opacity-0 scale-95"
-                  x-transition:enter-end="opacity-100 scale-100"
-                  class="absolute top-full mt-1 z-20 bg-white rounded-xl shadow-xl border border-gray-100 w-56"
-                  style="right:0"
-                >
-                  <div class="p-2">
-                    <input
-                      x-model="search"
-                      type="text"
-                      placeholder="ابحث عن منتج..."
-                      class="w-full text-sm border border-gray-200 rounded-lg px-3 py-1.5 mb-2 outline-none focus:border-teal"
-                    />
-                    <div class="max-h-40 overflow-y-auto space-y-0.5">
-                      <template x-for="prod in allProducts.filter(p => !cond.products.includes(p) && p.includes(search))" :key="prod">
-                        <button
-                          @click="cond.products.push(prod); open = false; search = ''"
-                          class="w-full text-right text-sm px-3 py-1.5 rounded-lg hover:bg-teal-light hover:text-teal transition-colors"
-                          x-text="prod"
-                        ></button>
+              <div class="flex items-center gap-3 flex-wrap">
+
+                <!-- Delete button -->
+                <button @click="conditions=conditions.filter(c=>c.id!==cond.id)"
+                        class="text-gray-300 hover:text-red-400 transition-colors text-lg leading-none flex-shrink-0">×</button>
+
+                <!-- Condition type badge -->
+                <span class="bg-teal-light text-teal-dark text-xs font-semibold px-2.5 py-1 rounded-lg flex-shrink-0"
+                      x-text="cond.label"></span>
+
+                <!-- LIST TYPE: Operator Dropdown -->
+                <template x-if="cond.isListType">
+                  <div class="relative flex-shrink-0">
+                    <button @click="cond.dropOpen=!cond.dropOpen"
+                            @click.outside="cond.dropOpen=false"
+                            class="flex items-center gap-2 border border-gray-200 hover:border-teal rounded-lg px-3 py-1.5 text-sm transition-all bg-white">
+                      <span class="op-badge text-xs"
+                            :class="cond.operator==='subset_only' ? 'bg-teal/10 text-teal' : 'bg-gray-100 text-gray-600'"
+                            x-text="getOp(cond.operator)?.badge"></span>
+                      <span class="text-gray-700 max-w-[140px] truncate" x-text="getOp(cond.operator)?.label"></span>
+                      <svg class="w-3 h-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                      </svg>
+                    </button>
+
+                    <!-- Operator Dropdown Panel -->
+                    <div x-show="cond.dropOpen"
+                         x-transition:enter="transition ease-out duration-100"
+                         x-transition:enter-start="opacity-0 scale-95"
+                         x-transition:enter-end="opacity-100 scale-100"
+                         class="absolute right-0 top-full mt-1 w-80 bg-white rounded-xl shadow-xl border border-gray-100 overflow-hidden z-30">
+                      <template x-for="op in listOperators" :key="op.key">
+                        <div @click="cond.operator=op.key; cond.dropOpen=false"
+                             :class="{
+                               'border-r-4 border-teal bg-teal-xlight': op.isNew,
+                               'bg-teal-light/30': cond.operator===op.key && !op.isNew,
+                               'hover:bg-gray-50': !op.isNew
+                             }"
+                             class="relative px-3 py-3 cursor-pointer transition-all">
+
+                          <!-- "✦ جديد" badge — only on subset_only -->
+                          <template x-if="op.isNew">
+                            <span class="absolute left-3 top-3 bg-teal text-white text-[10px] font-bold px-2 py-0.5 rounded-full">✦ جديد</span>
+                          </template>
+
+                          <!-- Selected checkmark -->
+                          <template x-if="cond.operator===op.key">
+                            <span class="absolute left-3 bottom-3 text-teal text-sm">✓</span>
+                          </template>
+
+                          <div class="flex items-start gap-3" :class="op.isNew ? 'pl-16' : 'pl-6'">
+                            <span class="op-badge flex-shrink-0 mt-0.5"
+                                  :class="op.isNew ? 'bg-teal/10 text-teal' : 'bg-gray-100 text-gray-600'"
+                                  x-text="op.badge"></span>
+                            <div class="min-w-0">
+                              <p class="text-sm font-semibold text-gray-800" x-text="op.label"></p>
+                              <p class="text-xs text-gray-500 mt-0.5" x-text="opDesc(op, cond.condType)"></p>
+                              <p class="notation mt-1"
+                                 :class="op.isNew ? 'text-teal' : 'text-gray-400'"
+                                 x-text="op.notation"></p>
+                            </div>
+                          </div>
+                        </div>
                       </template>
-                      <p
-                        x-show="allProducts.filter(p => !cond.products.includes(p) && p.includes(search)).length === 0"
-                        class="text-xs text-gray-400 text-center py-2"
-                      >لا توجد منتجات</p>
+                    </div>
+                  </div>
+                </template>
+
+                <!-- NUMERIC TYPE: Operator select -->
+                <template x-if="!cond.isListType">
+                  <select x-model="cond.numOp" class="border border-gray-200 rounded-lg px-3 py-1.5 text-sm bg-white">
+                    <template x-for="op in numericOperators" :key="op.key">
+                      <option :value="op.key" x-text="op.label"></option>
+                    </template>
+                  </select>
+                </template>
+
+                <!-- TAGS (list types) -->
+                <template x-if="cond.isListType">
+                  <div class="flex items-center gap-2 flex-wrap flex-1">
+                    <template x-for="tag in cond.tags" :key="tag">
+                      <span class="flex items-center gap-1 bg-teal/10 text-teal-dark text-xs px-2.5 py-1 rounded-full">
+                        <span x-text="tag"></span>
+                        <button @click="removeTag(cond, tag)" class="text-teal hover:text-red-500 transition-colors leading-none">×</button>
+                      </span>
+                    </template>
+                    <!-- Add tag button -->
+                    <div class="relative">
+                      <button @click="tagPickerOpen=tagPickerOpen===cond.id?null:cond.id; tagSearch=''"
+                              @click.outside="tagPickerOpen=null"
+                              class="text-xs border border-dashed border-gray-300 hover:border-teal text-gray-400 hover:text-teal px-2 py-1 rounded-full transition-colors">
+                        + إضافة
+                      </button>
+                      <!-- Tag picker dropdown -->
+                      <div x-show="tagPickerOpen===cond.id" x-transition
+                           class="absolute right-0 top-full mt-1 w-48 bg-white rounded-xl shadow-xl border border-gray-100 py-2 z-20">
+                        <input x-model="tagSearch" placeholder="بحث..."
+                               class="w-full px-3 py-1.5 text-sm border-b border-gray-100 outline-none" />
+                        <template x-for="item in availableForPicker(cond)" :key="item">
+                          <button @click="addTag(cond, item)"
+                                  class="w-full text-right px-3 py-2 text-sm hover:bg-teal-xlight hover:text-teal transition-colors"
+                                  x-text="item"></button>
+                        </template>
+                        <div x-show="availableForPicker(cond).length===0"
+                             class="px-3 py-2 text-xs text-gray-400">لا توجد نتائج</div>
+                      </div>
+                    </div>
+                  </div>
+                </template>
+
+                <!-- NUMERIC VALUE INPUTS -->
+                <template x-if="!cond.isListType">
+                  <div class="flex items-center gap-2">
+                    <input x-model="cond.numVal" type="number" placeholder="القيمة"
+                           class="border border-gray-200 rounded-lg px-3 py-1.5 text-sm w-24 text-center" />
+                    <template x-if="cond.numOp==='between'">
+                      <span class="text-gray-400 text-sm">و</span>
+                    </template>
+                    <template x-if="cond.numOp==='between'">
+                      <input x-model="cond.numVal2" type="number" placeholder="الحد الأعلى"
+                             class="border border-gray-200 rounded-lg px-3 py-1.5 text-sm w-24 text-center" />
+                    </template>
+                    <span class="text-gray-400 text-xs" x-text="cond.condType==='value' ? 'ريال' : 'كجم'"></span>
+                  </div>
+                </template>
+
+              </div><!-- end flex row -->
+
+              <!-- INLINE EXPLANATION PANEL (subset_only only, with tags) -->
+              <template x-if="cond.isListType && cond.operator==='subset_only' && cond.tags.length > 0">
+                <div x-transition class="mt-3 bg-teal-light border-r-4 border-teal rounded-xl p-4">
+                  <p class="text-sm font-bold text-teal-dark mb-2">
+                    💡 ماذا يعني "من القائمة المحددة فقط" هنا؟
+                  </p>
+                  <div class="space-y-1.5">
+                    <div class="flex items-start gap-2 text-sm">
+                      <span class="text-green-600 font-bold flex-shrink-0">✅</span>
+                      <span>
+                        <span class="text-gray-600">يُطابق: </span>
+                        <span x-text="getOp('subset_only').explain[cond.condType]?.yes"></span>
+                        <template x-for="t in cond.tags.slice(0,3)" :key="t">
+                          <span class="inline-block bg-teal/10 text-teal-dark text-xs px-2 py-0.5 rounded-full mr-1" x-text="'['+t+']'"></span>
+                        </template>
+                      </span>
+                    </div>
+                    <div class="flex items-start gap-2 text-sm">
+                      <span class="text-red-500 font-bold flex-shrink-0">❌</span>
+                      <span class="text-gray-600" x-text="getOp('subset_only').explain[cond.condType]?.no"></span>
+                    </div>
+                    <div class="flex items-start gap-2 text-sm mt-2 pt-2 border-t border-teal/20">
+                      <span class="text-teal">💡</span>
+                      <span class="text-teal-dark font-medium" x-text="getOp('subset_only').explain[cond.condType]?.tip"></span>
                     </div>
                   </div>
                 </div>
-              </div>
-            </div>
+              </template>
 
-            <!-- Inline Explanation (subset_only + products exist) -->
-            <div
-              x-show="cond.operator === 'subset_only' && cond.products.length > 0"
-              x-transition:enter="transition ease-out duration-200"
-              x-transition:enter-start="opacity-0 translate-y-1"
-              x-transition:enter-end="opacity-100 translate-y-0"
-              class="mt-3 bg-teal-light border-r-4 border-teal rounded-xl p-4"
-            >
-              <p class="text-teal-dark font-bold text-sm mb-2">💡 ماذا يعني هذا الشرط؟</p>
-              <div class="space-y-1.5">
-                <div class="flex items-start gap-2">
-                  <span class="text-green-600 text-sm">✅</span>
-                  <div class="text-sm text-gray-700">
-                    <span class="font-medium">الطلب يحتوي فقط على: </span>
-                    <span class="flex flex-wrap gap-1 mt-1">
-                      <template x-for="prod in cond.products" :key="prod">
-                        <span class="product-tag text-xs py-0.5" x-text="prod"></span>
-                      </template>
-                    </span>
-                  </div>
+              <!-- EMPTY TAG WARNING (subset_only + empty list) -->
+              <template x-if="cond.isListType && cond.operator==='subset_only' && cond.tags.length === 0">
+                <div x-transition class="mt-2 bg-amber-50 border border-amber-200 rounded-lg p-3 text-sm text-amber-800">
+                  ⚠️ القائمة فارغة — أضف عنصراً واحداً على الأقل لتفعيل هذا الشرط
                 </div>
-                <div class="flex items-start gap-2">
-                  <span class="text-red-500 text-sm">❌</span>
-                  <p class="text-sm text-gray-700"><span class="font-medium">لا يُقبل:</span> طلب فيه iPhone + منتج خارج القائمة</p>
-                </div>
-                <div class="flex items-start gap-2">
-                  <span class="text-gray-400 text-sm">📌</span>
-                  <p class="text-sm text-gray-500">مثال: مسار شحن سريع للأجهزة الإلكترونية فقط</p>
-                </div>
-              </div>
-            </div>
+              </template>
 
-            <!-- Empty Product Warning (subset_only + no products) -->
-            <div
-              x-show="cond.operator === 'subset_only' && cond.products.length === 0"
-              x-transition:enter="transition ease-out duration-200"
-              x-transition:enter-start="opacity-0"
-              x-transition:enter-end="opacity-100"
-              class="mt-2 bg-amber-50 border border-amber-300 rounded-lg p-3 text-amber-800 text-sm"
-            >
-              ⚠️ القائمة فارغة — أضف منتجاً واحداً على الأقل لتفعيل هذا الشرط
-            </div>
-
+            </div><!-- end ROW BOX -->
           </div>
         </template>
 
-        <!-- Empty state if no conditions -->
-        <div x-show="conditions.length === 0" class="text-center py-8 text-gray-400">
-          <p class="text-sm">لا توجد شروط — أضف شرطاً لتخصيص المسار</p>
+      </div><!-- end Conditions Card -->
+
+      <!-- Route Type Section -->
+      <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 mt-4">
+        <h3 class="font-bold text-base mb-4">نوع الشحن</h3>
+        <div class="grid grid-cols-3 gap-3">
+          <template x-for="type in ['شحن عادي', 'شحن سريع', 'نقطة التسليم']" :key="type">
+            <div @click="routeType=type"
+                 :class="routeType===type ? 'border-teal bg-teal-xlight' : 'border-gray-200 hover:border-gray-300'"
+                 class="border-2 rounded-xl p-4 cursor-pointer transition-all text-center">
+              <div class="text-2xl mb-1"
+                   x-text="type==='شحن عادي'?'📦':type==='شحن سريع'?'⚡':'📍'"></div>
+              <div class="text-sm font-medium" x-text="type"></div>
+              <template x-if="routeType===type">
+                <div class="text-teal text-xs mt-1">✓ محدد</div>
+              </template>
+            </div>
+          </template>
         </div>
       </div>
-    </div>
 
-    <!-- ── ROUTE TYPE CARD ── -->
-    <div class="bg-white rounded-2xl shadow-sm p-6 mb-5">
-      <h2 class="text-base font-bold mb-4">نوع الشحن</h2>
-      <div class="grid grid-cols-3 gap-3">
-        <template x-for="type in ['شحن عادي','شحن سريع','نقطة التسليم']" :key="type">
-          <button
-            @click="routeType = type"
-            :class="routeType === type
-              ? 'border-2 border-teal bg-teal-light text-teal'
-              : 'border border-gray-200 bg-white text-gray-600 hover:border-gray-300'"
-            class="rounded-xl p-4 text-sm font-medium text-center transition-all relative"
-          >
-            <div class="flex flex-col items-center gap-2">
-              <span x-text="type === 'شحن عادي' ? '🚚' : type === 'شحن سريع' ? '⚡' : '📦'" class="text-2xl"></span>
-              <span x-text="type"></span>
-            </div>
-            <span
-              x-show="routeType === type"
-              class="absolute top-2 left-2 bg-teal text-white w-5 h-5 rounded-full flex items-center justify-center text-xs"
-            >✓</span>
-          </button>
-        </template>
+      <!-- Test Banner -->
+      <div class="bg-teal-xlight border border-teal/20 rounded-xl p-4 mt-4 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <span class="text-xl">💡</span>
+          <p class="text-sm text-teal-dark">هل تريد اختبار هذا المسار قبل الحفظ؟</p>
+        </div>
+        <button @click="goSim()" class="text-teal text-sm font-medium hover:underline">تجربة الآن ←</button>
       </div>
-    </div>
 
-    <!-- ── TEST BANNER ── -->
-    <div class="bg-teal-light border border-teal/30 rounded-xl p-4 flex items-center justify-between">
-      <p class="text-sm text-teal-dark font-medium">💡 هل تريد اختبار هذا المسار قبل الحفظ؟</p>
-      <button @click="goToSimulation()" class="text-teal font-bold text-sm hover:underline">
-        تجربة الآن ←
-      </button>
-    </div>
+    </div><!-- end max-w -->
 
-    <!-- ── FLOATING "تجربة المسار" BUTTON ── -->
-    <div class="fixed bottom-6 left-6 z-40">
-      <button
-        @click="goToSimulation()"
-        class="floating-btn bg-teal text-white rounded-2xl px-5 py-3 shadow-xl text-sm font-bold flex items-center gap-2 hover:bg-teal-dark transition-colors"
-      >
-        <span>🧪</span>
-        <span>تجربة المسار</span>
-      </button>
-    </div>
+    <!-- Floating button -->
+    <button @click="goSim()"
+            class="fixed bottom-6 left-6 z-40 bg-teal text-white rounded-2xl px-5 py-3 shadow-xl text-sm font-bold hover:bg-teal-dark transition-colors flex items-center gap-2 animate-pulse">
+      🧪 تجربة المسار
+    </button>
 
-  </div>
-  <!-- END VIEW A -->
+  </div><!-- end VIEW A -->
 
+  <!-- ═══════════════════════════════════════════════════════════════
+       VIEW B — SIMULATION MODE
+  ═══════════════════════════════════════════════════════════════ -->
+  <div x-show="view==='simulation'"
+       x-transition:enter="transition ease-out duration-200"
+       x-transition:enter-start="opacity-0"
+       x-transition:enter-end="opacity-100">
 
-  <!-- ══════════════════════════════════════════════════════ -->
-  <!-- VIEW B — SIMULATION MODE                               -->
-  <!-- ══════════════════════════════════════════════════════ -->
-  <div
-    x-show="view === 'simulation'"
-    x-transition:enter="transition ease-out duration-200"
-    x-transition:enter-start="opacity-0"
-    x-transition:enter-end="opacity-100"
-    x-transition:leave="transition ease-in duration-150"
-    x-transition:leave-end="opacity-0"
-    class="max-w-5xl mx-auto px-4 py-8"
-  >
-    <!-- Page Header -->
-    <div class="flex items-center justify-between mb-6">
-      <button
-        @click="goToBuilder()"
-        class="flex items-center gap-2 text-gray-600 hover:text-gray-800 text-sm font-medium transition-colors"
-      >
-        <span>←</span>
-        <span>العودة للمسار</span>
-      </button>
-      <div class="flex items-center gap-2">
-        <span class="text-2xl">🧪</span>
-        <h1 class="text-xl font-bold">وضع المحاكاة</h1>
+    <div class="max-w-5xl mx-auto px-4 py-6">
+
+      <!-- Page Header -->
+      <div class="flex items-center justify-between mb-6">
+        <button @click="goBack()"
+                class="flex items-center gap-2 text-gray-500 hover:text-gray-800 transition-colors text-sm">
+          ← العودة للمسار
+        </button>
+        <div class="flex items-center gap-2">
+          <span class="text-lg">🧪</span>
+          <h1 class="font-bold text-base">وضع المحاكاة</h1>
+        </div>
       </div>
-      <div class="w-24"></div><!-- spacer -->
-    </div>
 
-    <!-- ── QUICK-FILL SCENARIOS ── -->
-    <div class="mb-6">
-      <div class="flex gap-2 flex-wrap justify-center mb-2">
-        <template x-for="(sc, i) in scenarios" :key="i">
-          <button
-            @click="loadScenario(sc)"
-            :title="'النتيجة المتوقعة: ' + sc.expected"
-            class="border border-gray-200 bg-white text-sm font-medium px-4 py-2 rounded-full hover:border-teal hover:text-teal hover:bg-teal-light transition-all shadow-sm"
-            x-text="sc.label"
-          ></button>
-        </template>
+      <!-- Quick-Fill Scenarios -->
+      <div class="mb-6">
+        <p class="text-xs text-gray-400 mb-2 text-center">سيناريوهات جاهزة — انقر للاختبار الفوري</p>
+        <div class="flex gap-2 flex-wrap justify-center">
+          <template x-for="(s,i) in scenarios" :key="i">
+            <button @click="loadScenario(s)"
+                    :title="'النتيجة المتوقعة: '+s.label"
+                    class="border border-gray-200 hover:border-teal hover:bg-teal-xlight text-sm px-3 py-1.5 rounded-full transition-all text-gray-600 hover:text-teal"
+                    x-text="s.label"></button>
+          </template>
+        </div>
       </div>
-      <p class="text-center text-xs text-gray-400">سيناريوهات جاهزة — انقر للاختبار الفوري</p>
-    </div>
 
-    <!-- ── TWO COLUMN LAYOUT ── -->
-    <div class="flex gap-6" style="flex-direction: row;">
+      <!-- Two-column layout -->
+      <div class="flex gap-6 flex-col md:flex-row">
 
-      <!-- RIGHT COLUMN (60%) — Cart Builder -->
-      <div class="w-3/5">
-        <div class="bg-white rounded-2xl shadow-sm p-6">
-          <h2 class="text-base font-bold mb-5">بيانات الطلب التجريبي</h2>
+        <!-- RIGHT: Order Builder (60%) -->
+        <div class="md:w-3/5 bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+          <h2 class="font-bold text-base mb-5">بيانات الطلب التجريبي</h2>
 
-          <div class="space-y-6">
-
-            <!-- Step 1: Products -->
-            <div>
-              <div class="flex items-center gap-2 mb-3">
-                <div
-                  class="step-circle"
-                  :class="cartProducts.length > 0 ? 'bg-teal text-white' : 'border-2 border-gray-300 text-gray-400'"
-                >١</div>
-                <span class="font-semibold text-sm">اختر منتجات الطلب</span>
-                <span x-show="cartProducts.length > 0" class="bg-teal text-white text-xs font-bold px-2 py-0.5 rounded-full" x-text="cartProducts.length + ' منتجات مختارة'"></span>
-              </div>
-              <!-- Selected products -->
-              <div class="flex flex-wrap gap-2 mb-3 min-h-8">
-                <template x-for="prod in cartProducts" :key="prod">
-                  <span class="product-tag">
+          <!-- Step 1 — Products -->
+          <div class="flex items-start gap-4 mb-6">
+            <div class="w-6 h-6 bg-teal text-white rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0">1</div>
+            <div class="flex-1">
+              <p class="text-sm font-semibold mb-2">منتجات الطلب</p>
+              <div class="flex items-center gap-2 flex-wrap mb-2">
+                <template x-for="prod in simProducts" :key="prod">
+                  <span class="flex items-center gap-1 bg-teal/10 text-teal-dark text-xs px-2.5 py-1 rounded-full">
                     <span x-text="prod"></span>
-                    <button @click="cartProducts = cartProducts.filter(p => p !== prod)" class="text-teal hover:text-teal-dark font-bold">×</button>
+                    <button @click="simProducts=simProducts.filter(p=>p!==prod); simResult=null"
+                            class="text-teal hover:text-red-500 transition-colors leading-none">×</button>
                   </span>
                 </template>
-                <span x-show="cartProducts.length === 0" class="text-gray-400 text-sm py-1">لم تختر أي منتج بعد</span>
+                <span class="text-xs text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full"
+                      x-text="simProducts.length + ' منتجات'"></span>
               </div>
-              <!-- Product search to add -->
-              <div class="relative" x-data="{ open: false, search: '' }">
-                <input
-                  type="text"
-                  x-model="search"
-                  @focus="open = true"
-                  @click.outside="open = false; search = ''"
-                  placeholder="🔍 ابحث وأضف منتجاً..."
-                  class="w-full text-sm border border-gray-200 rounded-xl px-4 py-2 outline-none focus:border-teal transition-colors"
-                />
-                <div
-                  x-show="open && allProducts.filter(p => !cartProducts.includes(p) && p.includes(search)).length > 0"
-                  class="absolute top-full mt-1 z-10 bg-white rounded-xl shadow-lg border border-gray-100 w-full"
-                >
-                  <div class="p-2 max-h-40 overflow-y-auto space-y-0.5">
-                    <template x-for="prod in allProducts.filter(p => !cartProducts.includes(p) && p.includes(search))" :key="prod">
-                      <button
-                        @click="cartProducts.push(prod); search = ''; open = false"
-                        class="w-full text-right text-sm px-3 py-2 rounded-lg hover:bg-teal-light hover:text-teal transition-colors"
-                        x-text="prod"
-                      ></button>
-                    </template>
-                  </div>
+              <!-- Product picker -->
+              <div class="relative">
+                <input x-model="tagInputText"
+                       @focus="simPickerOpen=true"
+                       @click.outside="simPickerOpen=false"
+                       placeholder="أضف منتجاً..."
+                       class="w-full border border-gray-200 rounded-lg px-3 py-1.5 text-sm outline-none focus:border-teal transition-colors" />
+                <div x-show="simPickerOpen" x-transition
+                     class="absolute right-0 top-full mt-1 w-full bg-white rounded-xl shadow-xl border border-gray-100 py-2 z-20">
+                  <template x-for="prod in availableSimProducts" :key="prod">
+                    <button @click="simProducts.push(prod); tagInputText=''; simResult=null; simPickerOpen=false"
+                            class="w-full text-right px-3 py-2 text-sm hover:bg-teal-xlight hover:text-teal transition-colors"
+                            x-text="prod"></button>
+                  </template>
+                  <div x-show="availableSimProducts.length===0"
+                       class="px-3 py-2 text-xs text-gray-400">لا توجد منتجات إضافية</div>
                 </div>
               </div>
             </div>
+          </div>
 
-            <!-- Step 2: Cart Value -->
-            <div>
-              <div class="flex items-center gap-2 mb-3">
-                <div
-                  class="step-circle"
-                  :class="cartValue > 0 ? 'bg-teal text-white' : 'border-2 border-gray-300 text-gray-400'"
-                >٢</div>
-                <span class="font-semibold text-sm">قيمة الطلب</span>
+          <!-- Step 2 — Categories (auto-derived) -->
+          <div class="flex items-start gap-4 mb-6">
+            <div class="w-6 h-6 bg-teal text-white rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0">2</div>
+            <div class="flex-1">
+              <p class="text-sm font-semibold mb-1">تصنيفات الطلب</p>
+              <div class="text-xs text-gray-400 mb-2">مشتقة تلقائياً من المنتجات المختارة</div>
+              <div class="flex gap-2 flex-wrap">
+                <template x-for="cat in simCategories" :key="cat">
+                  <span class="bg-purple-50 text-purple-700 text-xs px-2.5 py-1 rounded-full" x-text="cat"></span>
+                </template>
+                <span x-show="simCategories.length===0" class="text-xs text-gray-400 italic">لا توجد تصنيفات</span>
               </div>
+            </div>
+          </div>
+
+          <!-- Step 3 — Branch -->
+          <div class="flex items-start gap-4 mb-6">
+            <div class="w-6 h-6 bg-teal text-white rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0">3</div>
+            <div class="flex-1">
+              <p class="text-sm font-semibold mb-2">الفرع / المستودع</p>
+              <div class="flex gap-2 flex-wrap">
+                <template x-for="branch in ['مستودع الرياض','فرع جدة','مستودع الدمام','مستودع آخر']" :key="branch">
+                  <button @click="simBranch=branch; simResult=null"
+                          :class="simBranch===branch ? 'bg-teal text-white border-teal' : 'bg-white text-gray-600 border-gray-200 hover:border-teal hover:text-teal'"
+                          class="border text-xs px-3 py-1.5 rounded-lg transition-all"
+                          x-text="branch"></button>
+                </template>
+              </div>
+            </div>
+          </div>
+
+          <!-- Step 4 — Order Value -->
+          <div class="flex items-start gap-4 mb-6">
+            <div class="w-6 h-6 bg-teal text-white rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0">4</div>
+            <div class="flex-1">
+              <p class="text-sm font-semibold mb-2">قيمة الطلب</p>
               <div class="flex items-center gap-3">
-                <div class="flex items-center border border-gray-200 rounded-xl overflow-hidden flex-1">
-                  <input
-                    type="number"
-                    x-model.number="cartValue"
-                    min="0"
-                    max="5000"
-                    class="flex-1 text-sm px-4 py-2 outline-none text-right"
-                  />
-                  <span class="bg-gray-50 border-r border-gray-200 px-3 py-2 text-sm text-gray-500">ريال</span>
+                <input x-model="simValue" @input="simResult=null" type="number" min="0" max="2000"
+                       class="border border-gray-200 rounded-lg px-3 py-1.5 text-sm w-24 text-center outline-none focus:border-teal" />
+                <input x-model="simValue" @input="simResult=null" type="range" min="0" max="2000" step="10"
+                       class="flex-1 accent-teal" />
+                <span class="text-gray-500 text-sm">ريال</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Step 5 — Order Weight -->
+          <div class="flex items-start gap-4 mb-6">
+            <div class="w-6 h-6 bg-teal text-white rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0">5</div>
+            <div class="flex-1">
+              <p class="text-sm font-semibold mb-2">وزن الطلب</p>
+              <div class="flex items-center gap-3">
+                <input x-model="simWeight" @input="simResult=null" type="number" min="0" max="100" step="0.1"
+                       class="border border-gray-200 rounded-lg px-3 py-1.5 text-sm w-24 text-center outline-none focus:border-teal" />
+                <span class="text-gray-500 text-sm">كجم</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Step 6 — Run -->
+          <div class="flex items-start gap-4">
+            <div class="w-6 h-6 bg-teal text-white rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0">6</div>
+            <div class="flex-1">
+              <button @click="runSim()"
+                      class="w-full bg-teal text-white py-3 rounded-xl font-bold text-sm hover:bg-teal-dark transition-colors flex items-center justify-center gap-2">
+                🔍 اختبر الآن
+              </button>
+              <p class="text-xs text-gray-400 mt-2 text-center">سيتم تقييم الطلب مقابل شروط المسار المُعرَّف</p>
+            </div>
+          </div>
+
+        </div><!-- end Order Builder -->
+
+        <!-- LEFT: Result Panel (40%) -->
+        <div class="md:w-2/5">
+          <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 sticky top-20">
+            <h2 class="font-bold text-base mb-4">نتيجة المحاكاة</h2>
+
+            <!-- Empty state -->
+            <div x-show="simResult===null" class="text-center py-12 text-gray-400">
+              <div class="text-4xl mb-3">🧪</div>
+              <p class="text-sm">أدخل بيانات الطلب واضغط «اختبر الآن»</p>
+            </div>
+
+            <!-- State: match -->
+            <div x-show="simResult==='match'" x-transition
+                 class="border-2 border-green-400 bg-green-50 rounded-xl p-5">
+              <div class="flex items-center gap-2 mb-3">
+                <span class="text-3xl">✅</span>
+                <p class="font-bold text-green-800">هذا الطلب يطابق المسار</p>
+              </div>
+              <div class="space-y-2 text-sm border-t border-green-200 pt-3">
+                <div class="flex justify-between">
+                  <span class="text-gray-600">المسار المُطبَّق:</span>
+                  <span class="font-medium" x-text="simDetails.routeName"></span>
+                </div>
+                <div class="flex justify-between">
+                  <span class="text-gray-600">نوع الشحن:</span>
+                  <span x-text="(simDetails.shipping?.type || '') + ' — ' + (simDetails.shipping?.price ?? '') + ' ريال'"></span>
+                </div>
+                <div class="flex justify-between">
+                  <span class="text-gray-600">المدة:</span>
+                  <span x-text="simDetails.shipping?.duration"></span>
                 </div>
               </div>
-              <input
-                type="range"
-                min="0"
-                max="2000"
-                x-model.number="cartValue"
-                class="mt-2 w-full"
-              />
-              <div class="flex justify-between text-xs text-gray-400 mt-1">
-                <span>٠</span>
-                <span class="text-teal font-medium" x-text="cartValue + ' ريال'"></span>
-                <span>٢٠٠٠</span>
-              </div>
-            </div>
-
-            <!-- Step 3: Weight -->
-            <div>
-              <div class="flex items-center gap-2 mb-3">
-                <div
-                  class="step-circle"
-                  :class="cartWeight > 0 ? 'bg-teal text-white' : 'border-2 border-gray-300 text-gray-400'"
-                >٣</div>
-                <span class="font-semibold text-sm">وزن الطلب</span>
-              </div>
-              <div class="flex items-center border border-gray-200 rounded-xl overflow-hidden">
-                <input
-                  type="number"
-                  x-model.number="cartWeight"
-                  min="0"
-                  step="0.1"
-                  class="flex-1 text-sm px-4 py-2 outline-none text-right"
-                />
-                <span class="bg-gray-50 border-r border-gray-200 px-3 py-2 text-sm text-gray-500">كجم</span>
-              </div>
-            </div>
-
-            <!-- Step 4: Quantity -->
-            <div>
-              <div class="flex items-center gap-2 mb-3">
-                <div
-                  class="step-circle"
-                  :class="cartQty > 0 ? 'bg-teal text-white' : 'border-2 border-gray-300 text-gray-400'"
-                >٤</div>
-                <span class="font-semibold text-sm">كمية المنتجات</span>
-              </div>
-              <div class="flex items-center border border-gray-200 rounded-xl overflow-hidden w-40">
-                <button
-                  @click="if(cartQty > 1) cartQty--"
-                  class="px-3 py-2 text-gray-500 hover:bg-gray-50 border-l border-gray-200 transition-colors"
-                >−</button>
-                <input
-                  type="number"
-                  x-model.number="cartQty"
-                  min="1"
-                  class="flex-1 text-sm px-2 py-2 outline-none text-center"
-                />
-                <button
-                  @click="cartQty++"
-                  class="px-3 py-2 text-gray-500 hover:bg-gray-50 border-r border-gray-200 transition-colors"
-                >+</button>
-              </div>
-            </div>
-
-            <!-- Step 5: Region -->
-            <div>
-              <div class="flex items-center gap-2 mb-3">
-                <div
-                  class="step-circle"
-                  :class="cartRegion ? 'bg-teal text-white' : 'border-2 border-gray-300 text-gray-400'"
-                >٥</div>
-                <span class="font-semibold text-sm">موقع التوصيل</span>
-              </div>
-              <div class="flex flex-wrap gap-2">
-                <template x-for="region in ['المنطقة الوسطى','الغربية','الشرقية','الشمالية','الجنوبية']" :key="region">
-                  <button
-                    @click="cartRegion = region"
-                    :class="cartRegion === region
-                      ? 'bg-teal text-white border-teal'
-                      : 'bg-white text-gray-600 border-gray-200 hover:border-teal hover:text-teal'"
-                    class="border text-xs font-medium px-3 py-1.5 rounded-full transition-all"
-                    x-text="region"
-                  ></button>
+              <div class="mt-3 pt-3 border-t border-green-200">
+                <p class="text-xs font-semibold text-gray-600 mb-2">تفصيل الشروط المتطابقة:</p>
+                <template x-for="c in (simDetails.condResults || [])" :key="c.type">
+                  <div class="flex items-center gap-2 text-xs text-green-700 mb-1">
+                    <span>✓</span>
+                    <span x-text="c.type==='products'?'المنتجات':c.type==='categories'?'التصنيفات':c.type==='branches'?'الفروع':c.type==='value'?'قيمة السلة':'وزن السلة'"></span>
+                    <span class="notation text-green-600"
+                          x-text="c.op==='subset_only'?'(⊆ من القائمة فقط)':c.op==='any_in'?'(∩ أي عنصر)':c.op==='not_in'?'(⊄ لا يحتوي)':c.op==='in'?'(⊇ الكل)':c.op==='gte'?'(≥)':c.op==='lte'?'(≤)':''"></span>
+                    <span class="text-green-500">— متطابق</span>
+                  </div>
                 </template>
               </div>
             </div>
 
-            <!-- Step 6: Run -->
-            <div>
+            <!-- State: fallback -->
+            <div x-show="simResult==='fallback'" x-transition
+                 class="border-2 border-amber-400 bg-amber-50 rounded-xl p-5">
               <div class="flex items-center gap-2 mb-3">
-                <div class="step-circle bg-teal text-white">٦</div>
-                <span class="font-semibold text-sm">تشغيل المحاكاة</span>
+                <span class="text-3xl">⚠️</span>
+                <p class="font-bold text-amber-800">لا مسار مطابق — سيُطبَّق الافتراضي</p>
               </div>
-              <button
-                @click="runSimulation()"
-                class="w-full bg-teal text-white font-bold py-3 rounded-xl hover:bg-teal-dark transition-colors text-sm shadow-sm"
-              >
-                🔍 اختبر الآن
-              </button>
-              <p class="text-xs text-gray-400 mt-2 text-center">سيتم مقارنة هذا الطلب مع شروط المسار المُعرَّف</p>
-            </div>
-
-          </div>
-        </div>
-      </div>
-      <!-- END Right Column -->
-
-      <!-- LEFT COLUMN (40%) — Result Panel -->
-      <div class="w-2/5">
-        <div class="bg-white rounded-2xl shadow-sm p-6 sticky top-20">
-          <h2 class="text-base font-bold mb-4">نتيجة المحاكاة</h2>
-
-          <!-- Empty State -->
-          <div x-show="simResult === null" class="text-center py-10">
-            <div class="text-5xl mb-3">🧪</div>
-            <p class="text-gray-400 text-sm leading-relaxed">أدخل بيانات الطلب واضغط<br>«اختبر الآن»</p>
-          </div>
-
-          <!-- State 1: MATCH -->
-          <div
-            x-show="simResult === 'match'"
-            x-transition:enter="transition ease-out duration-300"
-            x-transition:enter-start="opacity-0 translate-y-2"
-            x-transition:enter-end="opacity-100 translate-y-0"
-            class="border-2 border-green-500 bg-green-50 rounded-xl p-5"
-          >
-            <div class="text-center mb-4">
-              <div class="text-5xl mb-2">✅</div>
-              <h3 class="text-green-700 font-bold text-base">هذا الطلب يطابق المسار</h3>
-            </div>
-            <div class="border-t border-green-200 pt-4 space-y-2">
-              <div class="flex justify-between text-sm">
-                <span class="text-gray-500">المسار المُطبَّق</span>
-                <span class="font-semibold text-gray-800" x-text="simDetails.routeName"></span>
-              </div>
-              <div class="flex justify-between text-sm">
-                <span class="text-gray-500">نوع الشحن</span>
-                <span class="font-semibold text-gray-800" x-text="simDetails.shipping"></span>
-              </div>
-              <div class="flex justify-between text-sm">
-                <span class="text-gray-500">السعر</span>
-                <span class="font-semibold text-gray-800" x-text="simDetails.price"></span>
-              </div>
-              <div class="flex justify-between text-sm">
-                <span class="text-gray-500">المدة</span>
-                <span class="font-semibold text-gray-800" x-text="simDetails.duration"></span>
+              <p class="text-sm text-gray-600 mb-3">المسار المُطبَّق: المسار الافتراضي</p>
+              <div class="flex gap-2 mt-4">
+                <button class="border border-teal text-teal text-xs px-3 py-1.5 rounded-lg hover:bg-teal-xlight transition-colors">💡 عدّل الشرط</button>
+                <button class="border border-gray-300 text-gray-600 text-xs px-3 py-1.5 rounded-lg hover:bg-gray-50 transition-colors">راجع الافتراضي</button>
               </div>
             </div>
-            <div class="border-t border-green-200 pt-4 mt-4">
-              <p class="text-xs text-gray-500 font-semibold mb-2">شروط متطابقة:</p>
-              <div class="space-y-1.5">
-                <div class="flex items-center gap-2 text-sm text-green-700">
-                  <span>✓</span>
-                  <span x-text="simDetails.conditionLabel"></span>
+
+            <!-- State: no_route -->
+            <div x-show="simResult==='no_route'" x-transition
+                 class="border-2 border-red-400 bg-red-50 rounded-xl p-5">
+              <div class="flex items-center gap-2 mb-3">
+                <span class="text-3xl">⛔</span>
+                <p class="font-bold text-red-800">هذا الطلب لن يصل — لا مسار ولا افتراضي</p>
+              </div>
+              <div class="text-sm text-gray-700 space-y-1 mb-3">
+                <p>السبب: المسار الافتراضي معطّل</p>
+                <p>النتيجة: العميل لن يرى أي خيار شحن</p>
+              </div>
+              <div class="border-t border-red-200 pt-3 mb-3">
+                <p class="text-xs font-semibold text-gray-600 mb-2">الشروط التي فشلت:</p>
+                <template x-for="c in (simDetails.failConds || [])" :key="c.type">
+                  <div class="flex items-center gap-2 text-xs text-red-700 mb-1">
+                    <span>✗</span>
+                    <span x-text="c.type==='branches'?'الفروع والمستودعات':c.type==='products'?'المنتجات المحددة':c.type"></span>
+                    <span class="notation text-red-500"
+                          x-text="c.op==='subset_only'?'(⊆ من القائمة فقط)':c.op"></span>
+                    <span class="text-red-400">— فشل</span>
+                  </div>
+                </template>
+              </div>
+              <div class="flex gap-2">
+                <button @click="defaultEnabled=true; runSim()"
+                        class="bg-red-600 text-white text-xs px-3 py-1.5 rounded-lg hover:bg-red-700 transition-colors">
+                  🔧 فعّل المسار الافتراضي
+                </button>
+                <button @click="view='builder'"
+                        class="border border-gray-300 text-gray-600 text-xs px-3 py-1.5 rounded-lg hover:bg-gray-50 transition-colors">
+                  راجع الشروط
+                </button>
+              </div>
+            </div>
+
+            <!-- State: conflict -->
+            <div x-show="simResult==='conflict'" x-transition
+                 class="border-2 border-purple-400 bg-purple-50 rounded-xl p-5">
+              <div class="flex items-center gap-2 mb-3">
+                <span class="text-3xl">🔄</span>
+                <p class="font-bold text-purple-800">يطابق مسارَين في نفس الوقت</p>
+              </div>
+              <div class="space-y-2 text-sm border-t border-purple-200 pt-3">
+                <div class="flex justify-between">
+                  <span class="text-gray-600">المسار الأول (أولوية <span x-text="simDetails.p1"></span>):</span>
+                  <span class="font-medium" x-text="simDetails.route1"></span>
                 </div>
-                <div class="flex items-center gap-2 text-sm text-green-700">
-                  <span>✓</span>
-                  <span>قيمة السلة: <span x-text="cartValue"></span> ريال</span>
+                <div class="flex justify-between">
+                  <span class="text-gray-600">المسار الثاني (أولوية <span x-text="simDetails.p2"></span>):</span>
+                  <span class="font-medium" x-text="simDetails.route2"></span>
+                </div>
+                <div class="flex justify-between font-bold text-purple-700">
+                  <span>سيُطبَّق:</span>
+                  <span x-text="(simDetails.applied || '') + ' (الأعلى أولوية)'"></span>
                 </div>
               </div>
-            </div>
-          </div>
-
-          <!-- State 2: FALLBACK -->
-          <div
-            x-show="simResult === 'fallback'"
-            x-transition:enter="transition ease-out duration-300"
-            x-transition:enter-start="opacity-0 translate-y-2"
-            x-transition:enter-end="opacity-100 translate-y-0"
-            class="border-2 border-orange-500 bg-amber-50 rounded-xl p-5"
-          >
-            <div class="text-center mb-4">
-              <div class="text-5xl mb-2">⚠️</div>
-              <h3 class="text-amber-700 font-bold text-base leading-snug">لا يوجد مسار مطابق — سيُطبَّق الافتراضي</h3>
-            </div>
-            <div class="border-t border-amber-200 pt-4 space-y-2">
-              <div class="flex justify-between text-sm">
-                <span class="text-gray-500">المسار المُطبَّق</span>
-                <span class="font-semibold text-gray-800">المسار الافتراضي</span>
+              <div class="mt-3 pt-3 border-t border-purple-200 text-sm text-purple-700">
+                💡 لتطبيق المسار الثاني — ارفع أولويته
               </div>
-            </div>
-            <div class="border-t border-amber-200 pt-4 mt-4">
-              <p class="text-xs text-gray-500 font-semibold mb-2">الشروط غير المتطابقة:</p>
-              <div class="flex items-center gap-2 text-sm text-red-600">
-                <span>✗</span>
-                <span>منتجات محددة — الطلب يحتوي منتجاً خارجياً</span>
-              </div>
-            </div>
-            <div class="mt-4 flex gap-2">
-              <button class="flex-1 text-teal border border-teal text-xs font-semibold py-2 rounded-lg hover:bg-teal-light transition-colors">
-                💡 عدّل شرط المنتجات
-              </button>
-              <button class="flex-1 text-teal border border-teal text-xs font-semibold py-2 rounded-lg hover:bg-teal-light transition-colors">
-                راجع المسار الافتراضي
-              </button>
-            </div>
-          </div>
-
-          <!-- State 3: NO ROUTE -->
-          <div
-            x-show="simResult === 'no_route'"
-            x-transition:enter="transition ease-out duration-300"
-            x-transition:enter-start="opacity-0 translate-y-2"
-            x-transition:enter-end="opacity-100 translate-y-0"
-            class="border-2 border-red-600 bg-red-50 rounded-xl p-5"
-            style="border-color:#B71C1C; background:#FFF5F5;"
-          >
-            <div class="text-center mb-4">
-              <div class="text-5xl mb-2">⛔</div>
-              <h3 class="font-bold text-base leading-snug" style="color:#B71C1C;">هذا الطلب لن يصل — لا مسار ولا افتراضي</h3>
-            </div>
-            <div class="border-t border-red-200 pt-4 space-y-2">
-              <div class="flex justify-between text-sm">
-                <span class="text-gray-500">السبب</span>
-                <span class="font-semibold text-red-700">المسار الافتراضي معطّل</span>
-              </div>
-              <p class="text-xs text-red-700 bg-red-100 rounded-lg p-2 mt-1">هذا يعني: العميل لن يرى أي خيار شحن</p>
-            </div>
-            <div class="mt-4 space-y-2">
-              <button
-                @click="defaultRouteEnabled=true; runSimulation()"
-                class="w-full bg-red-700 text-white text-sm font-bold py-2.5 rounded-xl hover:bg-red-800 transition-colors"
-                style="background:#B71C1C;"
-              >
-                🔧 فعّل المسار الافتراضي
-              </button>
-              <button class="w-full border border-gray-300 text-gray-600 text-sm font-medium py-2.5 rounded-xl hover:bg-gray-50 transition-colors">
-                راجع الشروط
-              </button>
-            </div>
-          </div>
-
-          <!-- State 4: CONFLICT -->
-          <div
-            x-show="simResult === 'conflict'"
-            x-transition:enter="transition ease-out duration-300"
-            x-transition:enter-start="opacity-0 translate-y-2"
-            x-transition:enter-end="opacity-100 translate-y-0"
-            class="rounded-xl p-5"
-            style="border: 2px solid #7B2D8B; background: #F9F0FF;"
-          >
-            <div class="text-center mb-4">
-              <div class="text-5xl mb-2">🔄</div>
-              <h3 class="font-bold text-base leading-snug" style="color:#7B2D8B;">هذا الطلب يطابق مسارَين في نفس الوقت</h3>
-            </div>
-            <div class="border-t pt-4 space-y-3" style="border-color:#E9D5FF;">
-              <div class="flex justify-between text-sm">
-                <span class="text-gray-500">المسار الأول</span>
-                <div class="text-right">
-                  <p class="font-semibold text-gray-800" x-text="simDetails.route1"></p>
-                  <p class="text-xs text-gray-400">أولوية <span x-text="simDetails.priority1"></span></p>
-                </div>
-              </div>
-              <div class="flex justify-between text-sm">
-                <span class="text-gray-500">المسار الثاني</span>
-                <div class="text-right">
-                  <p class="font-semibold text-gray-800" x-text="simDetails.route2"></p>
-                  <p class="text-xs text-gray-400">أولوية <span x-text="simDetails.priority2"></span></p>
-                </div>
-              </div>
-              <div class="rounded-lg p-3 text-sm" style="background:#EDE9FE;">
-                <span class="text-gray-500">سيُطبَّق: </span>
-                <span class="font-bold" style="color:#7B2D8B;" x-text="simDetails.applied"></span>
-                <span class="text-gray-500 text-xs"> (الأعلى أولوية)</span>
-              </div>
-            </div>
-            <div class="mt-3 p-3 rounded-lg text-xs text-gray-600" style="background:#F3E8FF;">
-              💡 إذا أردت المسار الثاني — ارفع أولويته
-            </div>
-            <div class="mt-4">
-              <button
-                class="w-full border text-sm font-semibold py-2.5 rounded-xl transition-colors hover:opacity-90"
-                style="border-color:#7B2D8B; color:#7B2D8B; background:white;"
-              >
+              <button class="mt-3 border border-purple-400 text-purple-700 text-xs px-3 py-1.5 rounded-lg hover:bg-purple-100 transition-colors">
                 إعادة ترتيب المسارات
               </button>
             </div>
+
           </div>
+        </div><!-- end Result Panel -->
 
-        </div>
-      </div>
-      <!-- END Left Column -->
+      </div><!-- end two-column -->
 
-    </div>
-    <!-- END Two Column -->
+    </div><!-- end max-w -->
+  </div><!-- end VIEW B -->
 
-  </div>
-  <!-- END VIEW B -->
-
-
-  <!-- ═══════════════════════════════════════════ -->
-  <!-- ALPINE DATA                                  -->
-  <!-- ═══════════════════════════════════════════ -->
   <script>
     function appData() {
       return {
         view: 'builder',
-        toastMsg: '',
-        toastType: '',
         showToast: false,
+        toastMsg: '',
+        toastSuccess: true,
 
-        // ── BUILDER STATE ──────────────────────────────────
+        // ── OPERATORS ────────────────────────────────────────
+        listOperators: [
+          {
+            key: 'in',
+            badge: '⊇',
+            label: 'كل العناصر المحددة أو أكثر',
+            notation: 'A ⊇ S',
+            isNew: false,
+            desc: {
+              products:   'الطلب يحتوي كل المنتجات المحددة، وقد يحتوي منتجات إضافية',
+              categories: 'الطلب يحتوي كل التصنيفات المحددة، وقد يحتوي تصنيفات أخرى',
+              branches:   'الطلب صادر من كل الفروع المحددة (نادراً ما يُستخدم)'
+            }
+          },
+          {
+            key: 'not_in',
+            badge: '⊄',
+            label: 'لا يحتوي أي عنصر محدد',
+            notation: 'A ∩ S = ∅',
+            isNew: false,
+            desc: {
+              products:   'الطلب لا يحتوي أياً من المنتجات المحددة',
+              categories: 'الطلب لا ينتمي لأي تصنيف محدد',
+              branches:   'الطلب ليس صادراً من أي فرع محدد — أي فرع آخر مقبول'
+            }
+          },
+          {
+            key: 'any_in',
+            badge: '∩',
+            label: 'يحتوي على أي عنصر محدد',
+            notation: 'A ∩ S ≠ ∅',
+            isNew: false,
+            desc: {
+              products:   'الطلب يحتوي منتجاً واحداً على الأقل من القائمة',
+              categories: 'الطلب يحتوي تصنيفاً واحداً على الأقل من القائمة',
+              branches:   'الطلب صادر من فرع واحد على الأقل من القائمة'
+            }
+          },
+          {
+            key: 'subset_only',
+            badge: '⊆',
+            label: 'من القائمة المحددة فقط',
+            notation: 'A ⊆ S , A ≠ ∅',
+            isNew: true,
+            desc: {
+              products:   'كل منتجات الطلب موجودة في القائمة المحددة — لا منتجات خارجها',
+              categories: 'كل تصنيفات الطلب موجودة في القائمة المحددة — لا تصنيفات خارجها',
+              branches:   'الطلب صادر فقط من الفروع المحددة — لا غيرها'
+            },
+            explain: {
+              products: {
+                yes: 'طلب يحتوي فقط على منتجات من القائمة',
+                no:  'طلب يحتوي منتجاً خارج القائمة',
+                tip: 'صمم مساراً حصرياً للأجهزة الإلكترونية فقط'
+              },
+              categories: {
+                yes: 'طلب كل منتجاته من تصنيفات القائمة',
+                no:  'طلب فيه تصنيف خارج القائمة المحددة',
+                tip: 'مسار خاص بطلبات التصنيف الواحد فقط'
+              },
+              branches: {
+                yes: 'طلب صادر فقط من الفروع المحددة',
+                no:  'طلب صادر من مستودع غير مدرج في القائمة',
+                tip: 'مسار حصري لمستودع معين — مثلاً مستودع Express'
+              }
+            }
+          }
+        ],
+
+        numericOperators: [
+          { key:'gte',     label:'أكبر من أو يساوي ≥' },
+          { key:'lte',     label:'أصغر من أو يساوي ≤' },
+          { key:'eq',      label:'يساوي =' },
+          { key:'between', label:'بين ... و ...' }
+        ],
+
+        // ── CONDITION ROWS ────────────────────────────────────
         conditions: [
-          { id: 1, type: 'منتجات محددة', operator: 'subset_only', products: ['iPhone 15 Pro', 'AirPods Pro'] }
+          {
+            id: 1,
+            condType: 'products',
+            label: 'منتجات محددة',
+            isListType: true,
+            operator: 'subset_only',
+            tags: ['iPhone 15 Pro', 'AirPods Pro'],
+            numOp: 'gte',
+            numVal: '',
+            numVal2: '',
+            dropOpen: false
+          },
+          {
+            id: 2,
+            condType: 'categories',
+            label: 'تصنيف المنتجات',
+            isListType: true,
+            operator: 'any_in',
+            tags: ['إلكترونيات', 'أجهزة منزلية'],
+            numOp: 'gte',
+            numVal: '',
+            numVal2: '',
+            dropOpen: false
+          },
+          {
+            id: 3,
+            condType: 'branches',
+            label: 'الفروع والمستودعات',
+            isListType: true,
+            operator: 'not_in',
+            tags: ['مستودع آخر'],
+            numOp: 'gte',
+            numVal: '',
+            numVal2: '',
+            dropOpen: false
+          }
         ],
+        nextCondId: 4,
+        showAddMenu: false,
+
+        availableItems: {
+          products:   ['iPhone 15 Pro', 'AirPods Pro', 'Samsung TV', 'كتاب تعلم البرمجة', 'عطر رجالي', 'حذاء رياضي'],
+          categories: ['إلكترونيات', 'أجهزة منزلية', 'ملابس', 'كتب ومواد تعليمية', 'أزياء وإكسسوار'],
+          branches:   ['مستودع الرياض', 'فرع جدة', 'مستودع الدمام', 'مستودع آخر']
+        },
+        tagPickerOpen: null,
+        tagSearch: '',
+
         routeType: 'شحن سريع',
-        showOperatorDropdown: null,
 
-        allProducts: ['iPhone 15 Pro', 'AirPods Pro', 'Samsung TV', 'كتاب تعلم البرمجة', 'عطر رجالي', 'حذاء رياضي'],
-        productSearch: '',
-
-        operators: [
-          { key: 'in',          badge: '⊇', label: 'كل المنتجات المحددة أو أكثر', desc: 'السلة تحتوي جميع المنتجات المحددة على الأقل', notation: 'A ⊇ S', isNew: false },
-          { key: 'not_in',      badge: '⊄', label: 'لا يحتوي أي منتج محدد',       desc: 'السلة لا تشترك مع القائمة المحددة بأي منتج',    notation: 'A ∩ S = ∅', isNew: false },
-          { key: 'any_in',      badge: '∩', label: 'يحتوي على أي منتج محدد',      desc: 'السلة تحتوي منتجاً واحداً على الأقل من القائمة', notation: 'A ∩ S ≠ ∅', isNew: false },
-          { key: 'subset_only', badge: '⊆', label: 'من القائمة المحددة فقط ✦',    desc: 'الطلب يحتوي فقط على منتجات من القائمة المحددة — لا غيرها', notation: 'A ⊆ S , A ≠ ∅', isNew: true },
-        ],
-
-        // ── SIMULATION STATE ───────────────────────────────
-        cartProducts: [],
-        cartValue: 450,
-        cartWeight: 2.5,
-        cartQty: 2,
-        cartRegion: 'المنطقة الوسطى',
+        // ── SIMULATION ────────────────────────────────────────
+        simProducts: ['iPhone 15 Pro', 'AirPods Pro'],
+        simBranch: 'مستودع الرياض',
+        simValue: 450,
+        simWeight: 2.5,
         simResult: null,
         simDetails: {},
+        tagInputText: '',
+        simPickerOpen: false,
+        defaultEnabled: false,
 
-        defaultRouteEnabled: false,
+        productCategoryMap: {
+          'iPhone 15 Pro':       'إلكترونيات',
+          'AirPods Pro':         'إلكترونيات',
+          'Samsung TV':          'إلكترونيات',
+          'كتاب تعلم البرمجة':  'كتب ومواد تعليمية',
+          'عطر رجالي':           'أزياء وإكسسوار',
+          'حذاء رياضي':          'أزياء وإكسسوار'
+        },
 
-        sampleRoutes: [
-          { id:1, name:'مسار الأجهزة الإلكترونية', cond:'subset_only', products:['iPhone 15 Pro','AirPods Pro'], minValue:200, shipping:'شحن سريع', price:25, duration:'خلال ٢٤ ساعة', priority:1 },
-          { id:2, name:'مسار القيمة العالية',       cond:'value_gte',  products:[],                              minValue:500, shipping:'شحن مجاني', price:0,  duration:'٢-٣ أيام',      priority:2 },
-          { id:3, name:'مسار الطلبات الاقتصادية',  cond:'value_lt',   products:[],                              maxValue:100, shipping:'شحن اقتصادي', price:15, duration:'٥-٧ أيام',  priority:3 },
+        demoRoutes: [
+          {
+            id: 1, name: 'مسار الأجهزة الإلكترونية', priority: 1,
+            conditions: [
+              { type:'products',   op:'subset_only', vals:['iPhone 15 Pro','AirPods Pro','Samsung TV'] },
+              { type:'categories', op:'any_in',      vals:['إلكترونيات'] },
+              { type:'branches',   op:'not_in',      vals:['مستودع آخر'] },
+              { type:'value',      op:'gte',          val:200 }
+            ],
+            shipping: { type:'شحن سريع', price:25, duration:'خلال ٢٤ ساعة' }
+          },
+          {
+            id: 2, name: 'مسار القيمة العالية', priority: 3,
+            conditions: [{ type:'value', op:'gte', val:500 }],
+            shipping: { type:'شحن مجاني', price:0, duration:'٢–٣ أيام' }
+          },
+          {
+            id: 3, name: 'مسار الشحن الاقتصادي', priority: 5,
+            conditions: [{ type:'value', op:'lte', val:100 }],
+            shipping: { type:'شحن اقتصادي', price:15, duration:'٥–٧ أيام' }
+          }
         ],
 
         scenarios: [
-          { label:'📱 طلب iPhone فقط',    products:['iPhone 15 Pro','AirPods Pro'],         value:450, weight:0.5, qty:2, region:'المنطقة الوسطى',  expected:'match' },
-          { label:'🛍️ طلب مختلط',         products:['iPhone 15 Pro','كتاب تعلم البرمجة'],  value:300, weight:1.2, qty:2, region:'المنطقة الغربية', expected:'no_route' },
-          { label:'💸 طلب قيمة عالية',    products:['عطر رجالي','حذاء رياضي'],             value:650, weight:2.0, qty:2, region:'المنطقة الوسطى',  expected:'match' },
-          { label:'🔄 تعارض مسارين',      products:['iPhone 15 Pro','AirPods Pro'],         value:550, weight:0.5, qty:2, region:'المنطقة الوسطى',  expected:'conflict' },
+          { label:'📱 أجهزة فقط',        products:['iPhone 15 Pro','AirPods Pro'],        branch:'مستودع الرياض', value:450, weight:0.5 },
+          { label:'🛍️ مختلط + فرع آخر', products:['iPhone 15 Pro','كتاب تعلم البرمجة'], branch:'مستودع آخر',    value:300, weight:1.2 },
+          { label:'💸 قيمة عالية',        products:['عطر رجالي','حذاء رياضي'],            branch:'فرع جدة',      value:650, weight:2.0 },
+          { label:'🔄 تعارض مسارين',     products:['iPhone 15 Pro','AirPods Pro'],        branch:'مستودع الرياض', value:550, weight:0.5 }
         ],
 
-        // ── METHODS ────────────────────────────────────────
-        init() {
-          this.cartProducts = [...this.scenarios[0].products];
+        // ── COMPUTED HELPERS ──────────────────────────────────
+        get simCategories() {
+          const cats = [...new Set(this.simProducts.map(p => this.productCategoryMap[p] || 'غير محدد'))];
+          return cats;
         },
 
-        getOperator(key) {
-          return this.operators.find(o => o.key === key);
+        get availableSimProducts() {
+          const all = ['iPhone 15 Pro','AirPods Pro','Samsung TV','كتاب تعلم البرمجة','عطر رجالي','حذاء رياضي'];
+          const search = this.tagInputText.toLowerCase();
+          return all.filter(p => !this.simProducts.includes(p) && (!search || p.toLowerCase().includes(search)));
         },
 
-        selectOperator(condId, opKey) {
-          const c = this.conditions.find(c => c.id === condId);
-          if (c) c.operator = opKey;
-          this.showOperatorDropdown = null;
+        getOp(key) {
+          return this.listOperators.find(o => o.key === key);
         },
 
-        removeProduct(condId, prod) {
-          const c = this.conditions.find(c => c.id === condId);
-          if (c) c.products = c.products.filter(p => p !== prod);
+        // ── LIST EVALUATOR ───────────────────────────────────
+        evalList(orderSet, configuredSet, op) {
+          switch(op) {
+            case 'in':          return configuredSet.every(i => orderSet.includes(i));
+            case 'not_in':      return !configuredSet.some(i => orderSet.includes(i));
+            case 'any_in':      return configuredSet.some(i => orderSet.includes(i));
+            case 'subset_only': return orderSet.length > 0 && orderSet.every(i => configuredSet.includes(i));
+          }
+          return false;
         },
 
-        addCondition() {
-          const id = Date.now();
-          this.conditions.push({ id, type:'منتجات محددة', operator:'in', products:['iPhone 15 Pro'] });
+        evalNumeric(orderVal, configuredVal, op, configuredVal2) {
+          switch(op) {
+            case 'gte':     return orderVal >= configuredVal;
+            case 'lte':     return orderVal <= configuredVal;
+            case 'eq':      return orderVal === configuredVal;
+            case 'between': return orderVal >= configuredVal && orderVal <= configuredVal2;
+          }
+          return false;
         },
 
-        removeCondition(id) {
-          this.conditions = this.conditions.filter(c => c.id !== id);
-        },
+        // ── SIMULATION RUNNER ─────────────────────────────────
+        runSim() {
+          const order = {
+            products:   this.simProducts,
+            categories: this.simCategories,
+            branches:   [this.simBranch],
+            value:      Number(this.simValue),
+            weight:     Number(this.simWeight)
+          };
 
-        loadScenario(s) {
-          this.cartProducts = [...s.products];
-          this.cartValue = s.value;
-          this.cartWeight = s.weight;
-          this.cartQty = s.qty;
-          this.cartRegion = s.region;
-          this.runSimulation();
-        },
+          const matchedRoutes = [];
 
-        runSimulation() {
-          const cart = { products: this.cartProducts, value: this.cartValue };
-          const matched = [];
+          for (const route of this.demoRoutes) {
+            let allPass = true;
+            const condResults = [];
 
-          for (const route of this.sampleRoutes) {
-            let match = false;
-            if (route.cond === 'subset_only') {
-              match = cart.products.length > 0 && cart.products.every(p => route.products.includes(p));
-            } else if (route.cond === 'value_gte') {
-              match = cart.value >= route.minValue;
-            } else if (route.cond === 'value_lt') {
-              match = cart.value < route.maxValue;
+            for (const c of route.conditions) {
+              let pass = false;
+              if (c.type === 'products')   pass = this.evalList(order.products,   c.vals, c.op);
+              if (c.type === 'categories') pass = this.evalList(order.categories, c.vals, c.op);
+              if (c.type === 'branches')   pass = this.evalList(order.branches,   c.vals, c.op);
+              if (c.type === 'value')      pass = this.evalNumeric(order.value,   c.val,  c.op, c.val2);
+              if (c.type === 'weight')     pass = this.evalNumeric(order.weight,  c.val,  c.op, c.val2);
+              condResults.push({ ...c, pass });
+              if (!pass) allPass = false;
             }
-            if (match) matched.push(route);
+
+            if (allPass) matchedRoutes.push({ route, condResults });
           }
 
-          if (matched.length >= 2) {
+          if (matchedRoutes.length >= 2) {
             this.simResult = 'conflict';
             this.simDetails = {
-              route1: matched[0].name, priority1: matched[0].priority,
-              route2: matched[1].name, priority2: matched[1].priority,
-              applied: matched[0].name,
+              route1: matchedRoutes[0].route.name, p1: matchedRoutes[0].route.priority,
+              route2: matchedRoutes[1].route.name, p2: matchedRoutes[1].route.priority,
+              applied: matchedRoutes[0].route.name,
+              condResults: matchedRoutes[0].condResults
             };
-          } else if (matched.length === 1) {
+          } else if (matchedRoutes.length === 1) {
             this.simResult = 'match';
             this.simDetails = {
-              routeName: matched[0].name,
-              shipping: matched[0].shipping,
-              price: matched[0].price + ' ريال',
-              duration: matched[0].duration,
-              conditionLabel: 'منتجات محددة — من القائمة المحددة فقط',
+              routeName: matchedRoutes[0].route.name,
+              shipping: matchedRoutes[0].route.shipping,
+              condResults: matchedRoutes[0].condResults
             };
-          } else if (!this.defaultRouteEnabled) {
+          } else if (!this.defaultEnabled) {
+            const firstRoute = this.demoRoutes[0];
+            const failConds = [];
+            for (const c of firstRoute.conditions) {
+              let pass = false;
+              if (c.type === 'products')   pass = this.evalList(order.products,   c.vals, c.op);
+              if (c.type === 'categories') pass = this.evalList(order.categories, c.vals, c.op);
+              if (c.type === 'branches')   pass = this.evalList(order.branches,   c.vals, c.op);
+              if (c.type === 'value')      pass = this.evalNumeric(order.value,   c.val,  c.op);
+              if (!pass) failConds.push(c);
+            }
             this.simResult = 'no_route';
-            this.simDetails = {};
+            this.simDetails = { failConds };
           } else {
             this.simResult = 'fallback';
             this.simDetails = {};
           }
         },
 
-        goToSimulation() {
-          this.view = 'simulation';
+        loadScenario(s) {
+          this.simProducts = [...s.products];
+          this.simBranch = s.branch;
+          this.simValue = s.value;
+          this.simWeight = s.weight;
+          this.$nextTick(() => this.runSim());
         },
 
-        goToBuilder() {
+        goSim() {
+          this.view = 'simulation';
+          this.simResult = null;
+        },
+
+        goBack() {
           const wasMatch = this.simResult === 'match';
           this.view = 'builder';
-          this.toastMsg = wasMatch
-            ? 'تم حفظ نتيجة المحاكاة — الطلب يطابق المسار ✅'
-            : '⚠️ تحقق من إعدادات المسار — لم يتطابق الطلب';
-          this.toastType = wasMatch ? 'success' : 'warning';
+          this.toastMsg = wasMatch ? 'تم الاختبار — الطلب يطابق المسار ✅' : '⚠️ لم يتطابق الطلب — راجع الشروط';
+          this.toastSuccess = wasMatch;
           this.showToast = true;
           setTimeout(() => this.showToast = false, 4000);
+        },
+
+        addCondition(type) {
+          const meta = {
+            products:   { label:'منتجات محددة',       isListType:true,  tags:[] },
+            categories: { label:'تصنيف المنتجات',      isListType:true,  tags:[] },
+            branches:   { label:'الفروع والمستودعات',  isListType:true,  tags:[] },
+            value:      { label:'قيمة السلة',          isListType:false, tags:[] },
+            weight:     { label:'وزن السلة',           isListType:false, tags:[] }
+          }[type];
+          this.conditions.push({
+            id: this.nextCondId++,
+            condType: type,
+            ...meta,
+            operator: 'any_in',
+            numOp: 'gte',
+            numVal: '',
+            numVal2: '',
+            dropOpen: false
+          });
+          this.showAddMenu = false;
+        },
+
+        removeTag(cond, tag) {
+          cond.tags = cond.tags.filter(t => t !== tag);
+        },
+
+        availableForPicker(cond) {
+          const all = this.availableItems[cond.condType] || [];
+          const search = this.tagSearch.toLowerCase();
+          return all.filter(i => !cond.tags.includes(i) && (!search || i.toLowerCase().includes(search)));
+        },
+
+        addTag(cond, item) {
+          if (!cond.tags.includes(item)) cond.tags.push(item);
+          this.tagSearch = '';
+          this.tagPickerOpen = null;
+        },
+
+        opDesc(op, condType) {
+          return op.desc[condType] || op.desc.products || '';
         }
       };
     }
