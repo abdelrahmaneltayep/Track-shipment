@@ -3,1889 +3,2275 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>المسارات v2 — سلة</title>
+<title>مسار شحن جديد — سلة</title>
 <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
 <style>
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-  body {
-    font-family: 'Tajawal', sans-serif;
-    background: #F4F5F7;
-    color: #1a1a2e;
-    direction: rtl;
-    min-height: 100vh;
-  }
+body {
+  font-family: 'Tajawal', sans-serif;
+  background: #F5F5F5;
+  color: #1A1A2E;
+  direction: rtl;
+  min-height: 100vh;
+  font-size: 14px;
+  line-height: 1.6;
+}
 
-  /* ── NAV ── */
-  .nav {
-    background: #0D1B2A;
-    color: #fff;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0 24px;
-    height: 56px;
-    position: sticky;
-    top: 0;
-    z-index: 100;
-    box-shadow: 0 2px 12px rgba(0,0,0,.4);
-  }
-  .nav-brand {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-  }
-  .nav-logo {
-    background: #04B49C;
-    color: #fff;
-    font-weight: 800;
-    font-size: 14px;
-    padding: 4px 10px;
-    border-radius: 6px;
-    letter-spacing: .5px;
-  }
-  .nav-title {
-    font-size: 13px;
-    color: #94a3b8;
-  }
-  .nav-badge {
-    background: rgba(4,180,156,.15);
-    color: #04B49C;
-    border: 1px solid rgba(4,180,156,.3);
-    font-size: 12px;
-    padding: 3px 10px;
-    border-radius: 20px;
-    font-weight: 500;
-  }
+/* ── TOP NAV ── */
+.top-nav {
+  background: #1A1A2E;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+  height: 56px;
+  position: sticky;
+  top: 0;
+  z-index: 200;
+}
+.nav-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.nav-logo-pill {
+  background: #04B49C;
+  color: #fff;
+  font-weight: 800;
+  font-size: 13px;
+  padding: 3px 10px;
+  border-radius: 20px;
+  letter-spacing: .5px;
+}
+.nav-store-name {
+  font-size: 13px;
+  color: #CBD5E1;
+}
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  list-style: none;
+}
+.nav-links a {
+  color: #CBD5E1;
+  text-decoration: none;
+  font-size: 13px;
+  padding: 6px 10px;
+  border-radius: 6px;
+  transition: background .15s, color .15s;
+}
+.nav-links a:hover { background: rgba(255,255,255,.08); color: #fff; }
+.nav-icons {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.nav-icon-btn {
+  background: none;
+  border: none;
+  color: #CBD5E1;
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 6px;
+  font-size: 16px;
+  transition: background .15s;
+  display: flex;
+  align-items: center;
+}
+.nav-icon-btn:hover { background: rgba(255,255,255,.1); color: #fff; }
+.nav-avatar {
+  width: 32px;
+  height: 32px;
+  background: #04B49C;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 700;
+  color: #fff;
+  cursor: pointer;
+}
 
-  /* ── MIGRATION BANNER ── */
-  .migration-banner {
-    background: linear-gradient(135deg, #FFFBEB, #FEF3C7);
-    border: 1.5px solid #F59E0B;
-    border-radius: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 14px 20px;
-    margin-bottom: 20px;
-    gap: 16px;
-  }
-  .migration-banner-text {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    font-size: 14px;
-    font-weight: 600;
-    color: #92400E;
-  }
-  .migration-banner-icon {
-    font-size: 20px;
-  }
-  .btn-migrate {
-    background: #7B2D8B;
-    color: #fff;
-    border: none;
-    border-radius: 8px;
-    padding: 8px 18px;
-    font-family: 'Tajawal', sans-serif;
-    font-size: 13px;
-    font-weight: 600;
-    cursor: pointer;
-    white-space: nowrap;
-    transition: background .2s;
-  }
-  .btn-migrate:hover { background: #6a2478; }
+/* ── SUB NAV ── */
+.sub-nav {
+  background: #fff;
+  border-bottom: 1px solid #E5E7EB;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
+  height: 48px;
+  position: sticky;
+  top: 56px;
+  z-index: 190;
+}
+.sub-nav-section-label {
+  font-size: 14px;
+  font-weight: 700;
+  color: #1A1A2E;
+}
+.sub-nav-links {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  list-style: none;
+}
+.sub-nav-links a {
+  color: #6B7280;
+  text-decoration: none;
+  font-size: 13px;
+  padding: 5px 10px;
+  border-radius: 6px;
+  transition: background .15s, color .15s;
+}
+.sub-nav-links a:hover { background: #F5F5F5; color: #1A1A2E; }
+.sub-nav-help-btn {
+  background: none;
+  border: 1px solid #D1D5DB;
+  color: #6B7280;
+  padding: 4px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  cursor: pointer;
+  font-family: 'Tajawal', sans-serif;
+  margin-right: 8px;
+  transition: border-color .15s, color .15s;
+}
+.sub-nav-help-btn:hover { border-color: #9CA3AF; color: #374151; }
 
-  /* ── LAYOUT ── */
-  .page-wrap { padding: 20px 24px; max-width: 1400px; margin: 0 auto; }
-  .main-layout { display: flex; gap: 20px; align-items: flex-start; }
-  .sidebar { width: 300px; flex-shrink: 0; display: flex; flex-direction: column; gap: 16px; }
-  .main-area { flex: 1; min-width: 0; }
+/* ── MIGRATION BANNER ── */
+.migration-banner {
+  background: #FFF3CD;
+  border-bottom: 2px solid #C05621;
+  padding: 10px 24px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  position: relative;
+}
+.migration-banner.hidden { display: none; }
+.migration-banner-text {
+  flex: 1;
+  font-size: 13.5px;
+  color: #7B341E;
+}
+.migration-banner-text strong { font-weight: 700; }
+.migration-start-btn {
+  background: none;
+  border: 1.5px solid #C05621;
+  color: #C05621;
+  padding: 5px 14px;
+  border-radius: 6px;
+  font-size: 13px;
+  cursor: pointer;
+  font-family: 'Tajawal', sans-serif;
+  transition: background .15s;
+  white-space: nowrap;
+}
+.migration-start-btn:hover { background: rgba(192,86,33,.08); }
+.migration-dismiss-btn {
+  background: none;
+  border: none;
+  color: #9CA3AF;
+  font-size: 18px;
+  cursor: pointer;
+  padding: 2px 6px;
+  border-radius: 4px;
+  transition: color .15s;
+  margin-right: 4px;
+}
+.migration-dismiss-btn:hover { color: #C05621; }
 
-  /* ── CARDS ── */
-  .card {
-    background: #fff;
-    border-radius: 12px;
-    box-shadow: 0 1px 4px rgba(0,0,0,.07), 0 4px 16px rgba(0,0,0,.05);
-    padding: 20px;
-  }
-  .card-title {
-    font-size: 15px;
-    font-weight: 700;
-    color: #1a1a2e;
-    margin-bottom: 14px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-  .card-title .icon { color: #7B2D8B; }
+/* ── BREADCRUMB ── */
+.breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 14px 24px 0;
+  font-size: 12.5px;
+  color: #6B7280;
+}
+.breadcrumb a { color: #6B7280; text-decoration: none; }
+.breadcrumb a:hover { color: #04B49C; }
+.breadcrumb-sep { color: #D1D5DB; }
+.breadcrumb-current { color: #1A1A2E; font-weight: 500; }
 
-  /* ── SUMMARY SIDEBAR ── */
-  .summary-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 8px 0;
-    border-bottom: 1px solid #f1f5f9;
-    font-size: 13px;
-  }
-  .summary-row:last-child { border-bottom: none; }
-  .summary-label { color: #64748b; }
-  .summary-value { font-weight: 600; color: #1a1a2e; }
-  .summary-tag {
-    background: #f0fdf4;
-    color: #16a34a;
-    border: 1px solid #bbf7d0;
-    border-radius: 12px;
-    font-size: 11px;
-    padding: 2px 8px;
-    font-weight: 600;
-  }
+/* ── LAYOUT ── */
+.page-content {
+  padding: 16px 24px 80px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+.two-col {
+  display: flex;
+  gap: 20px;
+  align-items: flex-start;
+}
+.col-main { flex: 1; min-width: 0; }
+.col-sidebar { width: 280px; flex-shrink: 0; }
 
-  .btn-simulate-sidebar {
-    width: 100%;
-    background: linear-gradient(135deg, #7B2D8B, #9b3dab);
-    color: #fff;
-    border: none;
-    border-radius: 10px;
-    padding: 12px;
-    font-family: 'Tajawal', sans-serif;
-    font-size: 14px;
-    font-weight: 700;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    transition: all .2s;
-    box-shadow: 0 4px 14px rgba(123,45,139,.3);
-  }
-  .btn-simulate-sidebar:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 6px 20px rgba(123,45,139,.4);
-  }
+/* ── CARDS ── */
+.card {
+  background: #fff;
+  border: 1px solid #E5E7EB;
+  border-radius: 12px;
+  padding: 24px;
+  margin-bottom: 16px;
+}
+.card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+.card-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: #1A1A2E;
+}
+.card-title-teal {
+  font-size: 16px;
+  font-weight: 700;
+  color: #0E6B5E;
+}
+.card-subtitle {
+  font-size: 13px;
+  color: #6B7280;
+  margin-top: 3px;
+}
 
-  /* ── FORM SECTIONS ── */
-  .form-section { margin-bottom: 16px; }
-  .section-header {
-    font-size: 15px;
-    font-weight: 700;
-    color: #1a1a2e;
-    margin-bottom: 14px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-  .section-num {
-    background: #7B2D8B;
-    color: #fff;
-    border-radius: 50%;
-    width: 24px;
-    height: 24px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 12px;
-    font-weight: 700;
-    flex-shrink: 0;
-  }
+/* ── TOGGLE SWITCH ── */
+.toggle-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.toggle-label-text {
+  font-size: 13px;
+  color: #6B7280;
+}
+.toggle {
+  position: relative;
+  width: 40px;
+  height: 22px;
+}
+.toggle input { opacity: 0; width: 0; height: 0; }
+.toggle-slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: #D1D5DB;
+  border-radius: 22px;
+  transition: .2s;
+}
+.toggle-slider:before {
+  content: '';
+  position: absolute;
+  width: 16px; height: 16px;
+  right: 3px; bottom: 3px;
+  background: #fff;
+  border-radius: 50%;
+  transition: .2s;
+}
+.toggle input:checked + .toggle-slider { background: #04B49C; }
+.toggle input:checked + .toggle-slider:before { right: auto; left: 3px; }
 
-  /* ── INPUTS ── */
-  .input-field {
-    width: 100%;
-    border: 1.5px solid #e2e8f0;
-    border-radius: 8px;
-    padding: 10px 14px;
-    font-family: 'Tajawal', sans-serif;
-    font-size: 14px;
-    color: #1a1a2e;
-    outline: none;
-    transition: border-color .2s, box-shadow .2s;
-    background: #fff;
-  }
-  .input-field:focus {
-    border-color: #7B2D8B;
-    box-shadow: 0 0 0 3px rgba(123,45,139,.1);
-  }
-  .input-field::placeholder { color: #94a3b8; }
+/* ── FORM ELEMENTS ── */
+.form-group { margin-bottom: 18px; }
+.form-label {
+  display: block;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 6px;
+}
+.required { color: #EF4444; }
+.form-input, .form-select {
+  width: 100%;
+  padding: 9px 12px;
+  border: 1px solid #D1D5DB;
+  border-radius: 8px;
+  font-size: 14px;
+  font-family: 'Tajawal', sans-serif;
+  color: #1A1A2E;
+  background: #fff;
+  transition: border-color .15s, box-shadow .15s;
+  outline: none;
+  direction: rtl;
+}
+.form-input:focus, .form-select:focus {
+  border-color: #04B49C;
+  box-shadow: 0 0 0 3px rgba(4,180,156,.12);
+}
+.form-input::placeholder { color: #9CA3AF; }
 
-  /* ── OPERATOR SECTION ── */
-  .operator-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
-  }
-  .operator-option {
-    position: relative;
-    border: 2px solid #e2e8f0;
-    border-radius: 10px;
-    padding: 12px 14px;
-    cursor: pointer;
-    transition: all .2s;
-    background: #fff;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-  .operator-option:hover { border-color: #7B2D8B; background: #faf5fc; }
-  .operator-option.selected { border-color: #7B2D8B; background: #f9f0fb; }
-  .operator-option input[type="radio"] { display: none; }
-  .op-radio {
-    width: 18px; height: 18px;
-    border: 2px solid #cbd5e1;
-    border-radius: 50%;
-    flex-shrink: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all .2s;
-  }
-  .operator-option.selected .op-radio {
-    border-color: #7B2D8B;
-    background: #7B2D8B;
-  }
-  .operator-option.selected .op-radio::after {
-    content: '';
-    width: 6px; height: 6px;
-    background: #fff;
-    border-radius: 50%;
-    display: block;
-  }
-  .op-label { font-size: 13px; font-weight: 600; color: #374151; flex: 1; }
-  .op-new-badge {
-    background: #7B2D8B;
-    color: #fff;
-    font-size: 10px;
-    padding: 2px 6px;
-    border-radius: 4px;
-    font-weight: 700;
-  }
+/* ── RADIO CARDS ── */
+.radio-cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+.radio-card {
+  border: 2px solid #E5E7EB;
+  border-radius: 10px;
+  padding: 14px;
+  cursor: pointer;
+  transition: border-color .15s, background .15s;
+  position: relative;
+}
+.radio-card.selected {
+  border-color: #04B49C;
+  background: rgba(4,180,156,.04);
+}
+.radio-card-check {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  width: 18px; height: 18px;
+  background: #04B49C;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 10px;
+  opacity: 0;
+  transition: opacity .15s;
+}
+.radio-card.selected .radio-card-check { opacity: 1; }
+.radio-card-title {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: #1A1A2E;
+  margin-bottom: 5px;
+}
+.radio-card-desc {
+  font-size: 12px;
+  color: #6B7280;
+  line-height: 1.5;
+}
 
-  /* Venn tooltip */
-  .op-tooltip {
-    position: absolute;
-    bottom: calc(100% + 8px);
-    right: 0;
-    background: #1a1a2e;
-    color: #fff;
-    border-radius: 10px;
-    padding: 12px;
-    width: 180px;
-    display: none;
-    z-index: 50;
-    pointer-events: none;
-    box-shadow: 0 8px 24px rgba(0,0,0,.25);
-  }
-  .op-tooltip::after {
-    content: '';
-    position: absolute;
-    top: 100%;
-    right: 20px;
-    border: 6px solid transparent;
-    border-top-color: #1a1a2e;
-  }
-  .operator-option:hover .op-tooltip { display: block; }
-  .venn-svg { display: block; margin: 0 auto 8px; }
-  .tooltip-text { font-size: 11px; text-align: center; color: #cbd5e1; line-height: 1.5; }
+/* ── CARRIER TAGS ── */
+.carrier-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+.carrier-tag {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: default;
+}
+.carrier-tag .tag-remove {
+  cursor: pointer;
+  font-size: 14px;
+  line-height: 1;
+  margin-right: 2px;
+  opacity: .7;
+}
+.carrier-tag .tag-remove:hover { opacity: 1; }
+.tag-aramex { background: #FFF3E0; color: #E65100; border: 1px solid #FFCC80; }
+.tag-smsa { background: #FFEBEE; color: #C62828; border: 1px solid #EF9A9A; }
+.tag-dhl { background: #FFFDE7; color: #F57F17; border: 1px solid #FFF176; }
+.tag-naqel { background: #EDE7F6; color: #4527A0; border: 1px solid #CE93D8; }
 
-  /* ── CONDITIONS ── */
-  .condition-row {
-    border: 1.5px solid #e2e8f0;
-    border-radius: 10px;
-    padding: 12px 14px;
-    margin-bottom: 10px;
-    background: #fff;
-    transition: all .2s;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    flex-wrap: wrap;
-  }
-  .condition-row.negated {
-    background: #FEF2F2;
-    border-color: #EF4444;
-  }
-  .condition-icon {
-    width: 32px; height: 32px;
-    background: #f0f4ff;
-    border-radius: 8px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #7B2D8B;
-    flex-shrink: 0;
-  }
-  .condition-label {
-    font-size: 13px;
-    font-weight: 700;
-    color: #374151;
-    min-width: 90px;
-  }
-  .condition-label.negated-label { color: #DC2626; }
-  .condition-inputs { flex: 1; display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
-  .range-input { width: 90px; }
-  .negate-wrap {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    margin-right: auto;
-    flex-shrink: 0;
-  }
-  .negate-label { font-size: 12px; color: #64748b; font-weight: 500; }
-  .negate-label.active { color: #DC2626; font-weight: 700; }
+/* ── CARRIER ROWS ── */
+.carrier-rows { display: flex; flex-direction: column; gap: 8px; }
+.carrier-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border: 1px solid #E5E7EB;
+  border-radius: 8px;
+  padding: 10px 12px;
+  background: #FAFAFA;
+}
+.carrier-icon {
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 800;
+  flex-shrink: 0;
+  color: #fff;
+}
+.carrier-icon.aramex { background: #E65100; }
+.carrier-icon.smsa { background: #C62828; }
+.carrier-icon.dhl { background: #F57F17; }
+.carrier-icon.naqel { background: #4527A0; }
+.carrier-name { flex: 1; font-size: 13.5px; font-weight: 600; }
+.carrier-time { font-size: 12px; color: #6B7280; }
+.carrier-price-input {
+  width: 90px;
+  padding: 5px 8px;
+  border: 1px solid #D1D5DB;
+  border-radius: 6px;
+  font-size: 13px;
+  font-family: 'Tajawal', sans-serif;
+  text-align: left;
+  direction: ltr;
+}
+.carrier-price-unit {
+  font-size: 12px;
+  color: #6B7280;
+}
+.carrier-drag {
+  cursor: grab;
+  color: #9CA3AF;
+  font-size: 16px;
+  padding: 0 2px;
+}
+.add-carrier-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: none;
+  border: 1.5px dashed #04B49C;
+  color: #04B49C;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 13px;
+  cursor: pointer;
+  font-family: 'Tajawal', sans-serif;
+  margin-top: 10px;
+  transition: background .15s;
+  width: 100%;
+  justify-content: center;
+}
+.add-carrier-btn:hover { background: rgba(4,180,156,.05); }
 
-  /* Toggle switch */
-  .toggle-switch {
-    position: relative;
-    width: 40px; height: 22px;
-    cursor: pointer;
-  }
-  .toggle-switch input { display: none; }
-  .toggle-track {
-    position: absolute; inset: 0;
-    background: #e2e8f0;
-    border-radius: 20px;
-    transition: background .2s;
-  }
-  .toggle-switch input:checked ~ .toggle-track { background: #EF4444; }
-  .toggle-thumb {
-    position: absolute;
-    top: 3px; right: 3px;
-    width: 16px; height: 16px;
-    background: #fff;
-    border-radius: 50%;
-    transition: transform .2s;
-    box-shadow: 0 1px 4px rgba(0,0,0,.2);
-  }
-  .toggle-switch input:checked ~ .toggle-track .toggle-thumb {
-    transform: translateX(-18px);
-  }
+/* ── CONDITIONS SECTION ── */
+.conditions-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 4px;
+}
+.conditions-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.badge-optional {
+  background: #F3F4F6;
+  color: #6B7280;
+  font-size: 11px;
+  padding: 2px 8px;
+  border-radius: 12px;
+}
+.match-mode-pills {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.match-pill {
+  border: 1.5px solid #E5E7EB;
+  background: #fff;
+  color: #6B7280;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  cursor: pointer;
+  font-family: 'Tajawal', sans-serif;
+  transition: all .15s;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.match-pill.active {
+  background: #04B49C;
+  border-color: #04B49C;
+  color: #fff;
+}
+.badge-new {
+  background: #04B49C;
+  color: #fff;
+  font-size: 10px;
+  padding: 1px 5px;
+  border-radius: 8px;
+  font-weight: 700;
+}
+.subset-count-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: rgba(4,180,156,.06);
+  border-radius: 8px;
+  margin-top: 8px;
+  font-size: 13px;
+  color: #374151;
+}
+.subset-count-input {
+  width: 50px;
+  padding: 3px 6px;
+  border: 1px solid #D1D5DB;
+  border-radius: 5px;
+  font-size: 13px;
+  text-align: center;
+  font-family: 'Tajawal', sans-serif;
+}
+.conditions-empty {
+  text-align: center;
+  padding: 32px 20px;
+  color: #9CA3AF;
+}
+.conditions-empty-icon { font-size: 36px; margin-bottom: 10px; }
+.conditions-empty-title { font-size: 14px; font-weight: 600; color: #6B7280; margin-bottom: 5px; }
+.conditions-empty-desc { font-size: 12.5px; color: #9CA3AF; margin-bottom: 16px; }
 
-  /* Multi-select dropdown */
-  .multi-select {
-    position: relative;
-    flex: 1;
-    min-width: 160px;
-  }
-  .multi-select-trigger {
-    border: 1.5px solid #e2e8f0;
-    border-radius: 8px;
-    padding: 7px 12px;
-    font-size: 13px;
-    cursor: pointer;
-    background: #fff;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 8px;
-    min-height: 36px;
-    transition: border-color .2s;
-    user-select: none;
-  }
-  .multi-select-trigger:hover { border-color: #7B2D8B; }
-  .multi-select-trigger.open { border-color: #7B2D8B; box-shadow: 0 0 0 3px rgba(123,45,139,.1); }
-  .multi-select-tags { display: flex; gap: 4px; flex-wrap: wrap; flex: 1; }
-  .select-tag {
-    background: #f0e6f6;
-    color: #7B2D8B;
-    border-radius: 4px;
-    padding: 2px 6px;
-    font-size: 11px;
-    font-weight: 600;
-    display: flex;
-    align-items: center;
-    gap: 3px;
-  }
-  .select-tag-remove { cursor: pointer; font-size: 13px; line-height: 1; }
-  .select-placeholder { color: #94a3b8; font-size: 13px; }
-  .multi-select-dropdown {
-    position: absolute;
-    top: calc(100% + 4px);
-    right: 0; left: 0;
-    background: #fff;
-    border: 1.5px solid #e2e8f0;
-    border-radius: 8px;
-    box-shadow: 0 8px 24px rgba(0,0,0,.12);
-    z-index: 30;
-    max-height: 200px;
-    overflow-y: auto;
-    display: none;
-  }
-  .multi-select-dropdown.open { display: block; }
-  .dropdown-option {
-    padding: 8px 12px;
-    font-size: 13px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    transition: background .15s;
-  }
-  .dropdown-option:hover { background: #f8f0fc; }
-  .dropdown-option.selected { background: #f0e6f6; }
-  .option-check {
-    width: 16px; height: 16px;
-    border: 2px solid #cbd5e1;
-    border-radius: 4px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-    transition: all .15s;
-  }
-  .dropdown-option.selected .option-check {
-    background: #7B2D8B;
-    border-color: #7B2D8B;
-  }
-  .dropdown-option.selected .option-check::after {
-    content: '✓';
-    color: #fff;
-    font-size: 10px;
-    font-weight: 700;
-  }
+/* ── CONDITION ROW ── */
+.condition-row {
+  border: 1px solid #E5E7EB;
+  border-radius: 8px;
+  padding: 12px;
+  margin-bottom: 8px;
+  background: #fff;
+  transition: border-color .15s;
+}
+.condition-row-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.condition-row-fields {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  flex-wrap: wrap;
+}
+.condition-select {
+  flex: 1;
+  min-width: 160px;
+  padding: 7px 10px;
+  border: 1px solid #D1D5DB;
+  border-radius: 7px;
+  font-size: 13px;
+  font-family: 'Tajawal', sans-serif;
+  direction: rtl;
+  outline: none;
+  background: #fff;
+}
+.condition-select:focus { border-color: #04B49C; }
+.condition-operator-select {
+  width: 150px;
+  padding: 7px 10px;
+  border: 1px solid #D1D5DB;
+  border-radius: 7px;
+  font-size: 13px;
+  font-family: 'Tajawal', sans-serif;
+  direction: rtl;
+  outline: none;
+  background: #fff;
+}
+.condition-operator-select:focus { border-color: #04B49C; }
+.condition-value-input {
+  width: 100px;
+  padding: 7px 10px;
+  border: 1px solid #D1D5DB;
+  border-radius: 7px;
+  font-size: 13px;
+  font-family: 'Tajawal', sans-serif;
+  outline: none;
+  direction: ltr;
+  text-align: left;
+}
+.condition-value-input:focus { border-color: #04B49C; }
+.condition-unit {
+  font-size: 12px;
+  color: #6B7280;
+  white-space: nowrap;
+}
+.trash-btn {
+  background: none;
+  border: none;
+  color: #9CA3AF;
+  cursor: pointer;
+  padding: 5px;
+  border-radius: 5px;
+  font-size: 16px;
+  transition: color .15s, background .15s;
+  flex-shrink: 0;
+}
+.trash-btn:hover { color: #EF4444; background: #FEF2F2; }
 
-  .btn-add-condition {
-    border: 2px dashed #7B2D8B;
-    border-radius: 8px;
-    padding: 10px;
-    width: 100%;
-    background: transparent;
-    color: #7B2D8B;
-    font-family: 'Tajawal', sans-serif;
-    font-size: 13px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all .2s;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 6px;
-    margin-top: 4px;
-  }
-  .btn-add-condition:hover { background: #f9f0fb; }
+/* ── NEGATE TOGGLE ── */
+.negate-wrap {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+.negate-pill {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 10px;
+  border-radius: 20px;
+  border: 1.5px solid #D1D5DB;
+  background: #F9FAFB;
+  color: #6B7280;
+  font-size: 12px;
+  cursor: pointer;
+  font-family: 'Tajawal', sans-serif;
+  transition: all .15s;
+  white-space: nowrap;
+  user-select: none;
+}
+.negate-pill.active {
+  background: #FDECEC;
+  border-color: #EF4444;
+  color: #B71C1C;
+}
+.negate-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: #9CA3AF;
+  transition: background .15s;
+}
+.negate-pill.active .negate-dot { background: #EF4444; }
+.negate-tooltip {
+  display: none;
+  position: absolute;
+  bottom: calc(100% + 6px);
+  right: 0;
+  background: #1A1A2E;
+  color: #fff;
+  font-size: 11.5px;
+  padding: 6px 10px;
+  border-radius: 6px;
+  white-space: nowrap;
+  z-index: 100;
+  pointer-events: none;
+}
+.negate-tooltip::after {
+  content: '';
+  position: absolute;
+  top: 100%; right: 10px;
+  border: 5px solid transparent;
+  border-top-color: #1A1A2E;
+}
+.negate-wrap:hover .negate-tooltip { display: block; }
 
-  /* ── MAP ── */
-  #route-map { width: 100%; height: 300px; border-radius: 10px; overflow: hidden; }
-  .map-instructions {
-    margin-top: 10px;
-    font-size: 13px;
-    color: #64748b;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-  }
-  .map-zone-badge {
-    display: none;
-    margin-top: 10px;
-    background: linear-gradient(135deg, #f0e6f6, #e8f8f5);
-    border: 1.5px solid #7B2D8B;
-    border-radius: 8px;
-    padding: 10px 14px;
-    font-size: 13px;
-    color: #7B2D8B;
-    font-weight: 600;
-    align-items: center;
-    gap: 8px;
-  }
-  .map-zone-badge.visible { display: flex; }
-  .btn-save-zone {
-    background: #7B2D8B;
-    color: #fff;
-    border: none;
-    border-radius: 6px;
-    padding: 6px 12px;
-    font-family: 'Tajawal', sans-serif;
-    font-size: 12px;
-    font-weight: 700;
-    cursor: pointer;
-    margin-top: 10px;
-    display: none;
-    transition: background .2s;
-  }
-  .btn-save-zone.visible { display: inline-block; }
-  .btn-save-zone:hover { background: #6a2478; }
+/* ── ZONE CONDITION ── */
+.zone-condition-body {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid #F3F4F6;
+}
+.zone-section-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.zone-section-label .zone-type-badge {
+  font-size: 11px;
+  padding: 1px 8px;
+  border-radius: 10px;
+}
+.zone-allowed-badge { background: #ECFDF5; color: #065F46; border: 1px solid #A7F3D0; }
+.zone-excluded-badge { background: #FEF2F2; color: #991B1B; border: 1px solid #FECACA; }
+.zone-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+.zone-add-btn {
+  background: none;
+  border: none;
+  color: #04B49C;
+  font-size: 13px;
+  cursor: pointer;
+  font-family: 'Tajawal', sans-serif;
+  padding: 3px 0;
+}
 
-  /* ── CARRIERS ── */
-  .carriers-grid { display: flex; gap: 12px; flex-wrap: wrap; }
-  .carrier-card {
-    border: 1.5px solid #e2e8f0;
-    border-radius: 10px;
-    padding: 14px 18px;
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    flex: 1;
-    min-width: 140px;
-    transition: all .2s;
-    background: #fff;
-  }
-  .carrier-card.active { border-color: #04B49C; background: #f0fdfa; }
-  .carrier-logo {
-    width: 40px; height: 40px;
-    border-radius: 8px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: 800;
-    font-size: 11px;
-    flex-shrink: 0;
-  }
-  .carrier-name { font-size: 14px; font-weight: 700; flex: 1; }
-  .carrier-status { font-size: 11px; color: #64748b; }
-  .carrier-card.active .carrier-status { color: #04B49C; }
+/* ── MAP CONDITION ── */
+.map-condition-body {
+  margin-top: 12px;
+}
+.map-instruction {
+  font-size: 12.5px;
+  color: #6B7280;
+  margin-bottom: 8px;
+}
+#leaflet-map-container {
+  width: 100%;
+  height: 300px;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid #E5E7EB;
+}
+.map-after-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 10px;
+  flex-wrap: wrap;
+}
+.map-save-btn {
+  background: #04B49C;
+  color: #fff;
+  border: none;
+  padding: 7px 18px;
+  border-radius: 7px;
+  font-size: 13px;
+  cursor: pointer;
+  font-family: 'Tajawal', sans-serif;
+}
+.map-badge {
+  background: rgba(4,180,156,.1);
+  color: #0E6B5E;
+  border: 1px solid #04B49C;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 12px;
+}
+.map-excluded-toggle {
+  background: none;
+  border: 1px solid #D1D5DB;
+  color: #6B7280;
+  padding: 5px 12px;
+  border-radius: 7px;
+  font-size: 13px;
+  cursor: pointer;
+  font-family: 'Tajawal', sans-serif;
+  margin-top: 10px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+#leaflet-excluded-container {
+  width: 100%;
+  height: 220px;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid #FECACA;
+  margin-top: 8px;
+  display: none;
+}
 
-  /* ── SAVE BTN ── */
-  .save-bar {
-    display: flex;
-    justify-content: flex-end;
-    padding: 16px 0 0;
-  }
-  .btn-save {
-    background: linear-gradient(135deg, #04B49C, #02a08b);
-    color: #fff;
-    border: none;
-    border-radius: 10px;
-    padding: 12px 32px;
-    font-family: 'Tajawal', sans-serif;
-    font-size: 15px;
-    font-weight: 700;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    transition: all .2s;
-    box-shadow: 0 4px 14px rgba(4,180,156,.3);
-  }
-  .btn-save:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 6px 20px rgba(4,180,156,.4);
-  }
+/* ── ADD CONDITION BTN ── */
+.add-condition-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: none;
+  border: 1.5px solid #04B49C;
+  color: #04B49C;
+  padding: 8px 18px;
+  border-radius: 8px;
+  font-size: 13px;
+  cursor: pointer;
+  font-family: 'Tajawal', sans-serif;
+  margin-top: 8px;
+  transition: background .15s;
+}
+.add-condition-btn:hover { background: rgba(4,180,156,.06); }
 
-  /* ── FLOATING SIM BUTTON ── */
-  .fab-simulate {
-    position: fixed;
-    bottom: 28px;
-    left: 28px;
-    background: linear-gradient(135deg, #7B2D8B, #9b3dab);
-    color: #fff;
-    border: none;
-    border-radius: 50px;
-    padding: 14px 22px;
-    font-family: 'Tajawal', sans-serif;
-    font-size: 14px;
-    font-weight: 700;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    box-shadow: 0 6px 24px rgba(123,45,139,.4);
-    z-index: 90;
-    transition: all .2s;
-  }
-  .fab-simulate:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 30px rgba(123,45,139,.5);
-  }
+/* ── SUMMARY PANEL ── */
+.summary-panel {
+  background: #fff;
+  border: 1px solid #E5E7EB;
+  border-radius: 12px;
+  padding: 20px;
+  position: sticky;
+  top: 120px;
+}
+.summary-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: #1A1A2E;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #F3F4F6;
+}
+.summary-empty {
+  text-align: center;
+  padding: 24px 12px;
+  color: #9CA3AF;
+}
+.summary-empty-icon { font-size: 32px; margin-bottom: 8px; }
+.summary-empty-text { font-size: 13px; }
+.summary-item {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  margin-bottom: 14px;
+}
+.summary-item-label {
+  font-size: 11.5px;
+  color: #9CA3AF;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: .5px;
+}
+.summary-item-value {
+  font-size: 13.5px;
+  color: #1A1A2E;
+  font-weight: 500;
+}
+.summary-carriers {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+.summary-carrier-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+  margin-left: 5px;
+}
 
-  /* ── SIMULATION PANEL ── */
-  .sim-overlay {
-    position: fixed; inset: 0;
-    background: rgba(0,0,0,.35);
-    z-index: 200;
-    display: none;
-    opacity: 0;
-    transition: opacity .25s;
-  }
-  .sim-overlay.open { display: block; opacity: 1; }
-  .sim-panel {
-    position: fixed;
-    top: 0; left: 0;
-    width: 400px;
-    height: 100vh;
-    background: #fff;
-    z-index: 201;
-    box-shadow: 4px 0 32px rgba(0,0,0,.15);
-    display: flex;
-    flex-direction: column;
-    transform: translateX(-100%);
-    transition: transform .3s cubic-bezier(.4,0,.2,1);
-    overflow-y: auto;
-  }
-  .sim-panel.open { transform: translateX(0); }
-  .sim-header {
-    background: linear-gradient(135deg, #7B2D8B, #9b3dab);
-    color: #fff;
-    padding: 20px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    flex-shrink: 0;
-  }
-  .sim-title { font-size: 17px; font-weight: 800; }
-  .sim-close {
-    background: rgba(255,255,255,.2);
-    border: none;
-    color: #fff;
-    width: 32px; height: 32px;
-    border-radius: 50%;
-    cursor: pointer;
-    font-size: 16px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: background .2s;
-  }
-  .sim-close:hover { background: rgba(255,255,255,.3); }
-  .sim-body { padding: 20px; flex: 1; }
-  .sim-field { margin-bottom: 16px; }
-  .sim-field label {
-    display: block;
-    font-size: 13px;
-    font-weight: 700;
-    color: #374151;
-    margin-bottom: 6px;
-  }
-  .btn-run {
-    width: 100%;
-    background: linear-gradient(135deg, #04B49C, #02a08b);
-    color: #fff;
-    border: none;
-    border-radius: 10px;
-    padding: 12px;
-    font-family: 'Tajawal', sans-serif;
-    font-size: 14px;
-    font-weight: 700;
-    cursor: pointer;
-    margin-bottom: 20px;
-    transition: all .2s;
-    box-shadow: 0 4px 12px rgba(4,180,156,.25);
-  }
-  .btn-run:hover { transform: translateY(-1px); box-shadow: 0 6px 18px rgba(4,180,156,.35); }
-  .sim-result { display: none; }
-  .sim-result.visible { display: block; }
-  .result-card {
-    border: 1.5px solid #04B49C;
-    border-radius: 12px;
-    padding: 16px;
-    background: linear-gradient(135deg, #f0fdfa, #fff);
-  }
-  .result-title {
-    font-size: 16px;
-    font-weight: 800;
-    color: #1a1a2e;
-    margin-bottom: 12px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-  .result-title .check { color: #04B49C; font-size: 20px; }
-  .result-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 7px 0;
-    border-bottom: 1px solid #e2e8f0;
-    font-size: 13px;
-  }
-  .result-row:last-child { border-bottom: none; }
-  .result-key { color: #64748b; }
-  .result-val { font-weight: 700; color: #1a1a2e; display: flex; align-items: center; gap: 6px; }
-  .carrier-dot {
-    width: 8px; height: 8px;
-    border-radius: 50%;
-    display: inline-block;
-  }
+/* ── BOTTOM ACTIONS ── */
+.bottom-actions {
+  padding: 20px 24px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+.btn-save {
+  background: #04B49C;
+  color: #fff;
+  border: none;
+  padding: 11px 32px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: 'Tajawal', sans-serif;
+  transition: background .15s, transform .1s;
+}
+.btn-save:hover { background: #03A48D; }
+.btn-save:active { transform: scale(.98); }
+.btn-cancel {
+  background: none;
+  border: 1px solid #D1D5DB;
+  color: #6B7280;
+  padding: 11px 24px;
+  border-radius: 8px;
+  font-size: 14px;
+  cursor: pointer;
+  font-family: 'Tajawal', sans-serif;
+}
 
-  /* ── MIGRATION MODAL ── */
-  .modal-overlay {
-    position: fixed; inset: 0;
-    background: rgba(0,0,0,.5);
-    z-index: 300;
-    display: none;
-    align-items: center;
-    justify-content: center;
-    padding: 20px;
-  }
-  .modal-overlay.open { display: flex; }
-  .modal {
-    background: #fff;
-    border-radius: 16px;
-    width: 100%;
-    max-width: 680px;
-    box-shadow: 0 20px 60px rgba(0,0,0,.2);
-    overflow: hidden;
-  }
-  .modal-header {
-    background: linear-gradient(135deg, #7B2D8B, #9b3dab);
-    color: #fff;
-    padding: 20px 24px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-  }
-  .modal-header-title { font-size: 17px; font-weight: 800; }
-  .modal-close {
-    background: rgba(255,255,255,.2);
-    border: none;
-    color: #fff;
-    width: 32px; height: 32px;
-    border-radius: 50%;
-    cursor: pointer;
-    font-size: 18px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: background .2s;
-  }
-  .modal-close:hover { background: rgba(255,255,255,.3); }
+/* ── SIMULATION PANEL ── */
+.sim-trigger-btn {
+  position: fixed;
+  bottom: 24px;
+  left: 24px;
+  background: #fff;
+  border: 1.5px solid #04B49C;
+  color: #04B49C;
+  padding: 10px 16px;
+  border-radius: 8px;
+  font-size: 13.5px;
+  cursor: pointer;
+  font-family: 'Tajawal', sans-serif;
+  box-shadow: 0 4px 16px rgba(0,0,0,.12);
+  z-index: 300;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: background .15s, transform .15s;
+}
+.sim-trigger-btn:hover { background: rgba(4,180,156,.05); transform: translateY(-1px); }
 
-  /* Step indicator */
-  .step-indicator {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 20px 24px 0;
-    gap: 0;
-  }
-  .step-item {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    position: relative;
-  }
-  .step-circle {
-    width: 36px; height: 36px;
-    border-radius: 50%;
-    background: #e2e8f0;
-    color: #94a3b8;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: 700;
-    font-size: 14px;
-    transition: all .3s;
-    z-index: 1;
-    position: relative;
-  }
-  .step-circle.active {
-    background: #7B2D8B;
-    color: #fff;
-    box-shadow: 0 4px 12px rgba(123,45,139,.35);
-  }
-  .step-circle.done {
-    background: #04B49C;
-    color: #fff;
-  }
-  .step-label {
-    font-size: 11px;
-    color: #94a3b8;
-    margin-top: 4px;
-    text-align: center;
-    font-weight: 500;
-    white-space: nowrap;
-  }
-  .step-circle.active ~ .step-label,
-  .step-circle.done ~ .step-label { color: #1a1a2e; font-weight: 700; }
-  .step-line {
-    width: 60px; height: 2px;
-    background: #e2e8f0;
-    margin-bottom: 20px;
-    transition: background .3s;
-  }
-  .step-line.done { background: #04B49C; }
+.sim-panel {
+  position: fixed;
+  top: 0;
+  left: -400px;
+  width: 380px;
+  height: 100vh;
+  background: #fff;
+  box-shadow: -4px 0 24px rgba(0,0,0,.15);
+  z-index: 500;
+  transition: left .3s ease;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.sim-panel.open { left: 0; }
+.sim-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 20px;
+  border-bottom: 1px solid #E5E7EB;
+}
+.sim-panel-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: #1A1A2E;
+}
+.sim-close-btn {
+  background: none;
+  border: none;
+  color: #9CA3AF;
+  font-size: 20px;
+  cursor: pointer;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+.sim-close-btn:hover { color: #EF4444; }
+.sim-body {
+  flex: 1;
+  padding: 20px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.sim-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 5px;
+}
+.sim-input, .sim-select {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid #D1D5DB;
+  border-radius: 7px;
+  font-size: 13px;
+  font-family: 'Tajawal', sans-serif;
+  direction: rtl;
+  outline: none;
+}
+.sim-input:focus, .sim-select:focus { border-color: #04B49C; }
+.sim-run-btn {
+  background: #04B49C;
+  color: #fff;
+  border: none;
+  padding: 10px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: 'Tajawal', sans-serif;
+  width: 100%;
+  margin-top: 4px;
+  transition: background .15s;
+}
+.sim-run-btn:hover { background: #03A48D; }
+.sim-result { display: none; }
+.sim-result-card {
+  padding: 14px 16px;
+  border-radius: 8px;
+  font-size: 13px;
+  line-height: 1.7;
+}
+.sim-result-card.match {
+  background: #ECFDF5;
+  border: 1px solid #A7F3D0;
+  color: #065F46;
+}
+.sim-result-card.no-match {
+  background: #FFFBEB;
+  border: 1px solid #FDE68A;
+  color: #92400E;
+}
 
-  .modal-body { padding: 20px 24px; min-height: 280px; }
-  .modal-footer {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 16px 24px;
-    border-top: 1px solid #f1f5f9;
-    gap: 12px;
-  }
-  .btn-modal-back {
-    background: #f8fafc;
-    border: 1.5px solid #e2e8f0;
-    border-radius: 8px;
-    padding: 9px 20px;
-    font-family: 'Tajawal', sans-serif;
-    font-size: 13px;
-    font-weight: 600;
-    cursor: pointer;
-    color: #374151;
-    transition: all .2s;
-  }
-  .btn-modal-back:hover { background: #f1f5f9; }
-  .btn-modal-next {
-    background: #7B2D8B;
-    color: #fff;
-    border: none;
-    border-radius: 8px;
-    padding: 9px 24px;
-    font-family: 'Tajawal', sans-serif;
-    font-size: 13px;
-    font-weight: 700;
-    cursor: pointer;
-    transition: background .2s;
-  }
-  .btn-modal-next:hover { background: #6a2478; }
+/* ── MODAL ── */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.45);
+  z-index: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  display: none;
+}
+.modal-overlay.open { display: flex; }
+.modal-box {
+  background: #fff;
+  border-radius: 14px;
+  padding: 28px;
+  width: 100%;
+  max-width: 620px;
+  max-height: 80vh;
+  overflow-y: auto;
+  box-shadow: 0 12px 40px rgba(0,0,0,.2);
+}
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+.modal-title { font-size: 17px; font-weight: 700; color: #1A1A2E; }
+.modal-close-btn {
+  background: none;
+  border: none;
+  color: #9CA3AF;
+  font-size: 22px;
+  cursor: pointer;
+}
+.modal-close-btn:hover { color: #EF4444; }
 
-  /* Step content */
-  .step-content { display: none; }
-  .step-content.active { display: block; }
+/* Step Indicator */
+.step-indicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  margin-bottom: 24px;
+}
+.step-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  position: relative;
+}
+.step-circle {
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  background: #F3F4F6;
+  border: 2px solid #E5E7EB;
+  color: #9CA3AF;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 700;
+  transition: all .2s;
+}
+.step-circle.active { background: #04B49C; border-color: #04B49C; color: #fff; }
+.step-circle.done { background: #ECFDF5; border-color: #04B49C; color: #04B49C; }
+.step-label { font-size: 11.5px; color: #6B7280; }
+.step-label.active { color: #04B49C; font-weight: 600; }
+.step-line {
+  width: 60px;
+  height: 2px;
+  background: #E5E7EB;
+  margin-bottom: 20px;
+  align-self: flex-start;
+  margin-top: 15px;
+}
+.step-line.done { background: #04B49C; }
 
-  /* Old rules table */
-  .rules-table { width: 100%; border-collapse: collapse; font-size: 13px; }
-  .rules-table th {
-    background: #f8fafc;
-    padding: 10px 12px;
-    text-align: right;
-    font-weight: 700;
-    color: #374151;
-    border-bottom: 1.5px solid #e2e8f0;
-  }
-  .rules-table td {
-    padding: 10px 12px;
-    border-bottom: 1px solid #f1f5f9;
-    color: #1a1a2e;
-    vertical-align: middle;
-  }
-  .rules-table tr:last-child td { border-bottom: none; }
-  .tag-pill {
-    background: #EDE9FE;
-    color: #5B21B6;
-    border-radius: 12px;
-    padding: 2px 8px;
-    font-size: 11px;
-    font-weight: 600;
-    margin-left: 4px;
-  }
+/* Step Content */
+.step-content { display: none; }
+.step-content.active { display: block; }
 
-  /* Step 2 matching */
-  .match-row {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 12px;
-    border: 1.5px solid #e2e8f0;
-    border-radius: 8px;
-    margin-bottom: 10px;
-    background: #f8fafc;
-  }
-  .match-old { flex: 1; font-size: 13px; font-weight: 600; color: #374151; }
-  .match-arrow { color: #94a3b8; font-size: 16px; }
-  .match-new { flex: 1; font-size: 13px; font-weight: 600; color: #7B2D8B; }
-  .match-check { color: #04B49C; font-size: 20px; font-weight: 700; }
+/* Table */
+.migration-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+  margin-top: 8px;
+}
+.migration-table th {
+  background: #F9FAFB;
+  padding: 10px 12px;
+  text-align: right;
+  font-weight: 600;
+  color: #374151;
+  border-bottom: 1px solid #E5E7EB;
+}
+.migration-table td {
+  padding: 10px 12px;
+  border-bottom: 1px solid #F3F4F6;
+  color: #374151;
+}
+.migration-table tr:hover td { background: #FAFAFA; }
 
-  /* Step 3 success */
-  .success-state { display: none; text-align: center; padding: 20px; }
-  .success-state.visible { display: block; }
-  .success-icon {
-    width: 80px; height: 80px;
-    background: linear-gradient(135deg, #04B49C, #02a08b);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin: 0 auto 16px;
-    font-size: 36px;
-    box-shadow: 0 8px 24px rgba(4,180,156,.3);
-    animation: popIn .4s cubic-bezier(.34,1.56,.64,1);
-  }
-  @keyframes popIn {
-    from { transform: scale(0); opacity: 0; }
-    to { transform: scale(1); opacity: 1; }
-  }
-  .success-title { font-size: 20px; font-weight: 800; color: #1a1a2e; margin-bottom: 8px; }
-  .success-sub { font-size: 14px; color: #64748b; }
+/* Map result row */
+.map-result-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px;
+  border: 1px solid #E5E7EB;
+  border-radius: 8px;
+  margin-bottom: 8px;
+}
+.map-result-arrow {
+  color: #04B49C;
+  font-size: 16px;
+}
+.map-result-check {
+  color: #04B49C;
+  font-size: 18px;
+  font-weight: 700;
+}
 
-  /* Scrollbar */
-  ::-webkit-scrollbar { width: 6px; }
-  ::-webkit-scrollbar-track { background: #f1f5f9; }
-  ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
-  ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+/* Modal Nav Buttons */
+.modal-nav {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid #F3F4F6;
+}
+.modal-btn-back {
+  background: none;
+  border: 1px solid #D1D5DB;
+  color: #6B7280;
+  padding: 8px 20px;
+  border-radius: 7px;
+  cursor: pointer;
+  font-size: 13px;
+  font-family: 'Tajawal', sans-serif;
+}
+.modal-btn-next {
+  background: #04B49C;
+  color: #fff;
+  border: none;
+  padding: 8px 20px;
+  border-radius: 7px;
+  cursor: pointer;
+  font-size: 13px;
+  font-family: 'Tajawal', sans-serif;
+}
+.modal-btn-publish {
+  background: #04B49C;
+  color: #fff;
+  border: none;
+  padding: 10px 28px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 700;
+  font-family: 'Tajawal', sans-serif;
+}
+.success-state {
+  text-align: center;
+  padding: 30px 20px;
+  display: none;
+}
+.success-icon { font-size: 50px; margin-bottom: 12px; }
+.success-text { font-size: 16px; font-weight: 700; color: #065F46; }
 
-  /* Responsive */
-  @media (max-width: 900px) {
-    .main-layout { flex-direction: column; }
-    .sidebar { width: 100%; }
-    .operator-grid { grid-template-columns: 1fr 1fr; }
-  }
-  @media (max-width: 600px) {
-    .operator-grid { grid-template-columns: 1fr; }
-    .sim-panel { width: 100%; }
-  }
+/* Negate row highlight */
+.condition-row.negated {
+  border-right: 3px solid #EF4444;
+  background: #FEF2F2;
+}
 
-  .leaflet-container { font-family: 'Tajawal', sans-serif; }
+/* Helper text */
+.helper-text {
+  font-size: 12px;
+  color: #9CA3AF;
+  margin-top: 4px;
+}
 
-  .divider { height: 1px; background: #f1f5f9; margin: 8px 0; }
+/* Divider */
+.section-divider {
+  height: 1px;
+  background: #F3F4F6;
+  margin: 16px 0;
+}
 </style>
 </head>
 <body>
 
-<!-- NAV -->
-<nav class="nav">
+<!-- ══════════════════════════════════════════════════════════════
+     TOP NAV
+══════════════════════════════════════════════════════════════ -->
+<nav class="top-nav">
+  <!-- Right: brand -->
   <div class="nav-brand">
-    <span class="nav-logo">سلة</span>
-    <span class="nav-title">نظام إدارة المسارات</span>
+    <span class="nav-logo-pill">salla</span>
+    <span class="nav-store-name">متجر وليد عيسى</span>
   </div>
-  <span class="nav-badge">نموذج تفاعلي — للاختبار الداخلي فقط | المسارات v2</span>
+
+  <!-- Center: links -->
+  <ul class="nav-links">
+    <li><a href="#">الرئيسية</a></li>
+    <li><a href="#">الطلبات</a></li>
+    <li><a href="#">المنتجات</a></li>
+    <li><a href="#">التسويق</a></li>
+    <li><a href="#">المتجر وقنوات البيع</a></li>
+    <li><a href="#">التقارير</a></li>
+    <li><a href="#">المزيد</a></li>
+  </ul>
+
+  <!-- Left: icons -->
+  <div class="nav-icons">
+    <button class="nav-icon-btn" title="الإشعارات">🔔</button>
+    <button class="nav-icon-btn" title="الرسائل">✉️</button>
+    <button class="nav-icon-btn" title="الإعدادات">⚙️</button>
+    <div class="nav-avatar" title="الملف الشخصي">و</div>
+  </div>
 </nav>
 
-<!-- MIGRATION MODAL -->
-<div class="modal-overlay" id="migrationModal">
-  <div class="modal">
-    <div class="modal-header">
-      <span class="modal-header-title">🔄 ترحيل القواعد القديمة</span>
-      <button class="modal-close" onclick="closeMigration()">✕</button>
-    </div>
+<!-- ══════════════════════════════════════════════════════════════
+     SUB NAV
+══════════════════════════════════════════════════════════════ -->
+<nav class="sub-nav">
+  <!-- Right: section label -->
+  <span class="sub-nav-section-label">الشحن والتوصيل</span>
 
-    <!-- Step Indicators -->
-    <div class="step-indicator" id="stepIndicators">
-      <div class="step-item">
-        <div class="step-circle active" id="sc1">١</div>
-        <span class="step-label">عرض القواعد</span>
-      </div>
-      <div class="step-line" id="sl1"></div>
-      <div class="step-item">
-        <div class="step-circle" id="sc2">٢</div>
-        <span class="step-label">مطابقة تلقائية</span>
-      </div>
-      <div class="step-line" id="sl2"></div>
-      <div class="step-item">
-        <div class="step-circle" id="sc3">٣</div>
-        <span class="step-label">مراجعة ونشر</span>
-      </div>
-    </div>
-
-    <div class="modal-body">
-      <!-- Step 1 -->
-      <div class="step-content active" id="step1">
-        <p style="font-size:14px;color:#64748b;margin-bottom:14px;">فيما يلي القواعد المكتشفة في النظام القديم. راجعها قبل الترحيل.</p>
-        <table class="rules-table">
-          <thead>
-            <tr>
-              <th>اسم القاعدة</th>
-              <th>الشروط</th>
-              <th>شركات الشحن</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td><strong>توصيل الرياض</strong></td>
-              <td>مدينة: الرياض · وزن &lt; ٥ كيلو</td>
-              <td><span class="tag-pill">أرامكس</span><span class="tag-pill">سمسا</span></td>
-            </tr>
-            <tr>
-              <td><strong>غرب المملكة</strong></td>
-              <td>مدينة: جدة، مكة · قيمة &gt; ٢٠٠ ر.س</td>
-              <td><span class="tag-pill">DHL</span><span class="tag-pill">أرامكس</span></td>
-            </tr>
-            <tr>
-              <td><strong>المسار العام</strong></td>
-              <td>جميع المناطق · بلا قيود</td>
-              <td><span class="tag-pill">سمسا</span></td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-
-      <!-- Step 2 -->
-      <div class="step-content" id="step2">
-        <p style="font-size:14px;color:#64748b;margin-bottom:14px;">تمت المطابقة التلقائية لكل قاعدة قديمة مع مسار جديد مكافئ.</p>
-        <div class="match-row">
-          <div class="match-old">🗂️ توصيل الرياض</div>
-          <div class="match-arrow">←</div>
-          <div class="match-new">مسار الرياض الرئيسي v2</div>
-          <div class="match-check">✔</div>
-        </div>
-        <div class="match-row">
-          <div class="match-old">🗂️ غرب المملكة</div>
-          <div class="match-arrow">←</div>
-          <div class="match-new">مسار غرب المملكة v2</div>
-          <div class="match-check">✔</div>
-        </div>
-        <div class="match-row">
-          <div class="match-old">🗂️ المسار العام</div>
-          <div class="match-arrow">←</div>
-          <div class="match-new">المسار العام v2</div>
-          <div class="match-check">✔</div>
-        </div>
-        <div style="background:#f0fdf4;border:1.5px solid #bbf7d0;border-radius:8px;padding:10px 14px;margin-top:12px;font-size:13px;color:#166534;">
-          ✅ جميع القواعد الـ ٣ تمت مطابقتها بنجاح. لم يتم العثور على تعارضات.
-        </div>
-      </div>
-
-      <!-- Step 3 -->
-      <div class="step-content" id="step3">
-        <div id="step3Review">
-          <p style="font-size:14px;color:#64748b;margin-bottom:14px;">أنت على وشك ترحيل <strong>٣ قواعد</strong> إلى النظام الجديد. هذه العملية لا يمكن التراجع عنها.</p>
-          <div style="background:#FFFBEB;border:1.5px solid #F59E0B;border-radius:8px;padding:12px 14px;font-size:13px;color:#92400E;margin-bottom:16px;">
-            ⚠️ سيتم تطبيق المسارات الجديدة فورًا على جميع الطلبات القادمة. تأكد من مراجعة الإعدادات.
-          </div>
-          <div style="font-size:13px;color:#374151;">
-            <div style="padding:6px 0;border-bottom:1px solid #f1f5f9;display:flex;justify-content:space-between;">
-              <span>عدد القواعد المُرحَّلة</span><strong>٣</strong>
-            </div>
-            <div style="padding:6px 0;border-bottom:1px solid #f1f5f9;display:flex;justify-content:space-between;">
-              <span>شركات الشحن المُفعَّلة</span><strong>أرامكس، DHL، سمسا</strong>
-            </div>
-            <div style="padding:6px 0;display:flex;justify-content:space-between;">
-              <span>الحالة</span><strong style="color:#04B49C;">جاهز للنشر</strong>
-            </div>
-          </div>
-        </div>
-        <div class="success-state" id="successState">
-          <div class="success-icon">✓</div>
-          <div class="success-title">تم الترحيل بنجاح!</div>
-          <div class="success-sub">تم ترحيل ٣ قواعد إلى النظام الجديد وهي الآن نشطة.</div>
-          <button class="btn-modal-next" style="margin-top:20px;" onclick="closeMigration()">إغلاق</button>
-        </div>
-      </div>
-    </div>
-
-    <div class="modal-footer" id="modalFooter">
-      <button class="btn-modal-back" id="btnBack" onclick="migrationBack()" style="visibility:hidden;">→ السابق</button>
-      <span style="font-size:13px;color:#94a3b8;" id="stepCounter">الخطوة ١ من ٣</span>
-      <button class="btn-modal-next" id="btnNext" onclick="migrationNext()">التالي ←</button>
-    </div>
+  <!-- Left: links + help -->
+  <div style="display:flex;align-items:center;gap:4px;">
+    <ul class="sub-nav-links">
+      <li><a href="#">إدارة التشغيل</a></li>
+      <li><a href="#">مواد التغليف</a></li>
+      <li><a href="#">التقارير</a></li>
+      <li><a href="#">أرشيف البوليصات</a></li>
+      <li><a href="#">جاهزية الشحن الدولي</a></li>
+      <li><a href="#">الإعدادات</a></li>
+    </ul>
+    <button class="sub-nav-help-btn">مركز المساعدة ⓘ</button>
   </div>
+</nav>
+
+<!-- ══════════════════════════════════════════════════════════════
+     FEATURE 1: MIGRATION WIZARD BANNER
+══════════════════════════════════════════════════════════════ -->
+<div class="migration-banner" id="migrationBanner">
+  <span style="font-size:20px;">⚠️</span>
+  <div class="migration-banner-text">
+    <strong>لديك ٤,٨١٠ تاجر على نظام القيود القديم</strong> — هل تريد ترحيل قواعدهم للمسارات؟
+  </div>
+  <button class="migration-start-btn" onclick="openMigrationModal()">ابدأ الترحيل</button>
+  <button class="migration-dismiss-btn" onclick="dismissBanner()" title="إغلاق">✕</button>
 </div>
 
-<!-- SIMULATION OVERLAY -->
-<div class="sim-overlay" id="simOverlay" onclick="closeSimPanel()"></div>
+<!-- BREADCRUMB -->
+<div class="breadcrumb">
+  <a href="#">الشحن والتوصيل</a>
+  <span class="breadcrumb-sep">&gt;</span>
+  <a href="#">الإعدادات</a>
+  <span class="breadcrumb-sep">&gt;</span>
+  <a href="#">مسارات الشحن</a>
+  <span class="breadcrumb-sep">&gt;</span>
+  <span class="breadcrumb-current">مسار شحن جديد</span>
+</div>
 
-<!-- SIMULATION PANEL -->
+<!-- ══════════════════════════════════════════════════════════════
+     PAGE CONTENT
+══════════════════════════════════════════════════════════════ -->
+<div class="page-content">
+  <div class="two-col">
+
+    <!-- ── MAIN COLUMN ── -->
+    <div class="col-main">
+
+      <!-- ╔═══════════════════════════════════════╗
+           ║ Card 1: معلومات مسار الشحن           ║
+           ╚═══════════════════════════════════════╝ -->
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <div class="card-title">معلومات مسار الشحن</div>
+          </div>
+          <div class="toggle-wrap">
+            <span class="toggle-label-text">تفعيل المسار</span>
+            <label class="toggle">
+              <input type="checkbox" id="routeToggle" checked onchange="updateSummary()">
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+        </div>
+
+        <!-- اسم المسار -->
+        <div class="form-group">
+          <label class="form-label">اسم المسار <span class="required">*</span></label>
+          <input type="text" class="form-input" id="routeName"
+            placeholder="اختر اسمًا يسهّل عليك تمييزه، مثال: شحن المناطق التالية"
+            oninput="updateSummary()">
+        </div>
+
+        <!-- السوق -->
+        <div class="form-group">
+          <label class="form-label">السوق <span class="required">*</span></label>
+          <select class="form-select" id="routeMarket" onchange="updateSummary()">
+            <option value="">اختر السوق</option>
+            <option value="sa">المملكة العربية السعودية</option>
+            <option value="ae">الإمارات العربية المتحدة</option>
+            <option value="kw">الكويت</option>
+          </select>
+        </div>
+
+        <!-- نوع المسار -->
+        <div class="form-group">
+          <label class="form-label">نوع المسار <span class="required">*</span></label>
+          <div class="radio-cards">
+            <div class="radio-card selected" id="rt-carriers" onclick="selectRouteType('carriers')">
+              <span class="radio-card-check">✓</span>
+              <div class="radio-card-title">تحديد الشركات</div>
+              <div class="radio-card-desc">تُظهر شركات الشحن المحددة وفق الأولوية في صفحة الدفع للعميل</div>
+            </div>
+            <div class="radio-card" id="rt-auto" onclick="selectRouteType('auto')">
+              <span class="radio-card-check">✓</span>
+              <div class="radio-card-title">تعيين تلقائي</div>
+              <div class="radio-card-desc">تعيين شركة الشحن تلقائيًا للطلب دون أن يراها العميل</div>
+            </div>
+            <div class="radio-card" id="rt-label" onclick="selectRouteType('label')">
+              <span class="radio-card-check">✓</span>
+              <div class="radio-card-title">تسمية خاصة</div>
+              <div class="radio-card-desc">إخفاء أسماء شركات الشحن وإظهار مسمى خاص بك</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- شركات الشحن -->
+        <div class="form-group">
+          <label class="form-label">شركة/ات الشحن <span class="required">*</span></label>
+          <select class="form-select" id="carrierSelect" onchange="addCarrierFromSelect(this)">
+            <option value="">— اختر شركة شحن —</option>
+            <option value="aramex">أرامكس</option>
+            <option value="smsa">SMSA</option>
+            <option value="dhl">DHL</option>
+            <option value="naqel">Naqel</option>
+          </select>
+
+          <!-- Selected carrier tags -->
+          <div class="carrier-tags" id="carrierTags" style="margin-top:10px;">
+            <span class="carrier-tag tag-aramex" data-carrier="aramex">
+              أرامكس <span class="tag-remove" onclick="removeCarrier('aramex')">×</span>
+            </span>
+            <span class="carrier-tag tag-smsa" data-carrier="smsa">
+              SMSA <span class="tag-remove" onclick="removeCarrier('smsa')">×</span>
+            </span>
+            <span class="carrier-tag tag-dhl" data-carrier="dhl">
+              DHL <span class="tag-remove" onclick="removeCarrier('dhl')">×</span>
+            </span>
+            <span class="carrier-tag tag-naqel" data-carrier="naqel">
+              Naqel <span class="tag-remove" onclick="removeCarrier('naqel')">×</span>
+            </span>
+          </div>
+
+          <!-- Carrier rows -->
+          <div class="carrier-rows" id="carrierRows">
+            <div class="carrier-row" data-carrier="aramex">
+              <div class="carrier-icon aramex">AR</div>
+              <div>
+                <div class="carrier-name">أرامكس</div>
+                <div class="carrier-time">1–2 أيام عمل</div>
+              </div>
+              <div style="flex:1;"></div>
+              <input type="number" class="carrier-price-input" placeholder="0.00">
+              <span class="carrier-price-unit">ر.س</span>
+              <span class="carrier-drag" title="سحب لإعادة الترتيب">⠿</span>
+              <label class="toggle" style="width:34px;height:18px;">
+                <input type="checkbox" checked>
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
+            <div class="carrier-row" data-carrier="smsa">
+              <div class="carrier-icon smsa">SM</div>
+              <div>
+                <div class="carrier-name">SMSA</div>
+                <div class="carrier-time">1–2 أيام عمل</div>
+              </div>
+              <div style="flex:1;"></div>
+              <input type="number" class="carrier-price-input" placeholder="0.00">
+              <span class="carrier-price-unit">ر.س</span>
+              <span class="carrier-drag" title="سحب لإعادة الترتيب">⠿</span>
+              <label class="toggle" style="width:34px;height:18px;">
+                <input type="checkbox" checked>
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
+            <div class="carrier-row" data-carrier="dhl">
+              <div class="carrier-icon dhl">DH</div>
+              <div>
+                <div class="carrier-name">DHL</div>
+                <div class="carrier-time">2–4 أيام عمل</div>
+              </div>
+              <div style="flex:1;"></div>
+              <input type="number" class="carrier-price-input" placeholder="0.00">
+              <span class="carrier-price-unit">ر.س</span>
+              <span class="carrier-drag" title="سحب لإعادة الترتيب">⠿</span>
+              <label class="toggle" style="width:34px;height:18px;">
+                <input type="checkbox" checked>
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
+            <div class="carrier-row" data-carrier="naqel">
+              <div class="carrier-icon naqel">NQ</div>
+              <div>
+                <div class="carrier-name">Naqel</div>
+                <div class="carrier-time">2–3 أيام عمل</div>
+              </div>
+              <div style="flex:1;"></div>
+              <input type="number" class="carrier-price-input" placeholder="0.00">
+              <span class="carrier-price-unit">ر.س</span>
+              <span class="carrier-drag" title="سحب لإعادة الترتيب">⠿</span>
+              <label class="toggle" style="width:34px;height:18px;">
+                <input type="checkbox" checked>
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
+          </div>
+
+          <button class="add-carrier-btn" onclick="showCarrierSelect()">
+            <span>+</span> إضافة شركة شحن
+          </button>
+        </div>
+      </div><!-- /card 1 -->
+
+
+      <!-- ╔═══════════════════════════════════════╗
+           ║ Card 2: شروط تطبيق المسار           ║
+           ╚═══════════════════════════════════════╝ -->
+      <div class="card">
+        <!-- Header -->
+        <div class="conditions-header">
+          <div class="conditions-title-wrap">
+            <span class="card-title">شروط تطبيق المسار</span>
+            <span class="badge-optional">اختياري</span>
+          </div>
+          <!-- Match mode pills -->
+          <div class="match-mode-pills">
+            <button class="match-pill active" id="pill-and" onclick="setMatchMode('and')">● عند تحقق جميع الشروط (AND)</button>
+            <button class="match-pill" id="pill-or" onclick="setMatchMode('or')">○ عند تحقق شرط واحد (OR)</button>
+            <button class="match-pill" id="pill-subset" onclick="setMatchMode('subset')">
+              ○ عدد محدد من الشروط <span class="badge-new">جديد</span>
+            </button>
+          </div>
+        </div>
+        <p class="card-subtitle" style="margin-bottom:12px;">حدّد متى يُطبَّق هذا المسار</p>
+
+        <!-- Feature 4: Subset count row -->
+        <div class="subset-count-row" id="subsetCountRow" style="display:none;">
+          يكفي تحقق
+          <input type="number" class="subset-count-input" id="subsetCount" value="2" min="1">
+          شروط من أصل <strong id="subsetTotal">0</strong>
+        </div>
+
+        <!-- Conditions list -->
+        <div id="conditionsList">
+          <!-- Empty state -->
+          <div class="conditions-empty" id="conditionsEmpty">
+            <div class="conditions-empty-icon">📋</div>
+            <div class="conditions-empty-title">لم تضف شروطًا بعد</div>
+            <div class="conditions-empty-desc">يمكنك تحديد شروط مثل المدينة أو قيمة السلة أو وزنها لتخصيص تطبيق هذا المسار</div>
+            <button class="add-condition-btn" onclick="addCondition()" style="margin:0 auto;">
+              <span>+</span> إضافة شرط جديد
+            </button>
+          </div>
+        </div>
+
+        <!-- Add condition button (shown when there are conditions) -->
+        <button class="add-condition-btn" id="addConditionBtn" style="display:none;" onclick="addCondition()">
+          <span>+</span> إضافة شرط جديد
+        </button>
+      </div><!-- /card 2 -->
+
+
+      <!-- ╔═══════════════════════════════════════╗
+           ║ Card 3: ترتيب شركات الشحن           ║
+           ╚═══════════════════════════════════════╝ -->
+      <div class="card">
+        <div class="card-header" style="margin-bottom:12px;">
+          <div>
+            <div class="card-title-teal">ترتيب شركات الشحن</div>
+            <div class="card-subtitle">رتّب أولوية ظهور شركات الشحن المعروضة للعملاء</div>
+          </div>
+        </div>
+        <div class="form-group" style="margin-bottom:0;">
+          <label class="form-label">خيارات الأولوية <span class="required">*</span></label>
+          <select class="form-select">
+            <option value="salla">توصيات سلة</option>
+            <option value="price">الأقل سعرًا أولًا</option>
+            <option value="speed">الأسرع توصيلًا أولًا</option>
+            <option value="manual">ترتيب يدوي</option>
+          </select>
+        </div>
+      </div><!-- /card 3 -->
+
+
+      <!-- ╔═══════════════════════════════════════╗
+           ║ Card 4: أولوية تطبيق المسار         ║
+           ╚═══════════════════════════════════════╝ -->
+      <div class="card">
+        <div class="card-header" style="margin-bottom:12px;">
+          <div>
+            <div class="card-title">
+              أولوية تطبيق المسار
+              <span class="badge-optional" style="margin-right:6px;font-size:12px;">اختياري</span>
+            </div>
+            <div class="card-subtitle">حدّد المسار السابق أو سيُضاف في نهاية القائمة</div>
+          </div>
+        </div>
+        <div class="form-group" style="margin-bottom:0;">
+          <label class="form-label">إضافة هذا المسار بعد</label>
+          <select class="form-select">
+            <option value="">اختر المسار</option>
+            <option value="1">مسار الرياض الرئيسي</option>
+            <option value="2">مسار جدة والغرب</option>
+            <option value="3">مسار المناطق النائية</option>
+          </select>
+          <div class="helper-text">إذا لم تختر مسارًا سيُضاف في نهاية قائمة المسارات</div>
+        </div>
+      </div><!-- /card 4 -->
+
+      <!-- Bottom actions -->
+      <div class="bottom-actions" style="padding:0;">
+        <button class="btn-cancel">إلغاء</button>
+        <button class="btn-save" onclick="saveRoute()">حفظ المسار</button>
+      </div>
+
+    </div><!-- /col-main -->
+
+
+    <!-- ── SIDEBAR: Summary Panel ── -->
+    <div class="col-sidebar">
+      <div class="summary-panel">
+        <div class="summary-title">ملخص المسار</div>
+        <div id="summaryContent">
+          <div class="summary-empty" id="summaryEmpty">
+            <div class="summary-empty-icon">📄</div>
+            <div class="summary-empty-text">لا توجد بيانات لعرضها</div>
+          </div>
+          <div id="summaryData" style="display:none;">
+            <div class="summary-item">
+              <div class="summary-item-label">اسم المسار</div>
+              <div class="summary-item-value" id="sum-name">—</div>
+            </div>
+            <div class="summary-item" id="sum-market-wrap">
+              <div class="summary-item-label">السوق</div>
+              <div class="summary-item-value" id="sum-market">—</div>
+            </div>
+            <div class="summary-item" id="sum-type-wrap">
+              <div class="summary-item-label">نوع المسار</div>
+              <div class="summary-item-value" id="sum-type">تحديد الشركات</div>
+            </div>
+            <div class="section-divider"></div>
+            <div class="summary-item">
+              <div class="summary-item-label">شركات الشحن</div>
+              <div class="summary-carriers" id="sum-carriers">
+                <span style="font-size:13px;color:#1A1A2E;">أرامكس · SMSA · DHL · Naqel</span>
+              </div>
+            </div>
+            <div class="section-divider"></div>
+            <div class="summary-item">
+              <div class="summary-item-label">الشروط</div>
+              <div class="summary-item-value" id="sum-conditions">لا توجد شروط</div>
+            </div>
+            <div class="summary-item">
+              <div class="summary-item-label">الحالة</div>
+              <div class="summary-item-value" id="sum-status" style="color:#04B49C;">✅ مفعّل</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /two-col -->
+</div><!-- /page-content -->
+
+
+<!-- ══════════════════════════════════════════════════════════════
+     FEATURE 5: SIMULATION PANEL
+══════════════════════════════════════════════════════════════ -->
+<button class="sim-trigger-btn" onclick="toggleSimPanel()">
+  🔍 جرّب المسار
+</button>
+
 <div class="sim-panel" id="simPanel">
-  <div class="sim-header">
-    <span class="sim-title">🧪 محاكاة المسار</span>
-    <button class="sim-close" onclick="closeSimPanel()">✕</button>
+  <div class="sim-panel-header">
+    <div class="sim-panel-title">محاكاة تطبيق المسار</div>
+    <button class="sim-close-btn" onclick="toggleSimPanel()">✕</button>
   </div>
   <div class="sim-body">
-    <div class="sim-field">
-      <label>المدينة</label>
-      <select class="input-field" id="simCity">
+    <div>
+      <div class="sim-label">قيمة السلة (ريال)</div>
+      <input type="number" class="sim-input" id="sim-value" placeholder="مثال: 150">
+    </div>
+    <div>
+      <div class="sim-label">وزن السلة (كجم)</div>
+      <input type="number" class="sim-input" id="sim-weight" placeholder="مثال: 2.5">
+    </div>
+    <div>
+      <div class="sim-label">كمية المنتجات</div>
+      <input type="number" class="sim-input" id="sim-qty" placeholder="مثال: 3">
+    </div>
+    <div>
+      <div class="sim-label">المدينة</div>
+      <select class="sim-select" id="sim-city">
         <option value="">اختر المدينة</option>
-        <option value="الرياض">الرياض</option>
-        <option value="جدة">جدة</option>
-        <option value="الدمام">الدمام</option>
-        <option value="مكة المكرمة">مكة المكرمة</option>
-        <option value="المدينة المنورة">المدينة المنورة</option>
+        <option value="riyadh">الرياض</option>
+        <option value="jeddah">جدة</option>
+        <option value="dammam">الدمام</option>
+        <option value="abha">أبها</option>
       </select>
     </div>
-    <div class="sim-field">
-      <label>الوزن بالكيلو</label>
-      <input type="number" class="input-field" id="simWeight" placeholder="مثال: ٢.٥" min="0" step="0.5">
-    </div>
-    <div class="sim-field">
-      <label>المنتجات</label>
-      <input type="text" class="input-field" id="simProducts" placeholder="مثال: ملابس، إلكترونيات">
-    </div>
-    <div class="sim-field">
-      <label>الكمية</label>
-      <input type="number" class="input-field" id="simQty" placeholder="مثال: ٣" min="1">
-    </div>
-    <button class="btn-run" onclick="runSimulation()">▶ شغّل المحاكاة</button>
-
+    <button class="sim-run-btn" onclick="runSimulation()">شغّل المحاكاة ▶</button>
     <div class="sim-result" id="simResult">
-      <div class="result-card">
-        <div class="result-title">
-          <span class="check">✓</span>
-          <span id="resultRouteName">—</span>
-        </div>
-        <div class="result-row">
-          <span class="result-key">المسار المُطبَّق</span>
-          <span class="result-val" id="resultRoute">—</span>
-        </div>
-        <div class="result-row">
-          <span class="result-key">شركات الشحن المتاحة</span>
-          <span class="result-val" id="resultCarriers">—</span>
-        </div>
-        <div class="result-row">
-          <span class="result-key">السعر المتوقع</span>
-          <span class="result-val" id="resultPrice">—</span>
-        </div>
-        <div class="result-row">
-          <span class="result-key">وقت التوصيل المتوقع</span>
-          <span class="result-val" id="resultTime">—</span>
-        </div>
-      </div>
+      <div class="sim-result-card" id="simResultCard"></div>
     </div>
   </div>
 </div>
 
-<!-- PAGE CONTENT -->
-<div class="page-wrap">
 
-  <!-- MIGRATION BANNER -->
-  <div class="migration-banner">
-    <div class="migration-banner-text">
-      <span class="migration-banner-icon">⚠️</span>
-      <span>٤,٨١٠ تاجر لديهم قواعد في النظام القديم — هل تريد ترحيلها؟</span>
+<!-- ══════════════════════════════════════════════════════════════
+     MIGRATION WIZARD MODAL
+══════════════════════════════════════════════════════════════ -->
+<div class="modal-overlay" id="migrationModal">
+  <div class="modal-box">
+    <!-- Header -->
+    <div class="modal-header">
+      <div class="modal-title">معالج ترحيل القيود القديمة</div>
+      <button class="modal-close-btn" onclick="closeMigrationModal()">✕</button>
     </div>
-    <button class="btn-migrate" onclick="openMigration()">ابدأ الترحيل</button>
+
+    <!-- Step Indicator -->
+    <div class="step-indicator" id="stepIndicator">
+      <div class="step-item">
+        <div class="step-circle active" id="step-circle-1">١</div>
+        <div class="step-label active" id="step-label-1">قواعدك القديمة</div>
+      </div>
+      <div class="step-line" id="step-line-1"></div>
+      <div class="step-item">
+        <div class="step-circle" id="step-circle-2">٢</div>
+        <div class="step-label" id="step-label-2">المطابقة التلقائية</div>
+      </div>
+      <div class="step-line" id="step-line-2"></div>
+      <div class="step-item">
+        <div class="step-circle" id="step-circle-3">٣</div>
+        <div class="step-label" id="step-label-3">مراجعة ونشر</div>
+      </div>
+    </div>
+
+    <!-- Success State -->
+    <div class="success-state" id="migrationSuccess">
+      <div class="success-icon">✅</div>
+      <div class="success-text">تم الترحيل بنجاح!</div>
+      <div style="font-size:13px;color:#6B7280;margin-top:8px;">تم إنشاء المسارات ونشرها بنجاح في متجرك</div>
+      <button class="modal-btn-publish" style="margin-top:20px;" onclick="closeMigrationModal()">إغلاق</button>
+    </div>
+
+    <!-- Step 1: Old Rules -->
+    <div class="step-content active" id="step-1">
+      <p style="font-size:13px;color:#6B7280;margin-bottom:12px;">القواعد التالية موجودة في نظامك القديم وسيتم ترحيلها:</p>
+      <table class="migration-table">
+        <thead>
+          <tr>
+            <th>اسم القاعدة</th>
+            <th>الشروط</th>
+            <th>الشركة</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>شحن الرياض</td>
+            <td>المدينة = الرياض</td>
+            <td>أرامكس</td>
+          </tr>
+          <tr>
+            <td>شحن جدة الممتاز</td>
+            <td>قيمة السلة &gt; 500 ر.س</td>
+            <td>DHL</td>
+          </tr>
+          <tr>
+            <td>شحن المناطق البعيدة</td>
+            <td>وزن السلة &lt; 5 كجم</td>
+            <td>SMSA</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="modal-nav">
+        <span></span>
+        <button class="modal-btn-next" onclick="goToStep(2)">التالي ←</button>
+      </div>
+    </div>
+
+    <!-- Step 2: Auto Match -->
+    <div class="step-content" id="step-2">
+      <p style="font-size:13px;color:#6B7280;margin-bottom:12px;">تم مطابقة القواعد القديمة بمسارات جديدة تلقائيًا:</p>
+      <div class="map-result-row">
+        <span style="font-size:13px;font-weight:600;">شحن الرياض</span>
+        <span class="map-result-arrow">←</span>
+        <span style="font-size:13px;color:#04B49C;">مسار: المدن الرئيسية</span>
+        <span class="map-result-check">✓</span>
+      </div>
+      <div class="map-result-row">
+        <span style="font-size:13px;font-weight:600;">شحن جدة الممتاز</span>
+        <span class="map-result-arrow">←</span>
+        <span style="font-size:13px;color:#04B49C;">مسار: طلبات ذات قيمة عالية</span>
+        <span class="map-result-check">✓</span>
+      </div>
+      <div class="map-result-row">
+        <span style="font-size:13px;font-weight:600;">شحن المناطق البعيدة</span>
+        <span class="map-result-arrow">←</span>
+        <span style="font-size:13px;color:#04B49C;">مسار: الشحن الخفيف</span>
+        <span class="map-result-check">✓</span>
+      </div>
+      <div class="modal-nav">
+        <button class="modal-btn-back" onclick="goToStep(1)">→ السابق</button>
+        <button class="modal-btn-next" onclick="goToStep(3)">التالي ←</button>
+      </div>
+    </div>
+
+    <!-- Step 3: Review & Publish -->
+    <div class="step-content" id="step-3">
+      <p style="font-size:13px;color:#6B7280;margin-bottom:16px;">مراجعة المسارات قبل النشر:</p>
+      <div style="background:#F9FAFB;border:1px solid #E5E7EB;border-radius:8px;padding:14px;margin-bottom:12px;">
+        <div style="font-weight:700;margin-bottom:6px;font-size:14px;">ملخص الترحيل</div>
+        <div style="font-size:13px;color:#374151;line-height:2;">
+          📦 عدد القواعد المرحّلة: <strong>3</strong><br>
+          🛣️ عدد المسارات الجديدة: <strong>3</strong><br>
+          ✅ نسبة المطابقة: <strong>100%</strong>
+        </div>
+      </div>
+      <div style="background:#ECFDF5;border:1px solid #A7F3D0;border-radius:8px;padding:12px;font-size:13px;color:#065F46;">
+        ✅ جميع القواعد تمت مطابقتها بنجاح — يمكنك النشر بأمان
+      </div>
+      <div class="modal-nav">
+        <button class="modal-btn-back" onclick="goToStep(2)">→ السابق</button>
+        <button class="modal-btn-publish" onclick="publishMigration()">نشر المسارات ✓</button>
+      </div>
+    </div>
+
   </div>
+</div>
 
-  <!-- MAIN LAYOUT -->
-  <div class="main-layout">
 
-    <!-- SIDEBAR -->
-    <div class="sidebar">
-      <div class="card">
-        <div class="card-title">
-          <span class="icon">📋</span>
-          ملخص المسار
-        </div>
-        <div class="summary-row">
-          <span class="summary-label">اسم المسار</span>
-          <span class="summary-value" id="sidebarName">غير محدد</span>
-        </div>
-        <div class="summary-row">
-          <span class="summary-label">المشغّل</span>
-          <span class="summary-value" id="sidebarOp">كل الشروط</span>
-        </div>
-        <div class="summary-row">
-          <span class="summary-label">الشروط</span>
-          <span class="summary-value" id="sidebarCondCount">٠ شرط نشط</span>
-        </div>
-        <div class="summary-row">
-          <span class="summary-label">المنطقة الجغرافية</span>
-          <span class="summary-value" id="sidebarZone">غير محددة</span>
-        </div>
-        <div class="summary-row">
-          <span class="summary-label">شركات الشحن</span>
-          <span class="summary-value" id="sidebarCarriers">لا يوجد</span>
-        </div>
-        <div class="summary-row">
-          <span class="summary-label">الحالة</span>
-          <span class="summary-tag" id="sidebarStatus">مسودة</span>
-        </div>
-      </div>
-
-      <button class="btn-simulate-sidebar" onclick="openSimPanel()">
-        🧪 جرّب المسار
-      </button>
-
-      <div class="card" style="background:linear-gradient(135deg,#f9f0fb,#f0e6f6);border:1.5px solid #d4b8e0;">
-        <div style="font-size:13px;font-weight:700;color:#7B2D8B;margin-bottom:8px;">💡 نصيحة</div>
-        <div style="font-size:12px;color:#6b21a8;line-height:1.6;">استخدم <strong>جزء محدد فقط</strong> لتطبيق المسار على مجموعة جزئية من الطلبات دون التأثير على بقية القواعد.</div>
-      </div>
-    </div>
-
-    <!-- MAIN FORM AREA -->
-    <div class="main-area">
-
-      <!-- SECTION 1: Route Name -->
-      <div class="card form-section">
-        <div class="section-header">
-          <span class="section-num">١</span>
-          اسم المسار
-        </div>
-        <input
-          type="text"
-          class="input-field"
-          id="routeNameInput"
-          placeholder="مثال: شحن الرياض السريع"
-          oninput="updateSidebar()"
-        >
-      </div>
-
-      <!-- SECTION 2: Conditions Operator -->
-      <div class="card form-section">
-        <div class="section-header">
-          <span class="section-num">٢</span>
-          طريقة تطبيق الشروط
-          <span style="font-size:12px;color:#64748b;font-weight:400;margin-right:auto;">اختر كيف تتفاعل الشروط مع بعضها</span>
-        </div>
-        <div class="operator-grid">
-
-          <!-- AND -->
-          <label class="operator-option selected" onclick="selectOp(this,'كل الشروط (AND)')">
-            <input type="radio" name="opMode" value="and" checked>
-            <div class="op-radio"></div>
-            <span class="op-label">كل الشروط (AND)</span>
-            <div class="op-tooltip">
-              <svg class="venn-svg" width="80" height="50" viewBox="0 0 80 50">
-                <ellipse cx="32" cy="25" rx="22" ry="16" fill="none" stroke="#94a3b8" stroke-width="1.5"/>
-                <ellipse cx="48" cy="25" rx="22" ry="16" fill="none" stroke="#94a3b8" stroke-width="1.5"/>
-                <path d="M40,9 A22,16 0 0,1 40,41 A22,16 0 0,1 40,9" fill="rgba(123,45,139,.5)" stroke="none"/>
-              </svg>
-              <div class="tooltip-text">يجب أن تتحقق جميع الشروط معًا</div>
-            </div>
-          </label>
-
-          <!-- OR -->
-          <label class="operator-option" onclick="selectOp(this,'أي شرط (OR)')">
-            <input type="radio" name="opMode" value="or">
-            <div class="op-radio"></div>
-            <span class="op-label">أي شرط (OR)</span>
-            <div class="op-tooltip">
-              <svg class="venn-svg" width="80" height="50" viewBox="0 0 80 50">
-                <ellipse cx="32" cy="25" rx="22" ry="16" fill="rgba(123,45,139,.4)" stroke="#94a3b8" stroke-width="1.5"/>
-                <ellipse cx="48" cy="25" rx="22" ry="16" fill="rgba(123,45,139,.4)" stroke="#94a3b8" stroke-width="1.5"/>
-              </svg>
-              <div class="tooltip-text">يكفي تحقق شرط واحد على الأقل</div>
-            </div>
-          </label>
-
-          <!-- Mixed -->
-          <label class="operator-option" onclick="selectOp(this,'مزيج محدد')">
-            <input type="radio" name="opMode" value="mixed">
-            <div class="op-radio"></div>
-            <span class="op-label">مزيج محدد</span>
-            <div class="op-tooltip">
-              <svg class="venn-svg" width="80" height="50" viewBox="0 0 80 50">
-                <ellipse cx="25" cy="25" rx="18" ry="14" fill="rgba(4,180,156,.3)" stroke="#94a3b8" stroke-width="1.5"/>
-                <ellipse cx="42" cy="25" rx="18" ry="14" fill="rgba(4,180,156,.3)" stroke="#94a3b8" stroke-width="1.5"/>
-                <ellipse cx="59" cy="25" rx="14" ry="12" fill="rgba(123,45,139,.4)" stroke="#94a3b8" stroke-width="1.5"/>
-              </svg>
-              <div class="tooltip-text">جمع AND و OR في نفس المسار</div>
-            </div>
-          </label>
-
-          <!-- Subset Only — NEW -->
-          <label class="operator-option" onclick="selectOp(this,'جزء محدد فقط')">
-            <input type="radio" name="opMode" value="subset_only">
-            <div class="op-radio"></div>
-            <span class="op-label">✦ جزء محدد فقط</span>
-            <span class="op-new-badge">جديد</span>
-            <div class="op-tooltip">
-              <svg class="venn-svg" width="80" height="50" viewBox="0 0 80 50">
-                <ellipse cx="40" cy="25" rx="28" ry="18" fill="rgba(4,180,156,.15)" stroke="#94a3b8" stroke-width="1.5"/>
-                <ellipse cx="40" cy="25" rx="14" ry="9" fill="rgba(123,45,139,.5)" stroke="#7B2D8B" stroke-width="1.5"/>
-              </svg>
-              <div class="tooltip-text">يُطبَّق فقط على مجموعة جزئية محددة من الطلبات (subset_only)</div>
-            </div>
-          </label>
-
-        </div>
-      </div>
-
-      <!-- SECTION 3: Conditions -->
-      <div class="card form-section">
-        <div class="section-header">
-          <span class="section-num">٣</span>
-          الشروط
-          <span style="font-size:12px;color:#64748b;font-weight:400;margin-right:auto;">أضف الشروط التي يجب أن تتحقق لتطبيق هذا المسار</span>
-        </div>
-
-        <!-- Condition 1: City -->
-        <div class="condition-row" id="cond-city">
-          <div class="condition-icon">🏙️</div>
-          <div class="condition-label" id="lbl-city">المدينة / المنطقة</div>
-          <div class="condition-inputs">
-            <div class="multi-select" id="ms-cities">
-              <div class="multi-select-trigger" onclick="toggleDropdown('cities')">
-                <div class="multi-select-tags" id="tags-cities">
-                  <span class="select-placeholder">اختر المدن...</span>
-                </div>
-                <span style="color:#94a3b8;font-size:12px;">▼</span>
-              </div>
-              <div class="multi-select-dropdown" id="dd-cities">
-                <div class="dropdown-option" onclick="toggleOption('cities', 'الرياض')"><div class="option-check"></div>الرياض</div>
-                <div class="dropdown-option" onclick="toggleOption('cities', 'جدة')"><div class="option-check"></div>جدة</div>
-                <div class="dropdown-option" onclick="toggleOption('cities', 'الدمام')"><div class="option-check"></div>الدمام</div>
-                <div class="dropdown-option" onclick="toggleOption('cities', 'مكة المكرمة')"><div class="option-check"></div>مكة المكرمة</div>
-                <div class="dropdown-option" onclick="toggleOption('cities', 'المدينة المنورة')"><div class="option-check"></div>المدينة المنورة</div>
-                <div class="dropdown-option" onclick="toggleOption('cities', 'الطائف')"><div class="option-check"></div>الطائف</div>
-                <div class="dropdown-option" onclick="toggleOption('cities', 'أبها')"><div class="option-check"></div>أبها</div>
-                <div class="dropdown-option" onclick="toggleOption('cities', 'تبوك')"><div class="option-check"></div>تبوك</div>
-              </div>
-            </div>
-          </div>
-          <div class="negate-wrap">
-            <span class="negate-label" id="negate-lbl-city">اعكس</span>
-            <label class="toggle-switch">
-              <input type="checkbox" id="neg-city" onchange="toggleNegate('city')">
-              <div class="toggle-track"><div class="toggle-thumb"></div></div>
-            </label>
-          </div>
-        </div>
-
-        <!-- Condition 2: Weight -->
-        <div class="condition-row" id="cond-weight">
-          <div class="condition-icon">⚖️</div>
-          <div class="condition-label" id="lbl-weight">وزن الطلب (كيلو)</div>
-          <div class="condition-inputs">
-            <input type="number" class="input-field range-input" placeholder="من" min="0" step="0.5">
-            <span style="color:#94a3b8;font-size:13px;">—</span>
-            <input type="number" class="input-field range-input" placeholder="إلى" min="0" step="0.5">
-          </div>
-          <div class="negate-wrap">
-            <span class="negate-label" id="negate-lbl-weight">اعكس</span>
-            <label class="toggle-switch">
-              <input type="checkbox" id="neg-weight" onchange="toggleNegate('weight')">
-              <div class="toggle-track"><div class="toggle-thumb"></div></div>
-            </label>
-          </div>
-        </div>
-
-        <!-- Condition 3: Order Value -->
-        <div class="condition-row" id="cond-value">
-          <div class="condition-icon">💰</div>
-          <div class="condition-label" id="lbl-value">قيمة الطلب (ر.س)</div>
-          <div class="condition-inputs">
-            <input type="number" class="input-field range-input" placeholder="من" min="0">
-            <span style="color:#94a3b8;font-size:13px;">—</span>
-            <input type="number" class="input-field range-input" placeholder="إلى" min="0">
-          </div>
-          <div class="negate-wrap">
-            <span class="negate-label" id="negate-lbl-value">اعكس</span>
-            <label class="toggle-switch">
-              <input type="checkbox" id="neg-value" onchange="toggleNegate('value')">
-              <div class="toggle-track"><div class="toggle-thumb"></div></div>
-            </label>
-          </div>
-        </div>
-
-        <!-- Condition 4: Categories -->
-        <div class="condition-row" id="cond-cats">
-          <div class="condition-icon">🏷️</div>
-          <div class="condition-label" id="lbl-cats">الفئات</div>
-          <div class="condition-inputs">
-            <div class="multi-select" id="ms-cats">
-              <div class="multi-select-trigger" onclick="toggleDropdown('cats')">
-                <div class="multi-select-tags" id="tags-cats">
-                  <span class="select-placeholder">اختر الفئات...</span>
-                </div>
-                <span style="color:#94a3b8;font-size:12px;">▼</span>
-              </div>
-              <div class="multi-select-dropdown" id="dd-cats">
-                <div class="dropdown-option" onclick="toggleOption('cats', 'ملابس')"><div class="option-check"></div>ملابس</div>
-                <div class="dropdown-option" onclick="toggleOption('cats', 'إلكترونيات')"><div class="option-check"></div>إلكترونيات</div>
-                <div class="dropdown-option" onclick="toggleOption('cats', 'أثاث')"><div class="option-check"></div>أثاث</div>
-                <div class="dropdown-option" onclick="toggleOption('cats', 'طعام وشراب')"><div class="option-check"></div>طعام وشراب</div>
-                <div class="dropdown-option" onclick="toggleOption('cats', 'مستحضرات تجميل')"><div class="option-check"></div>مستحضرات تجميل</div>
-                <div class="dropdown-option" onclick="toggleOption('cats', 'كتب')"><div class="option-check"></div>كتب</div>
-              </div>
-            </div>
-          </div>
-          <div class="negate-wrap">
-            <span class="negate-label" id="negate-lbl-cats">اعكس</span>
-            <label class="toggle-switch">
-              <input type="checkbox" id="neg-cats" onchange="toggleNegate('cats')">
-              <div class="toggle-track"><div class="toggle-thumb"></div></div>
-            </label>
-          </div>
-        </div>
-
-        <button class="btn-add-condition" onclick="addCondition()">
-          + إضافة شرط جديد
-        </button>
-      </div>
-
-      <!-- SECTION 4: Geographic Zone -->
-      <div class="card form-section">
-        <div class="section-header">
-          <span class="section-num">٤</span>
-          المنطقة الجغرافية
-          <span style="font-size:12px;color:#64748b;font-weight:400;margin-right:auto;">ارسم نطاق التوصيل على الخريطة</span>
-        </div>
-        <div id="route-map"></div>
-        <div class="map-instructions">
-          <span>🖱️</span>
-          <span>انقر على الخريطة لرسم منطقة التوصيل. انقر مرتين للإنهاء.</span>
-        </div>
-        <div class="map-zone-badge" id="zoneBadge">
-          <span>⚡</span>
-          <span>مناسب لـ Quick Commerce · التوصيل الفائق السرعة</span>
-        </div>
-        <button class="btn-save-zone" id="btnSaveZone" onclick="saveZone()">حفظ المنطقة ✓</button>
-      </div>
-
-      <!-- SECTION 5: Carriers -->
-      <div class="card form-section">
-        <div class="section-header">
-          <span class="section-num">٥</span>
-          شركات الشحن
-        </div>
-        <div class="carriers-grid">
-
-          <!-- Aramex -->
-          <div class="carrier-card active" id="carrier-aramex">
-            <div class="carrier-logo" style="background:#FF6600;color:#fff;">AR</div>
-            <div>
-              <div class="carrier-name">أرامكس</div>
-              <div class="carrier-status">نشط</div>
-            </div>
-            <label class="toggle-switch" style="margin-right:auto;">
-              <input type="checkbox" checked onchange="toggleCarrier('aramex', this)">
-              <div class="toggle-track" style=""><div class="toggle-thumb"></div></div>
-            </label>
-          </div>
-
-          <!-- DHL -->
-          <div class="carrier-card active" id="carrier-dhl">
-            <div class="carrier-logo" style="background:#FFCC00;color:#D40511;">DHL</div>
-            <div>
-              <div class="carrier-name">DHL</div>
-              <div class="carrier-status">نشط</div>
-            </div>
-            <label class="toggle-switch" style="margin-right:auto;">
-              <input type="checkbox" checked onchange="toggleCarrier('dhl', this)">
-              <div class="toggle-track"><div class="toggle-thumb"></div></div>
-            </label>
-          </div>
-
-          <!-- Smsa -->
-          <div class="carrier-card" id="carrier-smsa">
-            <div class="carrier-logo" style="background:#1B4F9A;color:#fff;">SM</div>
-            <div>
-              <div class="carrier-name">سمسا</div>
-              <div class="carrier-status">غير نشط</div>
-            </div>
-            <label class="toggle-switch" style="margin-right:auto;">
-              <input type="checkbox" onchange="toggleCarrier('smsa', this)">
-              <div class="toggle-track"><div class="toggle-thumb"></div></div>
-            </label>
-          </div>
-
-        </div>
-      </div>
-
-      <!-- SAVE BAR -->
-      <div class="save-bar">
-        <button class="btn-save" onclick="saveRoute()">
-          <span>💾</span>
-          حفظ المسار
-        </button>
-      </div>
-
-    </div><!-- end main-area -->
-  </div><!-- end main-layout -->
-</div><!-- end page-wrap -->
-
-<!-- FAB -->
-<button class="fab-simulate" onclick="openSimPanel()">🧪 جرّب المسار</button>
-
+<!-- ══════════════════════════════════════════════════════════════
+     JAVASCRIPT
+══════════════════════════════════════════════════════════════ -->
 <script>
-// ──────────────────────────────────────────────
-// LEAFLET MAP
-// ──────────────────────────────────────────────
-var map = L.map('route-map', { zoomControl: true }).setView([24.7136, 46.6753], 11);
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-  attribution: '© OpenStreetMap',
-  maxZoom: 18
-}).addTo(map);
+// ─── State ───────────────────────────────────────────────
+let currentRouteType = 'carriers';
+let matchMode = 'and';
+let conditionCount = 0;
+let selectedCarriers = ['aramex', 'smsa', 'dhl', 'naqel'];
+let leafletMap = null;
+let leafletExcludedMap = null;
+let polygonPoints = [];
+let polygonLayer = null;
+let mapConditionCreated = false;
 
-var polygonPoints = [];
-var drawnLines = [];
-var drawnPolygon = null;
-var zoneSaved = false;
-
-function drawLinesOnMap() {
-  drawnLines.forEach(function(l) { map.removeLayer(l); });
-  drawnLines = [];
-  if (polygonPoints.length < 2) return;
-  for (var i = 0; i < polygonPoints.length - 1; i++) {
-    var line = L.polyline([polygonPoints[i], polygonPoints[i+1]], {
-      color: '#7B2D8B', weight: 2, opacity: 0.8, dashArray: '6,4'
-    }).addTo(map);
-    drawnLines.push(line);
-  }
-}
-
-function closePolygon() {
-  if (polygonPoints.length < 3) return;
-  drawnLines.forEach(function(l) { map.removeLayer(l); });
-  drawnLines = [];
-  if (drawnPolygon) { map.removeLayer(drawnPolygon); }
-  drawnPolygon = L.polygon(polygonPoints, {
-    color: '#7B2D8B',
-    weight: 2,
-    fillColor: '#7B2D8B',
-    fillOpacity: 0.3
-  }).addTo(map);
-  document.getElementById('zoneBadge').classList.add('visible');
-  document.getElementById('btnSaveZone').classList.add('visible');
-  updateSidebar();
-}
-
-map.on('click', function(e) {
-  if (zoneSaved) return;
-  polygonPoints.push([e.latlng.lat, e.latlng.lng]);
-  L.circleMarker([e.latlng.lat, e.latlng.lng], {
-    radius: 5, color: '#7B2D8B', fillColor: '#7B2D8B', fillOpacity: 1, weight: 2
-  }).addTo(map);
-  drawLinesOnMap();
-});
-
-map.on('dblclick', function(e) {
-  if (zoneSaved) return;
-  L.DomEvent.stop(e);
-  if (polygonPoints.length >= 3) { closePolygon(); }
-});
-
-function saveZone() {
-  zoneSaved = true;
-  document.getElementById('btnSaveZone').textContent = '✓ تم حفظ المنطقة';
-  document.getElementById('btnSaveZone').style.background = '#04B49C';
-  updateSidebar();
-}
-
-// ──────────────────────────────────────────────
-// MULTI-SELECT DROPDOWNS
-// ──────────────────────────────────────────────
-var selectedValues = { cities: [], cats: [] };
-
-function toggleDropdown(id) {
-  var dd = document.getElementById('dd-' + id);
-  var trigger = dd.previousElementSibling;
-  var isOpen = dd.classList.contains('open');
-  // close all
-  document.querySelectorAll('.multi-select-dropdown').forEach(function(d) {
-    d.classList.remove('open');
-    d.previousElementSibling.classList.remove('open');
+// ─── Route Type ───────────────────────────────────────────
+function selectRouteType(type) {
+  currentRouteType = type;
+  ['carriers','auto','label'].forEach(t => {
+    document.getElementById('rt-' + t).classList.remove('selected');
   });
-  if (!isOpen) {
-    dd.classList.add('open');
-    trigger.classList.add('open');
-  }
+  document.getElementById('rt-' + type).classList.add('selected');
+  updateSummary();
 }
 
-document.addEventListener('click', function(e) {
-  if (!e.target.closest('.multi-select')) {
-    document.querySelectorAll('.multi-select-dropdown').forEach(function(d) {
-      d.classList.remove('open');
-      if (d.previousElementSibling) d.previousElementSibling.classList.remove('open');
-    });
-  }
-});
-
-function toggleOption(id, val) {
-  var arr = selectedValues[id];
-  var idx = arr.indexOf(val);
-  if (idx >= 0) { arr.splice(idx, 1); }
-  else { arr.push(val); }
-  renderTags(id);
-  // Update dropdown options visual
-  var dd = document.getElementById('dd-' + id);
-  dd.querySelectorAll('.dropdown-option').forEach(function(opt) {
-    var text = opt.textContent.trim();
-    if (arr.indexOf(text) >= 0) { opt.classList.add('selected'); }
-    else { opt.classList.remove('selected'); }
-  });
-  updateSidebar();
-}
-
-function renderTags(id) {
-  var container = document.getElementById('tags-' + id);
-  var arr = selectedValues[id];
-  if (arr.length === 0) {
-    container.innerHTML = '<span class="select-placeholder">' + (id === 'cities' ? 'اختر المدن...' : 'اختر الفئات...') + '</span>';
-  } else {
-    container.innerHTML = arr.map(function(v) {
-      return '<span class="select-tag">' + v + '<span class="select-tag-remove" onclick="event.stopPropagation();removeTag(\'' + id + '\',\'' + v + '\')">×</span></span>';
-    }).join('');
-  }
-}
-
-function removeTag(id, val) {
-  var arr = selectedValues[id];
-  var idx = arr.indexOf(val);
-  if (idx >= 0) arr.splice(idx, 1);
-  renderTags(id);
-  var dd = document.getElementById('dd-' + id);
-  dd.querySelectorAll('.dropdown-option').forEach(function(opt) {
-    var text = opt.textContent.trim();
-    if (arr.indexOf(text) >= 0) opt.classList.add('selected');
-    else opt.classList.remove('selected');
-  });
-  updateSidebar();
-}
-
-// ──────────────────────────────────────────────
-// NEGATE TOGGLE
-// ──────────────────────────────────────────────
-function toggleNegate(condId) {
-  var row = document.getElementById('cond-' + condId);
-  var lbl = document.getElementById('lbl-' + condId);
-  var negateLbl = document.getElementById('negate-lbl-' + condId);
-  var chk = document.getElementById('neg-' + condId);
-  if (chk.checked) {
-    row.classList.add('negated');
-    lbl.classList.add('negated-label');
-    negateLbl.textContent = 'عدا هذا';
-    negateLbl.classList.add('active');
-  } else {
-    row.classList.remove('negated');
-    lbl.classList.remove('negated-label');
-    var labels = { city: 'المدينة / المنطقة', weight: 'وزن الطلب (كيلو)', value: 'قيمة الطلب (ر.س)', cats: 'الفئات' };
-    negateLbl.textContent = 'اعكس';
-    negateLbl.classList.remove('active');
-  }
-}
-
-// ──────────────────────────────────────────────
-// OPERATOR SELECTION
-// ──────────────────────────────────────────────
-var currentOp = 'كل الشروط (AND)';
-
-function selectOp(el, label) {
-  document.querySelectorAll('.operator-option').forEach(function(o) { o.classList.remove('selected'); });
-  el.classList.add('selected');
-  currentOp = label;
-  document.getElementById('sidebarOp').textContent = label;
-}
-
-// ──────────────────────────────────────────────
-// CARRIER TOGGLES
-// ──────────────────────────────────────────────
-var activeCarriers = { aramex: true, dhl: true, smsa: false };
-
-function toggleCarrier(id, chk) {
-  activeCarriers[id] = chk.checked;
-  var card = document.getElementById('carrier-' + id);
-  var status = card.querySelector('.carrier-status');
-  if (chk.checked) {
-    card.classList.add('active');
-    status.textContent = 'نشط';
-  } else {
-    card.classList.remove('active');
-    status.textContent = 'غير نشط';
-  }
-  updateSidebar();
-}
-
-// ──────────────────────────────────────────────
-// ADD CONDITION
-// ──────────────────────────────────────────────
-var extraCondCount = 0;
-var extraCondNames = ['تاريخ الطلب', 'رمز المنتج', 'نوع العميل', 'كوبون الخصم'];
-
-function addCondition() {
-  var condList = document.querySelector('.form-section:nth-of-type(3) .card');
-  var btn = document.querySelector('.btn-add-condition');
-  if (extraCondCount >= extraCondNames.length) { return; }
-  var name = extraCondNames[extraCondCount];
-  extraCondCount++;
-  var id = 'extra-' + extraCondCount;
-  var div = document.createElement('div');
-  div.className = 'condition-row';
-  div.id = 'cond-' + id;
-  div.innerHTML = '<div class="condition-icon">📌</div>' +
-    '<div class="condition-label" id="lbl-' + id + '">' + name + '</div>' +
-    '<div class="condition-inputs"><input type="text" class="input-field" placeholder="أدخل القيمة..." style="flex:1;min-width:160px;"></div>' +
-    '<div class="negate-wrap">' +
-      '<span class="negate-label" id="negate-lbl-' + id + '">اعكس</span>' +
-      '<label class="toggle-switch"><input type="checkbox" id="neg-' + id + '" onchange="toggleNegate(\'' + id + '\')">' +
-        '<div class="toggle-track"><div class="toggle-thumb"></div></div></label>' +
-    '</div>';
-  btn.parentNode.insertBefore(div, btn);
-  updateSidebar();
-}
-
-// ──────────────────────────────────────────────
-// SIDEBAR UPDATER
-// ──────────────────────────────────────────────
-function updateSidebar() {
-  var name = document.getElementById('routeNameInput').value.trim();
-  document.getElementById('sidebarName').textContent = name || 'غير محدد';
-
-  // Count active conditions (those with values or negated)
-  var count = 0;
-  if (selectedValues.cities.length > 0) count++;
-  if (selectedValues.cats.length > 0) count++;
-  count += extraCondCount;
-  document.getElementById('sidebarCondCount').textContent = count + ' شرط نشط';
-
-  // Zone
-  if (drawnPolygon) {
-    document.getElementById('sidebarZone').textContent = zoneSaved ? 'محددة ✓' : 'مرسومة (غير محفوظة)';
-  } else {
-    document.getElementById('sidebarZone').textContent = 'غير محددة';
-  }
-
-  // Carriers
-  var active = [];
-  if (activeCarriers.aramex) active.push('أرامكس');
-  if (activeCarriers.dhl) active.push('DHL');
-  if (activeCarriers.smsa) active.push('سمسا');
-  document.getElementById('sidebarCarriers').textContent = active.length ? active.join('، ') : 'لا يوجد';
-}
-
-// ──────────────────────────────────────────────
-// SAVE ROUTE
-// ──────────────────────────────────────────────
-function saveRoute() {
-  var name = document.getElementById('routeNameInput').value.trim();
-  if (!name) {
-    alert('يرجى إدخال اسم المسار أولاً');
-    document.getElementById('routeNameInput').focus();
-    return;
-  }
-  var btn = document.querySelector('.btn-save');
-  btn.textContent = '✓ تم الحفظ بنجاح!';
-  btn.style.background = 'linear-gradient(135deg, #16a34a, #15803d)';
-  document.getElementById('sidebarStatus').textContent = 'نشط';
-  document.getElementById('sidebarStatus').style.background = '#dcfce7';
-  document.getElementById('sidebarStatus').style.color = '#16a34a';
-  document.getElementById('sidebarStatus').style.border = '1px solid #bbf7d0';
-  setTimeout(function() {
-    btn.innerHTML = '<span>💾</span> حفظ المسار';
-    btn.style.background = 'linear-gradient(135deg, #04B49C, #02a08b)';
-  }, 3000);
-}
-
-// ──────────────────────────────────────────────
-// SIMULATION PANEL
-// ──────────────────────────────────────────────
-function openSimPanel() {
-  document.getElementById('simOverlay').classList.add('open');
-  document.getElementById('simPanel').classList.add('open');
-  document.body.style.overflow = 'hidden';
-}
-
-function closeSimPanel() {
-  document.getElementById('simOverlay').classList.remove('open');
-  document.getElementById('simPanel').classList.remove('open');
-  document.body.style.overflow = '';
-}
-
-var simScenarios = {
-  'الرياض': {
-    route: 'مسار الرياض الرئيسي',
-    carriers: [
-      { name: 'أرامكس', color: '#FF6600' },
-      { name: 'سمسا', color: '#1B4F9A' }
-    ],
-    price: '٢٥ — ٣٥ ر.س',
-    time: '٢ — ٣ أيام عمل'
-  },
-  'جدة': {
-    route: 'مسار غرب المملكة',
-    carriers: [
-      { name: 'DHL', color: '#FFCC00' },
-      { name: 'أرامكس', color: '#FF6600' }
-    ],
-    price: '٣٠ — ٤٥ ر.س',
-    time: '١ — ٢ يوم عمل'
-  },
-  'default': {
-    route: 'المسار العام',
-    carriers: [
-      { name: 'سمسا', color: '#1B4F9A' }
-    ],
-    price: '٢٠ — ٤٠ ر.س',
-    time: '٣ — ٥ أيام عمل'
-  }
+// ─── Carrier Management ──────────────────────────────────
+const carrierData = {
+  aramex: { label: 'أرامكس', cls: 'aramex', tagCls: 'tag-aramex', abbr: 'AR', time: '1–2 أيام عمل' },
+  smsa:   { label: 'SMSA',   cls: 'smsa',   tagCls: 'tag-smsa',   abbr: 'SM', time: '1–2 أيام عمل' },
+  dhl:    { label: 'DHL',    cls: 'dhl',     tagCls: 'tag-dhl',    abbr: 'DH', time: '2–4 أيام عمل' },
+  naqel:  { label: 'Naqel',  cls: 'naqel',  tagCls: 'tag-naqel',  abbr: 'NQ', time: '2–3 أيام عمل' },
 };
 
-function runSimulation() {
-  var city = document.getElementById('simCity').value;
-  if (!city) { alert('يرجى اختيار المدينة أولاً'); return; }
-
-  var scenario = simScenarios[city] || simScenarios['default'];
-  document.getElementById('resultRouteName').textContent = scenario.route;
-  document.getElementById('resultRoute').textContent = scenario.route;
-
-  var carriersHtml = scenario.carriers.map(function(c) {
-    return '<span class="carrier-dot" style="background:' + c.color + '"></span>' + c.name;
-  }).join(' &nbsp;');
-  document.getElementById('resultCarriers').innerHTML = carriersHtml;
-  document.getElementById('resultPrice').textContent = scenario.price;
-  document.getElementById('resultTime').textContent = scenario.time;
-
-  document.getElementById('simResult').classList.add('visible');
+function addCarrierFromSelect(sel) {
+  const val = sel.value;
+  if (!val || selectedCarriers.includes(val)) { sel.value = ''; return; }
+  selectedCarriers.push(val);
+  renderCarriers();
+  sel.value = '';
+  updateSummary();
 }
 
-// ──────────────────────────────────────────────
-// MIGRATION MODAL
-// ──────────────────────────────────────────────
-var currentStep = 1;
-var totalSteps = 3;
-
-function openMigration() {
-  currentStep = 1;
-  renderMigrationStep();
-  document.getElementById('migrationModal').classList.add('open');
+function removeCarrier(id) {
+  selectedCarriers = selectedCarriers.filter(c => c !== id);
+  renderCarriers();
+  updateSummary();
 }
 
-function closeMigration() {
-  document.getElementById('migrationModal').classList.remove('open');
-  // Reset success state
-  document.getElementById('successState').classList.remove('visible');
-  document.getElementById('step3Review').style.display = '';
-  document.getElementById('btnNext').style.display = '';
-  document.getElementById('btnBack').style.visibility = '';
-  currentStep = 1;
-  renderMigrationStep();
-}
-
-function migrationNext() {
-  if (currentStep < totalSteps) {
-    currentStep++;
-    renderMigrationStep();
-  } else {
-    // Publish
-    document.getElementById('step3Review').style.display = 'none';
-    document.getElementById('successState').classList.add('visible');
-    document.getElementById('modalFooter').style.display = 'none';
-  }
-}
-
-function migrationBack() {
-  if (currentStep > 1) {
-    currentStep--;
-    renderMigrationStep();
-  }
-}
-
-function renderMigrationStep() {
-  // Update step contents
-  for (var i = 1; i <= totalSteps; i++) {
-    var sc = document.getElementById('step' + i);
-    if (sc) sc.classList.toggle('active', i === currentStep);
-  }
-
-  // Update circles
-  for (var i = 1; i <= totalSteps; i++) {
-    var circle = document.getElementById('sc' + i);
-    circle.classList.remove('active', 'done');
-    if (i < currentStep) circle.classList.add('done');
-    else if (i === currentStep) circle.classList.add('active');
-  }
-  // Update lines
-  for (var i = 1; i <= totalSteps - 1; i++) {
-    var line = document.getElementById('sl' + i);
-    if (line) line.classList.toggle('done', i < currentStep);
-  }
-
-  // Counter
-  var stepLabels = ['١', '٢', '٣'];
-  document.getElementById('stepCounter').textContent = 'الخطوة ' + stepLabels[currentStep-1] + ' من ٣';
-
-  // Back button
-  document.getElementById('btnBack').style.visibility = currentStep > 1 ? 'visible' : 'hidden';
-
-  // Next button label
-  var nextBtn = document.getElementById('btnNext');
-  nextBtn.textContent = currentStep === totalSteps ? 'نشر الآن ✓' : 'التالي ←';
-
-  // Show footer
-  document.getElementById('modalFooter').style.display = '';
-}
-
-// ──────────────────────────────────────────────
-// INIT
-// ──────────────────────────────────────────────
-document.addEventListener('DOMContentLoaded', function() {
-  updateSidebar();
-  renderMigrationStep();
-  // Force map to resize correctly
-  setTimeout(function() { map.invalidateSize(); }, 100);
-});
-
-// Close dropdowns on scroll
-document.addEventListener('scroll', function() {
-  document.querySelectorAll('.multi-select-dropdown').forEach(function(d) {
-    d.classList.remove('open');
-    if (d.previousElementSibling) d.previousElementSibling.classList.remove('open');
+function renderCarriers() {
+  const tagsEl = document.getElementById('carrierTags');
+  const rowsEl = document.getElementById('carrierRows');
+  tagsEl.innerHTML = '';
+  rowsEl.innerHTML = '';
+  selectedCarriers.forEach(id => {
+    const d = carrierData[id];
+    // Tag
+    const tag = document.createElement('span');
+    tag.className = 'carrier-tag ' + d.tagCls;
+    tag.setAttribute('data-carrier', id);
+    tag.innerHTML = `${d.label} <span class="tag-remove" onclick="removeCarrier('${id}')">×</span>`;
+    tagsEl.appendChild(tag);
+    // Row
+    const row = document.createElement('div');
+    row.className = 'carrier-row';
+    row.setAttribute('data-carrier', id);
+    row.innerHTML = `
+      <div class="carrier-icon ${d.cls}">${d.abbr}</div>
+      <div>
+        <div class="carrier-name">${d.label}</div>
+        <div class="carrier-time">${d.time}</div>
+      </div>
+      <div style="flex:1;"></div>
+      <input type="number" class="carrier-price-input" placeholder="0.00">
+      <span class="carrier-price-unit">ر.س</span>
+      <span class="carrier-drag" title="سحب لإعادة الترتيب">⠿</span>
+      <label class="toggle" style="width:34px;height:18px;">
+        <input type="checkbox" checked>
+        <span class="toggle-slider"></span>
+      </label>`;
+    rowsEl.appendChild(row);
   });
-}, true);
+}
+
+function showCarrierSelect() {
+  document.getElementById('carrierSelect').focus();
+}
+
+// ─── Match Mode ───────────────────────────────────────────
+function setMatchMode(mode) {
+  matchMode = mode;
+  ['and','or','subset'].forEach(m => {
+    const pill = document.getElementById('pill-' + m);
+    pill.classList.remove('active');
+    pill.textContent = pill.textContent.replace('●','○');
+  });
+  const activePill = document.getElementById('pill-' + mode);
+  activePill.classList.add('active');
+  // Restore badge-new for subset
+  if (mode === 'subset') {
+    activePill.innerHTML = '● عدد محدد من الشروط <span class="badge-new">جديد</span>';
+  }
+  const subsetRow = document.getElementById('subsetCountRow');
+  subsetRow.style.display = mode === 'subset' ? 'flex' : 'none';
+  updateSummary();
+}
+
+// ─── Conditions ──────────────────────────────────────────
+const conditionTypes = [
+  { value: 'zone',    label: 'الطلب من مناطق محددة' },
+  { value: 'value',   label: 'قيمة السلة' },
+  { value: 'weight',  label: 'وزن السلة' },
+  { value: 'qty',     label: 'كمية المنتجات في السلة' },
+  { value: 'branches',label: 'عدد الفروع والمستودعات' },
+  { value: 'map',     label: '🗺️ رسم منطقة بالخريطة' },
+];
+const numericOperators = [
+  { value: 'eq',   label: 'يساوي' },
+  { value: 'gt',   label: 'أكبر من' },
+  { value: 'gte',  label: 'أكبر من أو يساوي' },
+  { value: 'lt',   label: 'أصغر من' },
+  { value: 'lte',  label: 'أصغر من أو يساوي' },
+  { value: 'between', label: 'ما بين' },
+];
+const conditionUnits = {
+  value: 'ريال', weight: 'كجم', qty: 'منتج', branches: 'فرع'
+};
+
+function addCondition() {
+  conditionCount++;
+  const id = 'cond-' + conditionCount;
+
+  // Hide empty state, show add btn
+  document.getElementById('conditionsEmpty').style.display = 'none';
+  document.getElementById('addConditionBtn').style.display = 'flex';
+
+  const list = document.getElementById('conditionsList');
+  const row = document.createElement('div');
+  row.className = 'condition-row';
+  row.id = id;
+
+  // Build type options
+  const typeOptions = conditionTypes.map(t =>
+    `<option value="${t.value}">${t.label}</option>`
+  ).join('');
+
+  // Build operator options
+  const opOptions = numericOperators.map(o =>
+    `<option value="${o.value}">${o.label}</option>`
+  ).join('');
+
+  row.innerHTML = `
+    <div class="condition-row-header">
+      <div class="condition-row-fields">
+        <select class="condition-select" onchange="onConditionTypeChange('${id}', this.value)">
+          <option value="">— اختر الشرط —</option>
+          ${typeOptions}
+        </select>
+        <select class="condition-operator-select" id="${id}-op" style="display:none;">
+          ${opOptions}
+        </select>
+        <input type="number" class="condition-value-input" id="${id}-val" placeholder="القيمة" style="display:none;" oninput="updateSummary()">
+        <span class="condition-unit" id="${id}-unit"></span>
+        <div class="negate-wrap" id="${id}-negate" style="display:none;" title="">
+          <button class="negate-pill" onclick="toggleNegate('${id}', this)">
+            <span class="negate-dot"></span> اعكس الشرط
+          </button>
+          <div class="negate-tooltip">يُطبَّق المسار على الطلبات التي لا تحقق هذا الشرط</div>
+        </div>
+      </div>
+      <button class="trash-btn" onclick="removeCondition('${id}')">🗑️</button>
+    </div>
+    <div id="${id}-extra"></div>
+  `;
+
+  list.appendChild(row);
+  updateSubsetTotal();
+  updateSummary();
+}
+
+function onConditionTypeChange(id, type) {
+  const row = document.getElementById(id);
+  const opEl = document.getElementById(id + '-op');
+  const valEl = document.getElementById(id + '-val');
+  const unitEl = document.getElementById(id + '-unit');
+  const negateEl = document.getElementById(id + '-negate');
+  const extraEl = document.getElementById(id + '-extra');
+
+  // Reset
+  opEl.style.display = 'none';
+  valEl.style.display = 'none';
+  unitEl.textContent = '';
+  negateEl.style.display = 'none';
+  extraEl.innerHTML = '';
+  row.classList.remove('negated');
+
+  if (type === 'zone') {
+    extraEl.innerHTML = buildZoneConditionHTML(id);
+  } else if (type === 'map') {
+    extraEl.innerHTML = buildMapConditionHTML(id);
+    setTimeout(() => initLeafletMap(id), 100);
+  } else if (['value','weight','qty','branches'].includes(type)) {
+    opEl.style.display = '';
+    valEl.style.display = '';
+    unitEl.textContent = conditionUnits[type];
+    negateEl.style.display = 'flex';
+  }
+  updateSummary();
+}
+
+function buildZoneConditionHTML(id) {
+  return `
+    <div class="zone-condition-body">
+      <div class="zone-section-label">
+        مناطق مسموحة <span class="zone-type-badge zone-allowed-badge">مسموحة</span>
+      </div>
+      <div class="zone-row">
+        <select class="condition-select" style="flex:0 0 140px;">
+          <option>المملكة العربية السعودية</option>
+          <option>الإمارات</option>
+          <option>الكويت</option>
+        </select>
+        <select class="condition-select" style="flex:0 0 140px;">
+          <option value="">المدينة</option>
+          <option>الرياض</option>
+          <option>جدة</option>
+          <option>الدمام</option>
+          <option>أبها</option>
+          <option>مكة المكرمة</option>
+        </select>
+        <button class="zone-add-btn" onclick="addZoneRow(this, 'allowed')">+ إضافة منطقة مسموحة</button>
+      </div>
+      <div id="${id}-allowed-rows"></div>
+      <div class="section-divider"></div>
+      <div class="zone-section-label">
+        مناطق مستثناة <span class="zone-type-badge zone-excluded-badge">مستثناة</span>
+      </div>
+      <div class="zone-row">
+        <select class="condition-select" style="flex:0 0 140px;">
+          <option>المملكة العربية السعودية</option>
+          <option>الإمارات</option>
+          <option>الكويت</option>
+        </select>
+        <select class="condition-select" style="flex:0 0 140px;">
+          <option value="">المدينة</option>
+          <option>الرياض</option>
+          <option>جدة</option>
+          <option>الدمام</option>
+          <option>أبها</option>
+        </select>
+        <button class="zone-add-btn" onclick="addZoneRow(this, 'excluded')">+ إضافة منطقة مستثناة</button>
+      </div>
+      <div id="${id}-excluded-rows"></div>
+    </div>`;
+}
+
+function addZoneRow(btn, type) {
+  const label = type === 'allowed' ? 'مسموحة' : 'مستثناة';
+  const cls = type === 'allowed' ? 'zone-allowed-badge' : 'zone-excluded-badge';
+  const tag = document.createElement('div');
+  tag.className = 'zone-row';
+  tag.style.marginTop = '6px';
+  tag.innerHTML = `
+    <span class="zone-type-badge ${cls}" style="padding:3px 8px;border-radius:8px;font-size:12px;">${label}</span>
+    <select class="condition-select" style="flex:0 0 130px;"><option>المملكة العربية السعودية</option></select>
+    <select class="condition-select" style="flex:0 0 130px;"><option>الرياض</option><option>جدة</option><option>الدمام</option></select>
+    <button class="trash-btn" onclick="this.parentElement.remove()" style="font-size:13px;">🗑️</button>`;
+  btn.parentElement.parentElement.appendChild(tag);
+}
+
+function buildMapConditionHTML(id) {
+  return `
+    <div class="map-condition-body">
+      <p class="map-instruction">انقر على الخريطة لرسم منطقة التوصيل — انقر مرتين لإغلاق المنطقة</p>
+      <div id="leaflet-map-${id}" style="width:100%;height:300px;border-radius:8px;overflow:hidden;border:1px solid #E5E7EB;"></div>
+      <div class="map-after-actions" id="map-actions-${id}" style="display:none;">
+        <button class="map-save-btn" onclick="savePolygon('${id}')">حفظ المنطقة</button>
+        <span class="map-badge">مناسب لتجار Quick Commerce</span>
+      </div>
+      <button class="map-excluded-toggle" onclick="toggleExcludedMap('${id}')">
+        ▼ مناطق مستثناة
+      </button>
+      <div id="leaflet-excluded-${id}" style="width:100%;height:220px;border-radius:8px;overflow:hidden;border:1px solid #FECACA;margin-top:8px;display:none;"></div>
+    </div>`;
+}
+
+function initLeafletMap(condId) {
+  const mapEl = document.getElementById('leaflet-map-' + condId);
+  if (!mapEl || mapEl._leaflet_id) return;
+
+  const map = L.map('leaflet-map-' + condId).setView([24.7136, 46.6753], 11);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '© OpenStreetMap'
+  }).addTo(map);
+
+  let points = [];
+  let tempMarkers = [];
+  let poly = null;
+
+  map.on('click', function(e) {
+    points.push([e.latlng.lat, e.latlng.lng]);
+    const marker = L.circleMarker([e.latlng.lat, e.latlng.lng], {
+      radius: 4, color: '#7B2D8B', fillColor: '#7B2D8B', fillOpacity: 1
+    }).addTo(map);
+    tempMarkers.push(marker);
+
+    if (poly) map.removeLayer(poly);
+    if (points.length >= 2) {
+      poly = L.polygon(points, {
+        color: '#7B2D8B', weight: 2,
+        fillColor: '#7B2D8B', fillOpacity: 0.2
+      }).addTo(map);
+    }
+  });
+
+  map.on('dblclick', function(e) {
+    if (points.length < 3) return;
+    map.doubleClickZoom.disable();
+    points.push(points[0]); // close
+    if (poly) map.removeLayer(poly);
+    poly = L.polygon(points, {
+      color: '#7B2D8B', weight: 2,
+      fillColor: '#7B2D8B', fillOpacity: 0.2
+    }).addTo(map);
+    const actionsEl = document.getElementById('map-actions-' + condId);
+    if (actionsEl) actionsEl.style.display = 'flex';
+  });
+}
+
+function savePolygon(condId) {
+  const actionsEl = document.getElementById('map-actions-' + condId);
+  if (actionsEl) {
+    actionsEl.innerHTML = '<span style="color:#04B49C;font-weight:600;font-size:13px;">✅ تم حفظ المنطقة</span><span class="map-badge">مناسب لتجار Quick Commerce</span>';
+  }
+  updateSummary();
+}
+
+function toggleExcludedMap(condId) {
+  const el = document.getElementById('leaflet-excluded-' + condId);
+  if (!el) return;
+  if (el.style.display === 'none') {
+    el.style.display = 'block';
+    setTimeout(() => {
+      if (el._leaflet_id) return;
+      const exMap = L.map('leaflet-excluded-' + condId).setView([24.7136, 46.6753], 10);
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap'
+      }).addTo(exMap);
+    }, 100);
+  } else {
+    el.style.display = 'none';
+  }
+}
+
+// ─── Feature 2: Negate Toggle ────────────────────────────
+function toggleNegate(condId, btn) {
+  const row = document.getElementById(condId);
+  btn.classList.toggle('active');
+  if (btn.classList.contains('active')) {
+    row.classList.add('negated');
+  } else {
+    row.classList.remove('negated');
+  }
+}
+
+// ─── Remove Condition ─────────────────────────────────────
+function removeCondition(id) {
+  const el = document.getElementById(id);
+  if (el) el.remove();
+  const list = document.getElementById('conditionsList');
+  const remaining = list.querySelectorAll('.condition-row');
+  if (remaining.length === 0) {
+    document.getElementById('conditionsEmpty').style.display = '';
+    document.getElementById('addConditionBtn').style.display = 'none';
+  }
+  updateSubsetTotal();
+  updateSummary();
+}
+
+function updateSubsetTotal() {
+  const rows = document.getElementById('conditionsList').querySelectorAll('.condition-row');
+  document.getElementById('subsetTotal').textContent = rows.length;
+}
+
+// ─── Summary Panel ────────────────────────────────────────
+function updateSummary() {
+  const name = document.getElementById('routeName').value.trim();
+  const marketSel = document.getElementById('routeMarket');
+  const marketLabel = marketSel.options[marketSel.selectedIndex].text;
+  const routeOn = document.getElementById('routeToggle').checked;
+
+  const hasData = name || selectedCarriers.length > 0;
+
+  if (!hasData) {
+    document.getElementById('summaryEmpty').style.display = '';
+    document.getElementById('summaryData').style.display = 'none';
+    return;
+  }
+
+  document.getElementById('summaryEmpty').style.display = 'none';
+  document.getElementById('summaryData').style.display = '';
+
+  document.getElementById('sum-name').textContent = name || 'لم يُدخل اسم بعد';
+  document.getElementById('sum-market').textContent = marketSel.value ? marketLabel : '—';
+
+  const typeLabels = { carriers: 'تحديد الشركات', auto: 'تعيين تلقائي', label: 'تسمية خاصة' };
+  document.getElementById('sum-type').textContent = typeLabels[currentRouteType];
+
+  // Carriers
+  const carrierNames = selectedCarriers.map(c => carrierData[c].label);
+  document.getElementById('sum-carriers').textContent = carrierNames.join(' · ') || '—';
+
+  // Conditions
+  const condRows = document.getElementById('conditionsList').querySelectorAll('.condition-row');
+  document.getElementById('sum-conditions').textContent =
+    condRows.length > 0 ? condRows.length + ' شرط' : 'لا توجد شروط';
+
+  document.getElementById('sum-status').textContent = routeOn ? '✅ مفعّل' : '⛔ معطّل';
+  document.getElementById('sum-status').style.color = routeOn ? '#04B49C' : '#EF4444';
+}
+
+// ─── Save Route ───────────────────────────────────────────
+function saveRoute() {
+  const name = document.getElementById('routeName').value.trim();
+  if (!name) {
+    alert('يرجى إدخال اسم المسار أولًا');
+    document.getElementById('routeName').focus();
+    return;
+  }
+  const btn = document.querySelector('.btn-save');
+  btn.textContent = '✅ تم الحفظ!';
+  btn.style.background = '#065F46';
+  setTimeout(() => {
+    btn.textContent = 'حفظ المسار';
+    btn.style.background = '#04B49C';
+  }, 2000);
+}
+
+// ─── Simulation Panel ─────────────────────────────────────
+function toggleSimPanel() {
+  const panel = document.getElementById('simPanel');
+  panel.classList.toggle('open');
+}
+
+function runSimulation() {
+  const value = parseFloat(document.getElementById('sim-value').value) || 0;
+  const city = document.getElementById('sim-city').value;
+  const resultEl = document.getElementById('simResult');
+  const cardEl = document.getElementById('simResultCard');
+
+  resultEl.style.display = 'block';
+
+  const isMatch = city === 'riyadh' || value > 100;
+
+  if (isMatch) {
+    cardEl.className = 'sim-result-card match';
+    let reason = [];
+    if (city === 'riyadh') reason.push('المدينة = الرياض');
+    if (value > 100) reason.push('قيمة السلة > ١٠٠ ريال');
+    cardEl.innerHTML = `✅ المسار سيُطبَّق<br><strong>الشرط المحقق:</strong> ${reason.join(' ، ')}`;
+  } else {
+    cardEl.className = 'sim-result-card no-match';
+    cardEl.innerHTML = `⚠️ لا يوجد مسار يطابق<br>سيُطبَّق <strong>المسار الافتراضي</strong>`;
+  }
+}
+
+// ─── Migration Banner ─────────────────────────────────────
+function dismissBanner() {
+  document.getElementById('migrationBanner').classList.add('hidden');
+}
+
+// ─── Migration Modal ──────────────────────────────────────
+let currentStep = 1;
+
+function openMigrationModal() {
+  document.getElementById('migrationModal').classList.add('open');
+  goToStep(1);
+  document.getElementById('migrationSuccess').style.display = 'none';
+  ['step-1','step-2','step-3'].forEach(s => {
+    document.getElementById(s).style.display = '';
+  });
+}
+
+function closeMigrationModal() {
+  document.getElementById('migrationModal').classList.remove('open');
+}
+
+function goToStep(step) {
+  currentStep = step;
+  ['step-1','step-2','step-3'].forEach((s, i) => {
+    const el = document.getElementById(s);
+    el.className = 'step-content' + (i + 1 === step ? ' active' : '');
+  });
+
+  // Update circles and lines
+  for (let i = 1; i <= 3; i++) {
+    const circle = document.getElementById('step-circle-' + i);
+    const label = document.getElementById('step-label-' + i);
+    circle.classList.remove('active','done');
+    label.classList.remove('active');
+    if (i < step) { circle.classList.add('done'); circle.textContent = '✓'; }
+    else if (i === step) { circle.classList.add('active'); label.classList.add('active'); circle.textContent = ['١','٢','٣'][i-1]; }
+    else { circle.textContent = ['١','٢','٣'][i-1]; }
+  }
+  for (let i = 1; i <= 2; i++) {
+    const line = document.getElementById('step-line-' + i);
+    line.classList.toggle('done', i < step);
+  }
+}
+
+function publishMigration() {
+  ['step-1','step-2','step-3'].forEach(s => {
+    document.getElementById(s).style.display = 'none';
+  });
+  document.getElementById('migrationSuccess').style.display = 'block';
+  document.getElementById('stepIndicator').style.display = 'none';
+  setTimeout(() => {
+    document.getElementById('stepIndicator').style.display = 'flex';
+  }, 100);
+}
+
+// ─── Init ─────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', function() {
+  updateSummary();
+  // Close modal on overlay click
+  document.getElementById('migrationModal').addEventListener('click', function(e) {
+    if (e.target === this) closeMigrationModal();
+  });
+});
 </script>
 </body>
 </html>
