@@ -99,7 +99,10 @@ function masaratApp() {
 
   addConditionCard() {
     const newId = Date.now();
-    this.conditionCards.push({ id: newId, type: '', typeName: '', tags: [], qualifier: 'any_in', carrierStatus: 'visible', newTag: '' });
+    this.conditionCards.push({ id: newId, type: '', typeName: '', tags: [], qualifier: 'any_in', carrierStatus: 'visible', newTag: '',
+      zoneOperator: 'include_only', zoneInputMode: 'list', selectedCountry: 'SA',
+      selectedCities: [], selectedDistricts: [], advancedInclude: [], advancedExclude: [],
+      newZoneCity: '', newZoneDistrict: '' });
   },
 
   removeConditionCard(id) {
@@ -116,6 +119,69 @@ function masaratApp() {
     card.tags = card.tags.filter(t => t !== tag);
   },
 
+  zoneOperators: [
+    { id: 'include_only', label: 'مناطق محددة فقط', icon: '✅', desc: 'يتفعّل المسار فقط إذا كان عنوان الطلب ضمن المناطق المحددة' },
+    { id: 'exclude_all',  label: 'كل المناطق باستثناء', icon: '🚫', desc: 'يتفعّل لجميع المناطق ما عدا المناطق المستثناة' },
+    { id: 'advanced',     label: 'مزيج متقدم', icon: '⚙️', desc: 'حدد مناطق مشمولة ومناطق مستثناة بشكل منفصل' },
+  ],
+
+  countries: [
+    { id: 'SA', name: 'المملكة العربية السعودية', flag: '🇸🇦' },
+    { id: 'AE', name: 'الإمارات العربية المتحدة', flag: '🇦🇪' },
+    { id: 'KW', name: 'الكويت', flag: '🇰🇼' },
+    { id: 'BH', name: 'البحرين', flag: '🇧🇭' },
+    { id: 'QA', name: 'قطر', flag: '🇶🇦' },
+    { id: 'OM', name: 'عُمان', flag: '🇴🇲' },
+  ],
+
+  saCities: ['الرياض','جدة','مكة المكرمة','المدينة المنورة','الدمام','الخبر','أبها','تبوك','القصيم','حائل','جيزان','نجران','الطائف'],
+
+  saDistricts: {
+    'الرياض': ['العليا','النخيل','الملقا','الربوة','المحمدية','الورود','السليمانية','الروضة'],
+    'جدة': ['الروضة','الزهراء','السلامة','النزهة','الشاطئ','البوادي','الصفا'],
+    'الدمام': ['العنود','الفيصلية','الشاطئ','المنار','غرناطة'],
+    'مكة المكرمة': ['العزيزية','النسيم','الشبيكة','الحجون'],
+  },
+
+  addZoneCity(card, city) {
+    if (!city) return;
+    if (!card.selectedCities) card.selectedCities = [];
+    if (!card.selectedCities.includes(city)) card.selectedCities.push(city);
+    card.newZoneCity = '';
+  },
+
+  removeZoneCity(card, city) {
+    card.selectedCities = (card.selectedCities || []).filter(c => c !== city);
+  },
+
+  addZoneDistrict(card, district) {
+    if (!district) return;
+    if (!card.selectedDistricts) card.selectedDistricts = [];
+    if (!card.selectedDistricts.includes(district)) card.selectedDistricts.push(district);
+    card.newZoneDistrict = '';
+  },
+
+  removeZoneDistrict(card, district) {
+    card.selectedDistricts = (card.selectedDistricts || []).filter(d => d !== district);
+  },
+
+  addAdvancedZone(card, city, list) {
+    if (!city) return;
+    if (!card[list]) card[list] = [];
+    if (!card[list].includes(city)) card[list].push(city);
+  },
+
+  removeAdvancedZone(card, city, list) {
+    card[list] = (card[list] || []).filter(c => c !== city);
+  },
+
+  availableDistricts(card) {
+    const selected = card.selectedCities || [];
+    let all = [];
+    selected.forEach(city => { const d = this.saDistricts[city]; if (d) all = all.concat(d); });
+    return all;
+  },
+
   changeCardType(card, val) {
     const types = {
       'categories': 'تصنيفات المنتجات',
@@ -127,6 +193,17 @@ function masaratApp() {
     };
     card.type = val;
     card.typeName = types[val] || '';
+    if (val === 'zone') {
+      card.zoneOperator = card.zoneOperator || 'include_only';
+      card.zoneInputMode = card.zoneInputMode || 'list';
+      card.selectedCountry = card.selectedCountry || 'SA';
+      card.selectedCities = card.selectedCities || [];
+      card.selectedDistricts = card.selectedDistricts || [];
+      card.advancedInclude = card.advancedInclude || [];
+      card.advancedExclude = card.advancedExclude || [];
+      card.newZoneCity = '';
+      card.newZoneDistrict = '';
+    }
   },
 
   runSimulation() {
@@ -427,25 +504,194 @@ function masaratApp() {
               </div>
 
               <!-- ZONE body -->
-              <div x-show="card.type === 'zone'" class="p-4">
-                <div class="flex items-center gap-2 bg-info-100 text-info rounded-xl px-4 py-2.5 text-sm mb-4">
-                  <span>🌍</span>
-                  <span>اختر المناطق الجغرافية التي يشمله هذا المسار</span>
+              <div x-show="card.type === 'zone'" class="p-4 space-y-4">
+
+                <!-- Operator chips -->
+                <div>
+                  <div class="text-xs text-gray-400 mb-2 font-medium">آلية تطبيق الشرط</div>
+                  <div class="flex flex-wrap gap-2">
+                    <template x-for="op in zoneOperators" :key="op.id">
+                      <button
+                        @click="card.zoneOperator = op.id"
+                        class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-sm border transition-all"
+                        :class="card.zoneOperator === op.id
+                          ? 'border-2 border-primary bg-primary-100 text-primary font-semibold'
+                          : 'border border-gray-200 text-dark-200 hover:border-primary hover:text-primary'"
+                      >
+                        <span x-text="op.icon"></span>
+                        <span x-text="op.label"></span>
+                      </button>
+                    </template>
+                  </div>
+                  <!-- Operator explanation -->
+                  <div class="mt-2 bg-gray-50 rounded-xl px-3 py-2 text-xs text-gray-500 flex items-start gap-2">
+                    <span>ℹ️</span>
+                    <span x-text="(zoneOperators.find(o => o.id === card.zoneOperator) || {}).desc"></span>
+                  </div>
                 </div>
-                <div class="flex flex-wrap gap-2 mb-4">
-                  <template x-for="geo in ['كل مدن المملكة','المنطقة الوسطى','المنطقة الغربية','المنطقة الشرقية']" :key="geo">
-                    <button
-                      class="px-3 py-1.5 border border-gray-200 rounded-full text-sm text-dark-200 hover:border-primary hover:text-primary transition"
-                      x-text="geo"
-                    ></button>
-                  </template>
-                  <button class="px-3 py-1.5 border border-dashed border-gray-300 rounded-full text-sm text-gray-400 hover:border-primary hover:text-primary transition">
-                    + اختر على الخريطة
-                  </button>
+
+                <!-- Input mode toggle -->
+                <div class="flex gap-0 bg-gray-100 p-1 rounded-xl w-fit text-sm">
+                  <button
+                    @click="card.zoneInputMode = 'list'"
+                    class="px-4 py-1.5 rounded-lg transition-all"
+                    :class="card.zoneInputMode === 'list' ? 'bg-white text-primary shadow font-semibold' : 'text-gray-500'"
+                  >📋 اختيار من القائمة</button>
+                  <button
+                    @click="card.zoneInputMode = 'map'"
+                    class="px-4 py-1.5 rounded-lg transition-all"
+                    :class="card.zoneInputMode === 'map' ? 'bg-white text-primary shadow font-semibold' : 'text-gray-500'"
+                  >🗺 رسم على الخريطة</button>
                 </div>
-                <div class="bg-gray-100 rounded-2xl flex items-center justify-center text-gray-400 text-sm mb-4" style="height:180px">
-                  🗺 أداة رسم المناطق على الخريطة
+
+                <!-- LIST MODE -->
+                <div x-show="card.zoneInputMode === 'list'" class="space-y-3">
+
+                  <!-- Standard / include_only / exclude_all selector -->
+                  <div x-show="card.zoneOperator !== 'advanced'" class="space-y-3">
+                    <!-- 3-level cascading selects -->
+                    <div class="grid grid-cols-3 gap-3">
+                      <!-- Country -->
+                      <div>
+                        <label class="block text-xs text-gray-400 mb-1">الدولة</label>
+                        <select x-model="card.selectedCountry" class="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-primary bg-white">
+                          <template x-for="c in countries" :key="c.id">
+                            <option :value="c.id" x-text="c.flag + ' ' + c.name"></option>
+                          </template>
+                        </select>
+                      </div>
+                      <!-- City -->
+                      <div>
+                        <label class="block text-xs text-gray-400 mb-1">المدينة</label>
+                        <select
+                          @change="addZoneCity(card, $event.target.value); $event.target.value = ''"
+                          class="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-primary bg-white"
+                        >
+                          <option value="">اختر مدينة…</option>
+                          <template x-for="city in saCities" :key="city">
+                            <option :value="city" x-text="city"></option>
+                          </template>
+                        </select>
+                      </div>
+                      <!-- District -->
+                      <div>
+                        <label class="block text-xs text-gray-400 mb-1">الحي</label>
+                        <select
+                          @change="addZoneDistrict(card, $event.target.value); $event.target.value = ''"
+                          class="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-primary bg-white"
+                          :disabled="!card.selectedCities || card.selectedCities.length === 0"
+                        >
+                          <option value="">اختر حيًا…</option>
+                          <template x-for="d in availableDistricts(card)" :key="d">
+                            <option :value="d" x-text="d"></option>
+                          </template>
+                        </select>
+                      </div>
+                    </div>
+                    <!-- Selected cities chips -->
+                    <div x-show="card.selectedCities && card.selectedCities.length > 0" class="space-y-1.5">
+                      <div class="text-xs text-gray-400">المدن المختارة:</div>
+                      <div class="flex flex-wrap gap-2">
+                        <template x-for="city in (card.selectedCities || [])" :key="city">
+                          <span class="flex items-center gap-1 bg-primary-100 text-primary text-sm px-3 py-1 rounded-full">
+                            <span x-text="city"></span>
+                            <button @click="removeZoneCity(card, city)" class="hover:text-danger transition text-base leading-none">×</button>
+                          </span>
+                        </template>
+                      </div>
+                    </div>
+                    <!-- Selected districts chips -->
+                    <div x-show="card.selectedDistricts && card.selectedDistricts.length > 0" class="space-y-1.5">
+                      <div class="text-xs text-gray-400">الأحياء المختارة:</div>
+                      <div class="flex flex-wrap gap-2">
+                        <template x-for="d in (card.selectedDistricts || [])" :key="d">
+                          <span class="flex items-center gap-1 bg-info-100 text-info text-sm px-3 py-1 rounded-full">
+                            <span x-text="d"></span>
+                            <button @click="removeZoneDistrict(card, d)" class="hover:text-danger transition text-base leading-none">×</button>
+                          </span>
+                        </template>
+                      </div>
+                    </div>
+                    <!-- Quick-select shortcuts -->
+                    <div class="flex flex-wrap gap-2 pt-1 border-t border-gray-100">
+                      <span class="text-xs text-gray-400 self-center">اختيار سريع:</span>
+                      <template x-for="shortcut in ['كل مدن المملكة','المنطقة الوسطى','المنطقة الغربية','المنطقة الشرقية','المنطقة الشمالية']" :key="shortcut">
+                        <button
+                          @click="card.selectedCities = []; showToast('تم تحديد: ' + shortcut)"
+                          class="px-3 py-1 border border-gray-200 rounded-full text-xs text-dark-200 hover:border-primary hover:text-primary transition"
+                          x-text="shortcut"
+                        ></button>
+                      </template>
+                    </div>
+                  </div>
+
+                  <!-- ADVANCED MODE: include + exclude sections -->
+                  <div x-show="card.zoneOperator === 'advanced'" class="space-y-4">
+                    <!-- Include section -->
+                    <div class="rounded-xl border border-success bg-success-100 p-3 space-y-2">
+                      <div class="text-xs font-semibold text-success flex items-center gap-1">✅ مناطق مشمولة (يشمل)</div>
+                      <div class="grid grid-cols-2 gap-2">
+                        <select class="border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-primary bg-white"
+                          @change="addAdvancedZone(card, $event.target.value, 'advancedInclude'); $event.target.value = ''">
+                          <option value="">اختر مدينة لإشمالها…</option>
+                          <template x-for="city in saCities" :key="city">
+                            <option :value="city" x-text="city"></option>
+                          </template>
+                        </select>
+                      </div>
+                      <div class="flex flex-wrap gap-2">
+                        <template x-for="city in (card.advancedInclude || [])" :key="city">
+                          <span class="flex items-center gap-1 bg-white text-success text-sm px-3 py-1 rounded-full border border-success">
+                            <span x-text="city"></span>
+                            <button @click="removeAdvancedZone(card, city, 'advancedInclude')" class="hover:text-danger text-base leading-none">×</button>
+                          </span>
+                        </template>
+                        <span x-show="!card.advancedInclude || card.advancedInclude.length === 0" class="text-xs text-gray-400 italic">لم تُضَف مناطق مشمولة بعد</span>
+                      </div>
+                    </div>
+                    <!-- Exclude section -->
+                    <div class="rounded-xl border border-danger bg-danger-100 p-3 space-y-2">
+                      <div class="text-xs font-semibold text-danger flex items-center gap-1">🚫 مناطق مستثناة (لا يشمل)</div>
+                      <div class="grid grid-cols-2 gap-2">
+                        <select class="border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-primary bg-white"
+                          @change="addAdvancedZone(card, $event.target.value, 'advancedExclude'); $event.target.value = ''">
+                          <option value="">اختر مدينة لاستثنائها…</option>
+                          <template x-for="city in saCities" :key="city">
+                            <option :value="city" x-text="city"></option>
+                          </template>
+                        </select>
+                      </div>
+                      <div class="flex flex-wrap gap-2">
+                        <template x-for="city in (card.advancedExclude || [])" :key="city">
+                          <span class="flex items-center gap-1 bg-white text-danger text-sm px-3 py-1 rounded-full border border-danger">
+                            <span x-text="city"></span>
+                            <button @click="removeAdvancedZone(card, city, 'advancedExclude')" class="hover:text-danger text-base leading-none">×</button>
+                          </span>
+                        </template>
+                        <span x-show="!card.advancedExclude || card.advancedExclude.length === 0" class="text-xs text-gray-400 italic">لم تُضَف مناطق مستثناة بعد</span>
+                      </div>
+                    </div>
+                  </div>
                 </div>
+
+                <!-- MAP MODE -->
+                <div x-show="card.zoneInputMode === 'map'" class="space-y-3">
+                  <div class="bg-gray-100 rounded-2xl flex flex-col items-center justify-center text-gray-400 text-sm gap-2 border-2 border-dashed border-gray-200" style="height:220px">
+                    <span class="text-3xl">🗺</span>
+                    <span class="font-medium text-gray-500">أداة رسم المضلعات (Polygon)</span>
+                    <span class="text-xs text-gray-400">انقر على الخريطة لتحديد نقاط المنطقة</span>
+                    <button class="mt-1 px-4 py-1.5 bg-primary text-white text-xs rounded-xl hover:bg-primary-700 transition">+ بدء الرسم</button>
+                  </div>
+                  <div class="flex flex-wrap gap-2">
+                    <span class="text-xs text-gray-400 self-center">مضلعات محفوظة:</span>
+                    <span class="bg-primary-100 text-primary text-xs px-3 py-1 rounded-full flex items-center gap-1">
+                      منطقة 1 — 6 نقاط
+                      <button class="hover:text-danger text-base leading-none">×</button>
+                    </span>
+                  </div>
+                </div>
+
+                <!-- Footer: carrier status + ops log -->
                 <div class="flex items-center justify-between border-t border-gray-100 pt-3 flex-wrap gap-2">
                   <div class="flex items-center gap-4 text-sm text-dark-200 flex-wrap">
                     <span class="font-medium">حالة شركة الشحن:</span>
