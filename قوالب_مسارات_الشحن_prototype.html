@@ -1,0 +1,761 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>قوالب مسارات الشحن — سلة</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet"/>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+  <style>
+    * { font-family: 'Cairo','Noto Kufi Arabic',system-ui,sans-serif; }
+    [x-cloak] { display:none !important; }
+    body { background:#F7F8FA; color:#1A1D23; }
+
+    /* Field highlight on mount */
+    @keyframes fieldHighlight {
+      0%   { background-color:#E5F5F0; }
+      100% { background-color:#FFFFFF; }
+    }
+    .field-just-filled { animation: fieldHighlight 1.4s ease-out; }
+
+    /* Confetti */
+    @keyframes confettiFall {
+      0%   { transform: translateY(-20px) rotate(0deg);   opacity:1; }
+      100% { transform: translateY(360px) rotate(720deg); opacity:0; }
+    }
+    .confetti {
+      position:absolute;
+      width:10px; height:10px;
+      border-radius:2px;
+      animation: confettiFall 2.4s ease-in forwards;
+      top:0;
+    }
+
+    /* Spinner */
+    @keyframes spin { from { transform:rotate(0deg);} to { transform:rotate(360deg);} }
+    .spinner {
+      display:inline-block;
+      width:14px; height:14px;
+      border:2px solid rgba(255,255,255,.4);
+      border-top-color:#fff;
+      border-radius:50%;
+      animation: spin 0.7s linear infinite;
+    }
+
+    /* Slide transition */
+    .slide-in { animation: slideIn 0.35s ease-out both; }
+    @keyframes slideIn {
+      from { opacity:0; transform: translateX(-20px); }
+      to   { opacity:1; transform: translateX(0); }
+    }
+    .fade-in { animation: fade 0.4s ease-out both; }
+    @keyframes fade { from{opacity:0;} to{opacity:1;} }
+
+    /* Card hover */
+    .tpl-card { transition: all 0.18s ease; }
+    .tpl-card:hover { transform: scale(1.012); box-shadow:0 10px 22px -10px rgba(0,74,87,.25); border-color:#007A8A; }
+
+    /* Scrollbar polish */
+    ::-webkit-scrollbar { width:6px; height:6px; }
+    ::-webkit-scrollbar-thumb { background:#C4CAD4; border-radius:4px; }
+  </style>
+</head>
+<body x-cloak x-data="templatesApp()">
+
+  <!-- ================================================================ -->
+  <!-- TOP NAV                                                           -->
+  <!-- ================================================================ -->
+  <nav class="fixed top-0 inset-x-0 h-14 bg-[#004A57] z-30 flex items-center justify-between px-6 text-white shadow">
+    <div class="flex items-center gap-6">
+      <button class="text-xl">≡</button>
+      <span class="font-bold text-lg tracking-tight">سلة</span>
+      <div class="flex items-center gap-5 text-sm mr-4">
+        <span class="opacity-75 hover:opacity-100 cursor-pointer">الطلبات</span>
+        <span class="opacity-75 hover:opacity-100 cursor-pointer">المنتجات</span>
+        <span class="font-semibold border-b-2 border-white pb-3.5 -mb-3 cursor-pointer">الشحن</span>
+        <span class="opacity-75 hover:opacity-100 cursor-pointer">التقارير</span>
+        <span class="opacity-75 hover:opacity-100 cursor-pointer">الإعدادات</span>
+      </div>
+    </div>
+    <div class="flex items-center gap-4">
+      <span class="text-lg cursor-pointer">🔔</span>
+      <div class="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center text-sm font-bold">م</div>
+    </div>
+  </nav>
+
+  <!-- ================================================================ -->
+  <!-- TOAST                                                             -->
+  <!-- ================================================================ -->
+  <div x-show="showToast"
+       x-transition:enter="transition ease-out duration-300"
+       x-transition:enter-start="opacity-0 translate-y-4"
+       x-transition:enter-end="opacity-100 translate-y-0"
+       x-transition:leave="transition ease-in duration-200"
+       x-transition:leave-start="opacity-100"
+       x-transition:leave-end="opacity-0"
+       :class="toastType === 'success' ? 'bg-[#1A1D23] text-white' : 'bg-[#FFF8EC] text-[#92530D] border border-[#FFB223]'"
+       class="fixed bottom-6 left-1/2 -translate-x-1/2 text-sm px-5 py-3 rounded-xl flex gap-2 items-center z-50 shadow-xl whitespace-nowrap font-semibold">
+    <span x-text="toastMessage"></span>
+  </div>
+
+  <!-- ================================================================ -->
+  <!-- SCREEN 0 — قائمة المسارات                                         -->
+  <!-- ================================================================ -->
+  <div x-show="screen === 'list'" class="pt-14">
+    <div class="max-w-5xl mx-auto p-6 fade-in">
+
+      <!-- Page header -->
+      <div class="flex items-center justify-between mb-2">
+        <div>
+          <div class="text-sm text-[#6B7280] mb-1 flex items-center gap-1">
+            <span class="hover:text-[#007A8A] cursor-pointer">الشحن</span>
+            <span>›</span>
+            <span class="text-[#1A1D23]">مسارات الشحن</span>
+          </div>
+          <h1 class="text-2xl font-bold text-[#1A1D23]">مسارات الشحن</h1>
+        </div>
+        <button @click="openGallery()"
+                class="bg-[#004A57] text-white rounded-lg px-5 py-2.5 text-sm font-semibold hover:opacity-90 transition flex items-center gap-2">
+          <span>+</span><span>مسار جديد</span>
+        </button>
+      </div>
+
+      <!-- Info banner -->
+      <div class="bg-[#FFF8EC] border-r-4 border-[#FFB223] rounded-xl px-4 py-3 text-sm flex items-center gap-2 mt-5 mb-6">
+        <span class="text-lg">⚡</span>
+        <span><strong class="text-[#92530D]">جديد:</strong> الآن يمكنك إنشاء مسار من قالب جاهز بضغطة — جرّب "+ مسار جديد"</span>
+        <button @click="openGallery()" class="text-[#007A8A] text-sm underline underline-offset-2 mr-auto font-semibold">جرّب الآن ←</button>
+      </div>
+
+      <!-- Routes table -->
+      <div class="bg-white rounded-2xl border border-[#EAECF0] shadow-sm overflow-hidden">
+        <table class="w-full text-sm">
+          <thead class="bg-[#F7F8FA] text-[#6B7280] text-xs">
+            <tr>
+              <th class="text-right py-3 px-5 font-semibold">الاسم</th>
+              <th class="text-right py-3 px-5 font-semibold">الناقل</th>
+              <th class="text-right py-3 px-5 font-semibold">الشروط</th>
+              <th class="text-right py-3 px-5 font-semibold">الطلبات</th>
+              <th class="text-right py-3 px-5 font-semibold">الحالة</th>
+              <th class="text-right py-3 px-5 font-semibold">إجراءات</th>
+            </tr>
+          </thead>
+          <tbody>
+            <template x-for="route in existingRoutes" :key="route.id">
+              <tr class="border-t border-[#EAECF0] hover:bg-[#F7F8FA] transition">
+                <td class="py-4 px-5 font-bold text-[#1A1D23]" x-text="route.name"></td>
+                <td class="py-4 px-5 text-[#6B7280]" x-text="route.carrier"></td>
+                <td class="py-4 px-5">
+                  <span class="bg-[#E5F5F0] text-[#007A8A] text-xs px-2.5 py-1 rounded-full font-semibold"
+                        x-text="route.conditions + ' شرط'"></span>
+                </td>
+                <td class="py-4 px-5 text-[#1A1D23] font-semibold" x-text="route.orders"></td>
+                <td class="py-4 px-5">
+                  <span :class="route.status === 'active' ? 'bg-[#E8F9F1] text-[#1FC773]' : 'bg-[#F7F8FA] text-[#6B7280]'"
+                        class="text-xs px-2.5 py-1 rounded-full font-semibold inline-flex items-center gap-1.5">
+                    <span class="w-1.5 h-1.5 rounded-full"
+                          :class="route.status === 'active' ? 'bg-[#1FC773]' : 'bg-[#C4CAD4]'"></span>
+                    <span x-text="route.status === 'active' ? 'نشط' : 'معطّل'"></span>
+                  </span>
+                </td>
+                <td class="py-4 px-5">
+                  <button class="text-[#007A8A] text-sm font-semibold hover:underline">تعديل</button>
+                  <button class="text-[#6B7280] mr-2 hover:text-[#1A1D23]">⋯</button>
+                </td>
+              </tr>
+            </template>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Empty state (hidden when routes exist; shown otherwise) -->
+      <template x-if="existingRoutes.length === 0">
+        <div class="text-center py-16">
+          <div class="w-30 h-30 mx-auto mb-5 rounded-full border-2 border-dashed border-[#C4CAD4] flex items-center justify-center text-4xl" style="width:120px;height:120px;">📦</div>
+          <h3 class="text-lg font-bold text-[#1A1D23] mb-1">لا يوجد مسارات بعد</h3>
+          <p class="text-sm text-[#6B7280] mb-5">أنشئ مسارك الأول واختر من قوالب جاهزة</p>
+          <button @click="openGallery()" class="bg-[#004A57] text-white rounded-lg px-6 py-3 text-sm font-semibold">+ إنشاء مسار جديد</button>
+        </div>
+      </template>
+
+    </div>
+  </div>
+
+  <!-- ================================================================ -->
+  <!-- SCREEN 1 — معرض القوالب                                           -->
+  <!-- ================================================================ -->
+  <div x-show="screen === 'gallery'" class="pt-14">
+    <div class="max-w-5xl mx-auto p-6 fade-in">
+
+      <!-- Back link -->
+      <button @click="screen = 'list'" class="text-[#007A8A] text-sm font-semibold mb-4 hover:underline">← رجوع</button>
+
+      <!-- Gallery header -->
+      <div class="mb-6">
+        <h1 class="text-2xl font-bold text-[#004A57] mb-1">اختر قالباً للبدء</h1>
+        <p class="text-sm text-[#6B7280]">القوالب تملأ الإعداد تلقائياً — يمكنك تعديل أي شيء بعد الاختيار</p>
+      </div>
+
+      <!-- AI Suggestion Banner -->
+      <div x-show="!aiSuggestionDismissed"
+           x-transition:enter="transition ease-out duration-300"
+           x-transition:enter-start="opacity-0 -translate-y-2"
+           x-transition:enter-end="opacity-100 translate-y-0"
+           class="bg-[#FFF8EC] border border-[#FFB223] rounded-2xl p-4 mb-6 flex items-start gap-3">
+        <span class="text-2xl flex-shrink-0">🤖</span>
+        <div class="flex-1">
+          <p class="text-sm text-[#1A1D23] mb-1">
+            بناءً على منتجاتك في متجرك، نقترح:
+            <strong class="text-[#92530D]">قالب الشحن بالوزن</strong>
+          </p>
+          <p class="text-xs text-[#6B7280] italic mb-3">"منتجاتك تتنوع في الوزن — هذا القالب يناسب معظم طلباتك"</p>
+          <div class="flex items-center gap-3">
+            <button @click="applyAISuggestion()"
+                    class="bg-[#FFB223] text-[#1A1D23] text-xs font-bold px-4 py-2 rounded-lg hover:opacity-90 transition">
+              تطبيق الاقتراح
+            </button>
+            <button @click="aiSuggestionDismissed = true"
+                    class="text-[#6B7280] text-xs font-semibold hover:text-[#1A1D23]">✕ إغلاق</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Templates Grid -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <template x-for="t in templates" :key="t.id">
+          <div @click="selectTemplate(t)"
+               class="tpl-card relative bg-white rounded-2xl border shadow-sm p-5 cursor-pointer flex flex-col"
+               :class="{
+                 'border-2 border-[#004A57] bg-[#E5F5F0]': selectedTemplate && selectedTemplate.id === t.id,
+                 'border-[#EAECF0]': !(selectedTemplate && selectedTemplate.id === t.id) && !(t.id === aiSuggestedId && !aiSuggestionDismissed),
+                 'border-2 border-[#FFB223] bg-[#FFFCF5] ring-2 ring-[#FFB223]/30': t.id === aiSuggestedId && !aiSuggestionDismissed && !(selectedTemplate && selectedTemplate.id === t.id),
+               }"
+               :style="t.isCustom ? 'border-style:dashed; background:#FAFBFC;' : ''">
+
+            <!-- Selected check -->
+            <div x-show="selectedTemplate && selectedTemplate.id === t.id"
+                 class="absolute top-3 left-3 w-7 h-7 rounded-full bg-[#004A57] text-white flex items-center justify-center font-bold text-sm">✓</div>
+
+            <!-- Badge -->
+            <template x-if="t.badge">
+              <span class="absolute top-3 right-3 text-xs font-bold px-2 py-0.5 rounded-full"
+                    :class="{
+                      'bg-[#E5F5F0] text-[#007A8A]': t.badge.color === 'teal',
+                      'bg-[#FFF8EC] text-[#92530D]': t.badge.color === 'warning',
+                      'bg-[#F3F0FF] text-[#7C3AED]': t.badge.color === 'purple',
+                    }"
+                    x-text="t.badge.text"></span>
+            </template>
+
+            <!-- Icon + name -->
+            <div :class="t.isCustom ? 'text-center my-4' : ''">
+              <div class="text-4xl mb-3" :class="t.isCustom ? '' : 'mt-1'" x-text="t.icon"></div>
+              <h3 class="text-base font-bold text-[#1A1D23] mb-1" x-text="t.name"></h3>
+              <p class="text-xs text-[#6B7280] leading-relaxed" x-text="t.description"></p>
+            </div>
+
+            <!-- Divider + chips -->
+            <template x-if="t.conditionChips && t.conditionChips.length > 0">
+              <div class="mt-4 pt-3 border-t border-[#EAECF0]">
+                <div class="flex flex-wrap gap-1.5 mb-2">
+                  <template x-for="chip in t.conditionChips" :key="chip">
+                    <span class="inline-flex items-center text-xs bg-[#E5F5F0] text-[#007A8A] rounded-full px-2.5 py-1 font-semibold" x-text="chip"></span>
+                  </template>
+                </div>
+                <!-- Complexity -->
+                <template x-if="t.complexity">
+                  <div class="flex items-center gap-1.5 text-xs text-[#6B7280] mt-2">
+                    <span class="w-2 h-2 rounded-full"
+                          :class="{
+                            'bg-[#1FC773]': t.complexity === 'بسيط',
+                            'bg-[#FFB223]': t.complexity === 'متوسط',
+                            'bg-[#FB3F3F]': t.complexity === 'متقدم',
+                          }"></span>
+                    <span x-text="t.complexity"></span>
+                  </div>
+                </template>
+              </div>
+            </template>
+
+            <!-- Button -->
+            <div class="mt-auto pt-4">
+              <button @click.stop="applyTemplate(t)"
+                      class="w-full text-sm font-semibold rounded-lg py-2.5 transition"
+                      :class="(selectedTemplate && selectedTemplate.id === t.id)
+                        ? 'bg-[#004A57] text-white hover:opacity-90'
+                        : 'border border-[#EAECF0] text-[#007A8A] hover:border-[#007A8A] bg-white'"
+                      x-text="(selectedTemplate && selectedTemplate.id === t.id) ? 'تطبيق ←' : (t.isCustom ? 'ابدأ من الصفر' : 'اختيار هذا القالب')"></button>
+            </div>
+
+          </div>
+        </template>
+      </div>
+
+      <!-- Footer -->
+      <div class="text-center mt-8 text-sm text-[#6B7280] flex items-center justify-center gap-3 flex-wrap">
+        <span>أو يمكنك</span>
+        <button @click="applyTemplate(templates.find(t => t.isCustom))"
+                class="text-[#007A8A] underline underline-offset-2 font-semibold">ابدأ من الصفر بدون قالب</button>
+        <span class="opacity-50">·</span>
+        <button class="text-[#007A8A] underline underline-offset-2">غير متأكد؟ اقرأ عن المسارات</button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ================================================================ -->
+  <!-- SCREEN 2 — منشئ المسار                                             -->
+  <!-- ================================================================ -->
+  <div x-show="screen === 'builder'" class="pt-14 pb-24">
+    <div class="max-w-5xl mx-auto p-6 slide-in">
+
+      <!-- Builder header -->
+      <div class="flex items-center justify-between mb-3">
+        <div class="flex items-center gap-4">
+          <button @click="screen = 'gallery'" class="text-[#007A8A] text-sm font-semibold hover:underline">← معرض القوالب</button>
+        </div>
+        <button @click="saveRoute()" :disabled="saving"
+                class="bg-[#004A57] text-white rounded-lg px-5 py-2.5 text-sm font-semibold hover:opacity-90 transition flex items-center gap-2 disabled:opacity-70">
+          <span x-show="saving" class="spinner"></span>
+          <span x-text="saving ? 'جاري الحفظ...' : 'حفظ المسار'"></span>
+        </button>
+      </div>
+
+      <h1 class="text-2xl font-bold text-[#1A1D23] mb-3">إنشاء مسار جديد</h1>
+
+      <!-- Template badge -->
+      <div x-show="appliedTemplateName && appliedTemplateName !== 'مخصص — ابدأ من الصفر'"
+           class="bg-[#E5F5F0] text-[#007A8A] text-sm rounded-xl px-4 py-2 inline-flex items-center gap-2 mb-5">
+        <span>📋</span>
+        <span>تم تطبيق قالب: <strong x-text="appliedTemplateName"></strong></span>
+        <span class="opacity-50">·</span>
+        <button @click="screen = 'gallery'" class="underline underline-offset-2 font-semibold">تغيير القالب</button>
+      </div>
+
+      <!-- Form grid -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
+
+        <!-- LEFT (wider) — route info + conditions -->
+        <div class="lg:col-span-2 space-y-5">
+
+          <!-- Route info card -->
+          <div class="bg-white rounded-2xl border border-[#EAECF0] shadow-sm p-5">
+            <h3 class="text-lg font-bold text-[#004A57] mb-4">معلومات المسار</h3>
+            <div class="space-y-4">
+              <div>
+                <label class="text-sm font-semibold text-[#1A1D23] mb-1.5 block">اسم المسار <span class="text-[#FB3F3F]">*</span></label>
+                <input type="text" x-model="routeName"
+                       :class="fieldsHighlighted ? 'field-just-filled' : ''"
+                       class="w-full border border-[#EAECF0] rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:border-[#007A8A]"
+                       placeholder="مثال: شحن مجاني"/>
+              </div>
+              <div>
+                <label class="text-sm font-semibold text-[#1A1D23] mb-1.5 block">وصف المسار (اختياري)</label>
+                <textarea rows="2"
+                          class="w-full border border-[#EAECF0] rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:border-[#007A8A] resize-none"
+                          placeholder="اشرح متى يطبَّق هذا المسار..."></textarea>
+              </div>
+            </div>
+          </div>
+
+          <!-- Conditions card -->
+          <div class="bg-white rounded-2xl border border-[#EAECF0] shadow-sm p-5">
+            <h3 class="text-lg font-bold text-[#004A57] mb-4">الشروط</h3>
+
+            <!-- Free shipping callout -->
+            <template x-if="routeConditions.length === 0 && appliedTemplateName === 'شحن مجاني'">
+              <div class="bg-[#E5F5F0] border border-[#007A8A]/20 rounded-xl px-4 py-3 text-sm text-[#007A8A] flex items-start gap-2"
+                   :class="fieldsHighlighted ? 'field-just-filled' : ''">
+                <span>ℹ️</span>
+                <span>هذا المسار بدون شروط — سيطبَّق على جميع الطلبات تلقائياً</span>
+              </div>
+            </template>
+
+            <!-- Generic empty -->
+            <template x-if="routeConditions.length === 0 && appliedTemplateName !== 'شحن مجاني'">
+              <div class="text-center py-8 border-2 border-dashed border-[#EAECF0] rounded-xl text-sm text-[#6B7280]">
+                لم تُضَف شروط بعد — يمكنك إضافة شروط أو ترك المسار بدون شروط ليطبَّق على كل الطلبات
+              </div>
+            </template>
+
+            <!-- Weight condition -->
+            <template x-if="routeConditions.includes('weight')">
+              <div class="border border-[#EAECF0] rounded-xl p-4" :class="fieldsHighlighted ? 'field-just-filled' : ''">
+                <div class="flex items-center justify-between mb-3">
+                  <span class="font-semibold text-[#1A1D23] flex items-center gap-2">
+                    <span>⚖️</span><span>شرط الوزن</span>
+                  </span>
+                  <button @click="routeConditions = routeConditions.filter(c => c !== 'weight')"
+                          class="text-[#FB3F3F] text-xs font-semibold hover:underline">حذف ✕</button>
+                </div>
+                <div class="flex items-center gap-2 text-sm">
+                  <span class="text-[#6B7280]">الوزن بين</span>
+                  <input type="number" value="0" class="w-20 border border-[#EAECF0] rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-[#007A8A]"/>
+                  <span class="text-[#6B7280]">كيلو و</span>
+                  <input type="number" value="5" class="w-20 border border-[#EAECF0] rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-[#007A8A]"/>
+                  <span class="text-[#6B7280]">كيلو</span>
+                </div>
+              </div>
+            </template>
+
+            <!-- Region condition -->
+            <template x-if="routeConditions.includes('region')">
+              <div class="border border-[#EAECF0] rounded-xl p-4" :class="fieldsHighlighted ? 'field-just-filled' : ''">
+                <div class="flex items-center justify-between mb-3">
+                  <span class="font-semibold text-[#1A1D23] flex items-center gap-2">
+                    <span>📍</span><span>شرط المنطقة</span>
+                  </span>
+                  <button @click="routeConditions = routeConditions.filter(c => c !== 'region')"
+                          class="text-[#FB3F3F] text-xs font-semibold hover:underline">حذف ✕</button>
+                </div>
+                <select class="w-full border border-[#EAECF0] rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:border-[#007A8A] bg-white">
+                  <option>اختر المدن...</option>
+                  <option>الرياض</option>
+                  <option>جدة</option>
+                  <option>الدمام</option>
+                  <option>مكة المكرمة</option>
+                </select>
+              </div>
+            </template>
+
+            <!-- Payment condition -->
+            <template x-if="routeConditions.includes('payment')">
+              <div class="border border-[#EAECF0] rounded-xl p-4" :class="fieldsHighlighted ? 'field-just-filled' : ''">
+                <div class="flex items-center justify-between mb-3">
+                  <span class="font-semibold text-[#1A1D23] flex items-center gap-2">
+                    <span>💵</span><span>شرط طريقة الدفع</span>
+                  </span>
+                  <button @click="routeConditions = routeConditions.filter(c => c !== 'payment')"
+                          class="text-[#FB3F3F] text-xs font-semibold hover:underline">حذف ✕</button>
+                </div>
+                <select class="w-full border border-[#EAECF0] rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:border-[#007A8A] bg-white">
+                  <option>الدفع عند الاستلام (COD)</option>
+                  <option>الدفع الإلكتروني</option>
+                  <option>التحويل البنكي</option>
+                </select>
+              </div>
+            </template>
+
+            <!-- Add another condition -->
+            <button class="mt-3 text-sm text-[#007A8A] font-semibold hover:underline">+ إضافة شرط آخر</button>
+          </div>
+
+          <!-- Helper info -->
+          <div class="bg-[#F7F8FA] rounded-xl border border-[#EAECF0] p-4 text-sm">
+            <p class="font-bold text-[#1A1D23] mb-1">💡 كيف يعمل هذا القالب؟</p>
+            <p class="text-[#6B7280] leading-relaxed" x-text="helperText()"></p>
+          </div>
+
+        </div>
+
+        <!-- RIGHT (narrower) — shipping settings -->
+        <div class="lg:col-span-1 space-y-5">
+          <div class="bg-white rounded-2xl border border-[#EAECF0] shadow-sm p-5">
+            <h3 class="text-lg font-bold text-[#004A57] mb-4">إعدادات الشحن</h3>
+
+            <!-- Price -->
+            <div class="mb-4">
+              <label class="text-sm font-semibold text-[#1A1D23] mb-1.5 block">سعر الشحن <span class="text-[#FB3F3F]">*</span></label>
+              <div class="relative">
+                <input type="number" x-model="routePrice"
+                       :class="fieldsHighlighted ? 'field-just-filled' : ''"
+                       class="w-full border border-[#EAECF0] rounded-lg pl-12 pr-4 py-2.5 text-sm focus:outline-none focus:border-[#007A8A]" placeholder="0"/>
+                <span class="absolute left-3 top-2.5 text-sm text-[#6B7280]">ريال</span>
+              </div>
+              <p x-show="routePrice === '0'" class="text-xs text-[#1FC773] font-semibold mt-1">✓ مجاني</p>
+            </div>
+
+            <!-- Carrier -->
+            <div class="mb-4">
+              <label class="text-sm font-semibold text-[#1A1D23] mb-1.5 flex items-center justify-between">
+                <span>الناقل <span :class="!routeCarrier ? 'text-[#FFB223]' : 'text-[#FB3F3F]'">*</span></span>
+                <span x-show="!routeCarrier" class="text-xs text-[#92530D] font-bold">⚠ مطلوب</span>
+              </label>
+              <select x-model="routeCarrier"
+                      class="w-full rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:border-[#007A8A] border bg-white"
+                      :class="!routeCarrier ? 'border-[#FFB223] bg-[#FFF8EC]' : 'border-[#EAECF0]'">
+                <option value="">اختر ناقلاً...</option>
+                <option value="aramex">أرامكس</option>
+                <option value="smsa">SMSA</option>
+                <option value="sbl">سبل</option>
+                <option value="express">إكسبريس (24 ساعة)</option>
+              </select>
+              <p x-show="!routeCarrier" class="text-xs text-[#92530D] mt-1">هذا الحقل مطلوب</p>
+            </div>
+
+            <!-- Default -->
+            <div class="border-t border-[#EAECF0] pt-4">
+              <label class="flex items-center gap-2 cursor-pointer">
+                <input type="checkbox" x-model="isDefault" class="w-4 h-4 accent-[#004A57]"/>
+                <span class="text-sm text-[#1A1D23]">تفعيل كمسار افتراضي</span>
+              </label>
+              <p class="text-xs text-[#6B7280] mt-1 mr-6">يطبَّق إذا لم يتطابق أي مسار آخر</p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Sticky action bar -->
+    <div class="fixed bottom-0 inset-x-0 bg-white border-t border-[#EAECF0] py-4 px-6 z-20">
+      <div class="max-w-5xl mx-auto flex items-center justify-between">
+        <button @click="screen = 'gallery'"
+                class="border border-[#EAECF0] text-[#1A1D23] rounded-lg px-5 py-2.5 text-sm font-semibold hover:bg-[#F7F8FA] transition">
+          ← تغيير القالب
+        </button>
+        <div class="flex items-center gap-3">
+          <button class="text-[#007A8A] text-sm font-semibold hover:underline">معاينة</button>
+          <button @click="saveRoute()" :disabled="saving"
+                  class="bg-[#004A57] text-white rounded-lg px-6 py-2.5 text-sm font-semibold hover:opacity-90 transition flex items-center gap-2 disabled:opacity-70">
+            <span x-show="saving" class="spinner"></span>
+            <span x-text="saving ? 'جاري الحفظ...' : 'حفظ المسار  →'"></span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================================================================ -->
+  <!-- SCREEN 3 — نجاح                                                   -->
+  <!-- ================================================================ -->
+  <div x-show="screen === 'success'" class="pt-14 min-h-screen flex items-center justify-center p-6 fade-in relative overflow-hidden">
+
+    <!-- Confetti -->
+    <template x-for="i in 12" :key="i">
+      <span class="confetti"
+            :style="`left:${5 + i * 7.5}%; background:${['#FFB223','#1FC773','#007A8A','#7C3AED','#FB3F3F'][i % 5]}; animation-delay:${i * 0.12}s;`"></span>
+    </template>
+
+    <div class="bg-white rounded-3xl shadow-xl p-10 mx-auto max-w-lg w-full relative z-10 fade-in">
+      <div class="text-center mb-6">
+        <div class="text-6xl mb-3">🎉</div>
+        <h2 class="text-2xl font-bold text-[#1A1D23] mb-2">مسارك جاهز للعمل!</h2>
+        <p class="text-sm text-[#6B7280]">
+          تم إنشاء مسار "<strong class="text-[#004A57]" x-text="createdRoute && createdRoute.name"></strong>" بنجاح
+        </p>
+      </div>
+
+      <!-- Summary card -->
+      <div class="bg-[#E5F5F0] rounded-2xl p-5 text-sm space-y-3 mb-5">
+        <div class="flex items-start gap-3" x-show="createdRoute && createdRoute.templateName && createdRoute.templateName !== 'مخصص — ابدأ من الصفر'">
+          <span class="text-base">📋</span>
+          <div>
+            <span class="text-[#6B7280]">من قالب:</span>
+            <strong class="text-[#1A1D23] mr-2" x-text="createdRoute && createdRoute.templateName"></strong>
+          </div>
+        </div>
+        <div class="flex items-start gap-3">
+          <span class="text-base">💰</span>
+          <div>
+            <span class="text-[#6B7280]">سعر الشحن:</span>
+            <strong class="text-[#1A1D23] mr-2"
+                    x-text="createdRoute && (createdRoute.price === '0' ? '0 ريال (مجاني)' : (createdRoute.price + ' ريال'))"></strong>
+          </div>
+        </div>
+        <div class="flex items-start gap-3">
+          <span class="text-base">📦</span>
+          <div>
+            <span class="text-[#6B7280]">الناقل:</span>
+            <strong class="text-[#1A1D23] mr-2" x-text="carrierLabel(createdRoute && createdRoute.carrier)"></strong>
+          </div>
+        </div>
+        <div class="flex items-start gap-3">
+          <span class="text-base">🔄</span>
+          <div>
+            <span class="text-[#6B7280]">الشروط:</span>
+            <strong class="text-[#1A1D23] mr-2"
+                    x-text="createdRoute && createdRoute.conditions.length === 0 ? 'بدون شروط' : (createdRoute.conditions.length + ' شرط')"></strong>
+          </div>
+        </div>
+      </div>
+
+      <!-- Helper info -->
+      <div class="bg-[#FFF8EC] border border-[#FFB223]/30 rounded-xl p-4 text-sm mb-6">
+        <p class="font-bold text-[#92530D] mb-1">ℹ️ متى يطبَّق هذا المسار؟</p>
+        <p class="text-[#1A1D23] leading-relaxed">سيظهر هذا المسار في صفحة الدفع لجميع الطلبات المطابقة تلقائياً.</p>
+      </div>
+
+      <!-- Actions -->
+      <div class="flex items-center gap-3">
+        <button @click="backToList()"
+                class="flex-1 bg-[#004A57] text-white rounded-lg py-3 text-sm font-semibold hover:opacity-90 transition">
+          عرض المسار
+        </button>
+        <button @click="openGallery()"
+                class="flex-1 border border-[#EAECF0] text-[#1A1D23] rounded-lg py-3 text-sm font-semibold hover:bg-[#F7F8FA] transition">
+          + إنشاء مسار آخر
+        </button>
+      </div>
+    </div>
+  </div>
+
+<script>
+function templatesApp() {
+  return {
+    screen: 'list',
+
+    selectedTemplate: null,
+    hoveredTemplate: null,
+    aiSuggestionDismissed: false,
+    aiSuggestedId: 'weight-based',
+
+    routeName: '',
+    routePrice: '',
+    routeCarrier: '',
+    routeConditions: [],
+    appliedTemplateName: '',
+    isDefault: false,
+    fieldsHighlighted: false,
+    saving: false,
+
+    showToast: false,
+    toastMessage: '',
+    toastType: 'success',
+
+    createdRoute: null,
+
+    templates: [
+      {
+        id: 'free-shipping', icon: '🚚', name: 'شحن مجاني',
+        description: 'ينطبق على جميع الطلبات بدون شروط — مثالي إذا كنت تتحمل تكلفة الشحن',
+        badge: { text: 'الأكثر شيوعاً', color: 'teal' },
+        complexity: 'بسيط',
+        conditionChips: ['✅ بدون شروط', '✅ ينطبق على الكل'],
+        prefill: { name:'شحن مجاني', price:'0', conditions:[], carrier:'', isDefault:false },
+      },
+      {
+        id: 'local-city', icon: '📍', name: 'شحن محلي (حسب المدينة)',
+        description: 'يحدد مناطق التوصيل بالمدن والأحياء — مثالي للمنتجات الطازجة أو المتاجر المحلية',
+        badge: null,
+        complexity: 'متوسط',
+        conditionChips: ['📍 المنطقة = مدن محددة', '🚚 ناقل محلي'],
+        prefill: { name:'شحن محلي', price:'15', conditions:['region'], carrier:'', isDefault:false },
+      },
+      {
+        id: 'weight-based', icon: '⚖️', name: 'شحن بالوزن',
+        description: 'يحسب سعر الشحن بناءً على وزن الطلب — يدعم شرائح وزن متعددة',
+        badge: { text: 'مقترح لك', color: 'warning' },
+        complexity: 'متوسط',
+        conditionChips: ['⚖️ الوزن 0–5 كيلو', '💰 السعر: 20 ريال'],
+        prefill: { name:'شحن بالوزن', price:'20', conditions:['weight'], carrier:'', isDefault:false },
+      },
+      {
+        id: 'cod', icon: '💵', name: 'الدفع عند الاستلام',
+        description: 'يفعّل الشحن فقط عند اختيار الدفع عند الاستلام — يساعد على تقليل مشاكل المدفوعات',
+        badge: null,
+        complexity: 'متوسط',
+        conditionChips: ['💵 طريقة الدفع = COD', '📦 شحن قياسي'],
+        prefill: { name:'شحن الدفع عند الاستلام', price:'25', conditions:['payment'], carrier:'', isDefault:false },
+      },
+      {
+        id: 'express', icon: '⚡', name: 'شحن سريع (Express)',
+        description: 'ناقل إكسبريس بتوصيل خلال 24 ساعة — يظهر كخيار مميز في صفحة الدفع',
+        badge: { text: 'جديد', color: 'purple' },
+        complexity: 'متقدم',
+        conditionChips: ['⚡ ناقل إكسبريس', '⏱️ توصيل 24 ساعة', '💰 السعر: 45 ريال'],
+        prefill: { name:'شحن سريع', price:'45', conditions:[], carrier:'express', isDefault:false },
+      },
+      {
+        id: 'custom', icon: '✏️', name: 'مخصص — ابدأ من الصفر',
+        description: 'للتجار المتقدمين الذين يعرفون بالضبط ما يحتاجونه',
+        badge: null,
+        complexity: null,
+        conditionChips: [],
+        isCustom: true,
+        prefill: { name:'', price:'', conditions:[], carrier:'', isDefault:false },
+      },
+    ],
+
+    existingRoutes: [
+      { id:1, name:'مسار الرياض', status:'active', carrier:'أرامكس', conditions:2, orders:134 },
+      { id:2, name:'شحن COD', status:'active', carrier:'SMSA', conditions:1, orders:89 },
+      { id:3, name:'مسار المناطق البعيدة', status:'inactive', carrier:'سبل', conditions:3, orders:12 },
+    ],
+
+    openGallery() {
+      this.screen = 'gallery';
+      this.selectedTemplate = null;
+      this.createdRoute = null;
+    },
+
+    selectTemplate(t) { this.selectedTemplate = t; },
+
+    applyTemplate(t) {
+      if (!t) return;
+      this.routeName       = t.prefill.name;
+      this.routePrice      = t.prefill.price;
+      this.routeCarrier    = t.prefill.carrier;
+      this.routeConditions = [...t.prefill.conditions];
+      this.isDefault       = t.prefill.isDefault;
+      this.appliedTemplateName = t.name;
+      this.screen = 'builder';
+      this.fieldsHighlighted = true;
+      setTimeout(() => { this.fieldsHighlighted = false; }, 1500);
+      this.showToastMsg(
+        t.isCustom ? '✏️ منشئ مسار جديد — ابدأ من الصفر' : '✅ تم تطبيق قالب: ' + t.name,
+        t.isCustom ? 'warning' : 'success'
+      );
+    },
+
+    applyAISuggestion() {
+      const t = this.templates.find(x => x.id === this.aiSuggestedId);
+      if (t) this.applyTemplate(t);
+    },
+
+    saveRoute() {
+      this.saving = true;
+      setTimeout(() => {
+        this.saving = false;
+        this.createdRoute = {
+          name: this.routeName || 'مسار جديد',
+          price: this.routePrice || '0',
+          carrier: this.routeCarrier,
+          conditions: this.routeConditions,
+          templateName: this.appliedTemplateName,
+        };
+        this.screen = 'success';
+      }, 800);
+    },
+
+    backToList() {
+      this.screen = 'list';
+      this.selectedTemplate = null;
+      this.routeName = '';
+      this.routePrice = '';
+      this.routeCarrier = '';
+      this.routeConditions = [];
+      this.appliedTemplateName = '';
+      this.isDefault = false;
+    },
+
+    showToastMsg(msg, type = 'success') {
+      this.toastMessage = msg;
+      this.toastType = type;
+      this.showToast = true;
+      clearTimeout(this._toastTimer);
+      this._toastTimer = setTimeout(() => { this.showToast = false; }, 3500);
+    },
+
+    helperText() {
+      const map = {
+        'شحن مجاني': 'شحن مجاني ينطبق على جميع الطلبات بدون استثناء، بغض النظر عن الوزن أو المنطقة.',
+        'شحن محلي (حسب المدينة)': 'يفعَّل هذا المسار فقط للطلبات الواردة من مدن محددة — مثالي للمنتجات الطازجة.',
+        'شحن بالوزن': 'يحسب السعر بناءً على شرائح وزن محددة — أضف شرائح مختلفة حسب الحاجة.',
+        'الدفع عند الاستلام': 'يفعَّل المسار فقط عند اختيار الدفع عند الاستلام في صفحة الدفع.',
+        'شحن سريع (Express)': 'ناقل إكسبريس بتوصيل سريع خلال 24 ساعة — يظهر كخيار مميز.',
+        'مخصص — ابدأ من الصفر': 'ابنِ المسار من الصفر بكامل التحكم في الشروط والإعدادات.',
+      };
+      return map[this.appliedTemplateName] || 'اختر قالباً لعرض شرح تفصيلي هنا.';
+    },
+
+    carrierLabel(c) {
+      const m = { aramex:'أرامكس', smsa:'SMSA', sbl:'سبل', express:'إكسبريس (24 ساعة)' };
+      return m[c] || 'لم يُحدَّد';
+    },
+  };
+}
+</script>
+</body>
+</html>
