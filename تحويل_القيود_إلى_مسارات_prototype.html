@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="ar">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>تحويل القيود إلى مسارات — سلة</title>
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&display=swap" rel="stylesheet"/>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { sans: ['Tajawal','Arial','sans-serif'] },
+          colors: {
+            primary: '#004A57',
+            teal:    '#007A8A',
+            'teal-light': '#E5F5F0',
+            success: '#1FC773',
+            danger:  '#FB3F3F',
+            warning: '#FFB223',
+            amber:   '#FFF3CD',
+          },
+          borderRadius: { '2xl': '16px', '3xl': '20px' },
+        },
+      },
+    };
+  </script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/alpinejs@3/dist/cdn.min.js" defer></script>
+  <style>
+    body { font-family:'Tajawal',Arial,sans-serif; background:#F8F8F8; color:#1A1A1A; font-size:14px; }
+    [x-cloak] { display:none !important; }
+    select { direction:rtl; }
+
+    /* Spinning gear */
+    @keyframes spin { from { transform:rotate(0deg); } to { transform:rotate(360deg); } }
+    .spin { display:inline-block; animation:spin 1.2s linear infinite; }
+
+    /* Success emoji pop */
+    @keyframes popIn {
+      0%   { transform:scale(0.3); opacity:0; }
+      70%  { transform:scale(1.25); opacity:1; }
+      100% { transform:scale(1); opacity:1; }
+    }
+    .pop-in { animation:popIn 0.6s cubic-bezier(.36,.07,.19,.97) both; }
+
+    /* Slide up */
+    @keyframes slideUp {
+      from { opacity:0; transform:translateY(24px); }
+      to   { opacity:1; transform:translateY(0); }
+    }
+    .slide-up { animation:slideUp 0.4s ease-out both; }
+
+    /* Progress bar shimmer */
+    @keyframes shimmer {
+      0%   { background-position:200% center; }
+      100% { background-position:-200% center; }
+    }
+    .progress-fill {
+      background: linear-gradient(90deg, #004A57 0%, #007A8A 40%, #1FC773 60%, #004A57 100%);
+      background-size:200% auto;
+      animation: shimmer 1.5s linear infinite;
+      transition: width 0.2s ease;
+    }
+
+    /* Card base */
+    .card {
+      background:#fff;
+      border-radius:16px;
+      box-shadow:0 1px 4px rgba(0,0,0,.08);
+    }
+
+    /* Hover row */
+    .map-row-normal:hover { background:#F0F8FF; }
+    .map-row-medium:hover { background:#FFFDE0; }
+    .map-row-low:hover    { background:#FFF0F0; }
+
+    /* Scrollbar */
+    .modal-body::-webkit-scrollbar { width:4px; }
+    .modal-body::-webkit-scrollbar-track { background:transparent; }
+    .modal-body::-webkit-scrollbar-thumb { background:#ccc; border-radius:2px; }
+  </style>
+</head>
+<body x-data="wizardApp()" x-cloak>
+
+  <!-- ================================================================ -->
+  <!-- TOP NAV                                                           -->
+  <!-- ================================================================ -->
+  <div style="background:#004A57;color:#fff;padding:13px 24px;display:flex;align-items:center;gap:12px;">
+    <span style="font-size:19px;font-weight:700;letter-spacing:-.5px;">سلة</span>
+    <span style="opacity:.4;font-size:18px;">|</span>
+    <span style="opacity:.8;font-size:14px;">الشحن</span>
+    <span style="opacity:.4;">›</span>
+    <span style="font-size:14px;font-weight:600;">مسارات الشحن</span>
+  </div>
+
+  <!-- ================================================================ -->
+  <!-- MAIN CONTENT AREA                                                 -->
+  <!-- ================================================================ -->
+  <main class="max-w-3xl mx-auto px-4 py-7">
+
+    <!-- ── PAGE HEADER ── -->
+    <div class="flex items-center justify-between mb-5">
+      <div class="flex items-center gap-3">
+        <button class="text-sm text-gray-500 hover:text-primary transition flex items-center gap-1">
+          <span>←</span><span>رجوع</span>
+        </button>
+        <h1 class="text-xl font-bold" style="color:#1A1A1A;">مسارات الشحن</h1>
+      </div>
+      <button class="text-sm font-bold text-white px-5 py-2.5 rounded-xl hover:opacity-90 transition"
+              style="background:#004A57;">
+        + إضافة مسار
+      </button>
+    </div>
+
+    <!-- ================================================================ -->
+    <!-- SCREEN: CONVERTING (loading state)                               -->
+    <!-- ================================================================ -->
+    <div x-show="wizardStep==='converting'" class="slide-up">
+      <div class="card p-16 text-center space-y-6">
+        <div class="text-6xl spin select-none">⚙️</div>
+        <div>
+          <p class="text-lg font-bold mb-1" style="color:#004A57;">جاري إنشاء مساراتك من قيودك القديمة...</p>
+          <p class="text-sm" style="color:#666;" x-text="conversionStep"></p>
+        </div>
+        <!-- Progress bar -->
+        <div class="w-full bg-gray-100 rounded-full h-3 overflow-hidden max-w-sm mx-auto">
+          <div class="progress-fill h-full rounded-full" :style="'width:' + conversionProgress + '%'"></div>
+        </div>
+        <p class="text-xs" style="color:#999;" x-text="Math.round(conversionProgress) + '%'"></p>
+      </div>
+    </div>
+
+    <!-- ================================================================ -->
+    <!-- SCREEN: SUCCESS                                                  -->
+    <!-- ================================================================ -->
+    <div x-show="wizardStep==='success'" class="space-y-4 slide-up">
+
+      <!-- Success card -->
+      <div class="card p-12 text-center"
+           style="background:linear-gradient(135deg,#E5F5F0,#ffffff);border:1.5px solid #1FC773;">
+        <div class="text-6xl mb-4 pop-in select-none">🎉</div>
+        <h2 class="text-3xl font-black mb-2" style="color:#004A57;">
+          تم تحويل <span x-text="createdRoutes.length"></span> مسارات بنجاح!
+        </h2>
+        <p class="text-base mb-7" style="color:#666;">
+          تمت إضافة مساراتك تلقائياً وهي جاهزة الآن للتطبيق على طلباتك.
+        </p>
+        <button @click="wizardStep='entry'; showBanner=false"
+                class="text-white font-bold px-8 py-3 rounded-xl text-sm hover:opacity-90 transition"
+                style="background:#004A57;">
+          عرض جميع المسارات
+        </button>
+      </div>
+
+      <!-- Created routes list -->
+      <div class="card overflow-hidden">
+        <div class="px-5 py-4 border-b border-gray-100">
+          <h3 class="font-bold text-sm" style="color:#007A8A;">المسارات المُنشأة</h3>
+        </div>
+        <template x-for="(route, i) in createdRoutes" :key="route.id">
+          <div>
+            <div class="px-5 py-4 flex items-start justify-between gap-4"
+                 :class="route.needsReview ? 'border-r-4 border-warning' : ''"
+                 :style="route.needsReview ? 'background:#FFFBF0;' : ''">
+              <div class="flex items-start gap-3 flex-1 min-w-0">
+                <span class="text-lg mt-0.5 flex-shrink-0" x-text="route.needsReview ? '🟡' : '✅'"></span>
+                <div class="min-w-0">
+                  <p class="font-bold text-sm mb-1 truncate" x-text="route.name" style="color:#1A1A1A;"></p>
+                  <div class="flex flex-wrap gap-1.5">
+                    <template x-for="cond in route.conditions" :key="cond">
+                      <span class="text-xs px-2 py-0.5 rounded-full" style="background:#F0F0F0;color:#666;" x-text="'• ' + cond"></span>
+                    </template>
+                  </div>
+                  <p x-show="route.needsReview" class="text-xs mt-2 font-medium" style="color:#FFB223;">
+                    ⚠️ هذا المسار يحتاج مراجعة بسيطة — اضغط للتعديل
+                  </p>
+                </div>
+              </div>
+              <div class="flex items-center gap-2 flex-shrink-0">
+                <span class="text-xs px-2 py-0.5 rounded-full font-semibold" style="background:#E5F5F0;color:#1FC773;">● نشط</span>
+                <button class="text-xs font-bold px-3 py-1.5 rounded-lg transition"
+                        :style="route.needsReview ? 'background:#FFF3DA;color:#B47900;border:1.5px solid #FFB223;' : 'color:#004A57;border:1.5px solid #004A57;background:transparent;'"
+                        x-text="route.needsReview ? 'راجع وعدّل' : 'عرض'"></button>
+              </div>
+            </div>
+            <div x-show="i < createdRoutes.length - 1" class="h-px mx-5" style="background:#F0F0F0;"></div>
+          </div>
+        </template>
+      </div>
+
+      <!-- Manual items callout -->
+      <template x-for="q in qioudData.filter(x => x.confidence==='low')" :key="q.id">
+        <div class="rounded-2xl px-5 py-4 flex items-start gap-3"
+             style="background:#FFF3CD;border:1.5px solid #FFB223;">
+          <span class="text-xl flex-shrink-0 mt-0.5">⚠️</span>
+          <div class="flex-1">
+            <p class="font-bold text-sm mb-0.5" style="color:#1A1A1A;">قيد 1 يحتاج إعداداً يدوياً</p>
+            <p class="text-sm mb-2" style="color:#666;">
+              "<span x-text="q.name"></span>" لم يتم تحويله تلقائياً
+            </p>
+            <p class="text-xs mb-3" style="color:#888;" x-text="q.warning"></p>
+            <button class="text-xs font-bold" style="color:#004A57;">إعداد يدوياً ←</button>
+          </div>
+        </div>
+      </template>
+
+    </div>
+
+    <!-- ================================================================ -->
+    <!-- SCREEN: ENTRY — routes list page                                 -->
+    <!-- ================================================================ -->
+    <div x-show="wizardStep==='entry'" class="space-y-4">
+
+      <!-- ── MIGRATION BANNER ── -->
+      <div x-show="showBanner"
+           x-transition:enter="transition ease-out duration-300"
+           x-transition:enter-start="opacity-0 -translate-y-3"
+           x-transition:enter-end="opacity-100 translate-y-0"
+           x-transition:leave="transition ease-in duration-200"
+           x-transition:leave-start="opacity-100"
+           x-transition:leave-end="opacity-0"
+           class="rounded-2xl px-5 py-4 relative"
+           style="background:#FFF3CD;border-right:4px solid #FFB223;border:1px solid #FFE082;border-right:4px solid #FFB223;">
+        <!-- Close X -->
+        <button @click="showBanner=false"
+                class="absolute top-3 left-4 text-gray-400 hover:text-gray-700 text-lg leading-none transition">✕</button>
+        <div class="flex items-start gap-4">
+          <span class="text-3xl mt-0.5 flex-shrink-0" style="color:#004A57;">⚡</span>
+          <div class="flex-1 min-w-0 ml-6">
+            <p class="font-black text-base mb-0.5" style="color:#1A1A1A;">
+              لديك <span x-text="convertibleQioud"></span> قيود شحن قديمة يمكن تحويلها تلقائياً
+            </p>
+            <p class="text-sm mb-4" style="color:#666;">
+              حوّل إعداداتك القديمة إلى مسارات شحن في ثوانٍ — بدون إعداد يدوي
+            </p>
+            <div class="flex items-center gap-3 flex-wrap">
+              <button @click="showPreviewModal=true; wizardStep='preview'"
+                      class="text-sm font-bold text-white px-5 py-2.5 rounded-xl hover:opacity-90 transition flex items-center gap-2"
+                      style="background:#004A57;">
+                <span>⚡</span>
+                <span>تحويل تلقائي — <span x-text="convertibleQioud"></span> قيود</span>
+              </button>
+              <button @click="showBanner=false"
+                      class="text-sm font-medium" style="color:#666;">
+                تجاهل والإعداد يدوياً
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── EXISTING ROUTES (decorative) ── -->
+
+      <!-- Default route -->
+      <div class="card overflow-hidden">
+        <div class="px-5 py-4 flex items-start justify-between gap-3" style="background:#F8F8F8;">
+          <div class="flex items-center gap-3">
+            <span class="text-xl">🏠</span>
+            <div>
+              <p class="font-bold text-sm" style="color:#1A1A1A;">المسار الافتراضي</p>
+              <p class="text-xs mt-0.5" style="color:#888;">يُطبَّق على جميع الطلبات التي لا تنطبق عليها شروط أخرى</p>
+            </div>
+          </div>
+          <div class="flex items-center gap-2 flex-shrink-0">
+            <span class="text-xs px-2 py-1 rounded-full font-semibold" style="background:#E5F5F0;color:#1FC773;">● نشط</span>
+            <button class="text-xs border rounded-lg px-3 py-1.5 transition hover:border-primary" style="border-color:#D0D0D0;color:#666;">تعديل</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Route 1 -->
+      <div class="card">
+        <div class="px-5 py-4 flex items-start justify-between gap-3">
+          <div class="flex items-center gap-3">
+            <span class="text-xl">📦</span>
+            <div>
+              <p class="font-bold text-sm" style="color:#1A1A1A;">شحن سريع — الرياض</p>
+              <div class="flex items-center gap-2 mt-1 flex-wrap">
+                <span class="text-xs px-2 py-0.5 rounded-full" style="background:#E5F5F0;color:#007A8A;">2 شرط</span>
+                <span class="text-xs" style="color:#888;">أرامكس • ناقل</span>
+              </div>
+            </div>
+          </div>
+          <div class="flex items-center gap-2 flex-shrink-0">
+            <span class="text-xs px-2 py-1 rounded-full font-semibold" style="background:#E5F5F0;color:#1FC773;">● نشط</span>
+            <button class="text-xs border rounded-lg px-3 py-1.5 transition" style="border-color:#D0D0D0;color:#666;">تعديل</button>
+            <button class="text-xs border rounded-lg px-3 py-1.5 transition" style="border-color:#FB3F3F;color:#FB3F3F;">حذف</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Add route dashed -->
+      <button class="w-full rounded-2xl py-3.5 text-sm font-medium transition"
+              style="border:2px dashed #CCCCCC;color:#999;background:transparent;"
+              onmouseover="this.style.borderColor='#004A57';this.style.color='#004A57';"
+              onmouseout="this.style.borderColor='#CCCCCC';this.style.color='#999';">
+        + إضافة مسار جديد
+      </button>
+
+    </div>
+
+  </main>
+
+  <!-- ================================================================ -->
+  <!-- SCREEN 2: PREVIEW MODAL                                           -->
+  <!-- ================================================================ -->
+  <div x-show="showPreviewModal"
+       class="fixed inset-0 z-50 flex items-center justify-center p-4"
+       style="background:rgba(0,0,0,0.55);"
+       @click.self="closeModal()">
+
+    <div class="bg-white w-full flex flex-col"
+         style="max-width:720px;border-radius:20px;max-height:88vh;"
+         x-transition:enter="transition ease-out duration-300"
+         x-transition:enter-start="opacity-0 scale-95 translate-y-6"
+         x-transition:enter-end="opacity-100 scale-100 translate-y-0"
+         x-transition:leave="transition ease-in duration-200"
+         x-transition:leave-start="opacity-100 scale-100"
+         x-transition:leave-end="opacity-0 scale-95">
+
+      <!-- MODAL HEADER -->
+      <div class="flex items-start justify-between px-6 py-5 border-b border-gray-100 flex-shrink-0">
+        <div>
+          <div class="flex items-center gap-2 mb-1">
+            <span class="text-xl">⚡</span>
+            <h2 class="text-lg font-black" style="color:#004A57;">معاينة التحويل التلقائي</h2>
+          </div>
+          <p class="text-sm" style="color:#666;">
+            سيتم إنشاء <strong x-text="convertibleQioud"></strong> مسارات من <strong x-text="totalQioud"></strong> قيود قديمة
+          </p>
+        </div>
+        <button @click="closeModal()" class="text-gray-400 hover:text-gray-700 text-2xl leading-none mt-0.5 transition">✕</button>
+      </div>
+
+      <!-- CONFIDENCE LEGEND -->
+      <div class="px-6 py-3 border-b border-gray-100 flex items-center gap-4 flex-shrink-0" style="background:#F8F8F8;">
+        <span class="text-xs font-semibold" style="color:#666;">مستوى الثقة:</span>
+        <span class="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-full font-semibold" style="background:#E5F5F0;color:#1FC773;">
+          ✅ عالية: <span x-text="highConfidence"></span>
+        </span>
+        <span class="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-full font-semibold" style="background:#FFF3DA;color:#B47900;">
+          🟡 متوسطة: <span x-text="mediumConfidence"></span>
+        </span>
+        <span class="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-full font-semibold" style="background:#FFE3E3;color:#FB3F3F;">
+          ⚠️ يدوي: <span x-text="lowConfidence"></span>
+        </span>
+      </div>
+
+      <!-- MODAL BODY — scrollable -->
+      <div class="modal-body overflow-y-auto flex-1 px-6 py-4 space-y-3">
+
+        <!-- Mapping table header -->
+        <div class="grid grid-cols-12 gap-2 px-3 pb-1">
+          <div class="col-span-4 text-xs font-bold" style="color:#666;">القيد القديم</div>
+          <div class="col-span-4 text-xs font-bold" style="color:#666;">المسار الجديد</div>
+          <div class="col-span-2 text-xs font-bold text-center" style="color:#666;">الثقة</div>
+          <div class="col-span-2 text-xs font-bold text-center" style="color:#666;">الشروط</div>
+        </div>
+
+        <!-- Mapping rows -->
+        <template x-for="q in qioudData" :key="q.id">
+          <div>
+            <!-- Row -->
+            <div class="rounded-2xl overflow-hidden border cursor-pointer select-none"
+                 :class="{
+                   'border-gray-100': q.confidence==='high',
+                   'border-warning':  q.confidence==='medium',
+                   'border-danger':   q.confidence==='low',
+                 }"
+                 :style="q.confidence==='medium' ? 'border-right:4px solid #FFB223;background:#FFFBF0;' : q.confidence==='low' ? 'border-right:4px solid #FB3F3F;background:#FFF5F5;' : ''"
+                 @click="toggleRow(q.id)">
+              <div class="grid grid-cols-12 gap-2 px-4 py-3.5 items-center"
+                   :class="{ 'map-row-normal': q.confidence==='high', 'map-row-medium': q.confidence==='medium', 'map-row-low': q.confidence==='low' }">
+                <!-- Old restriction name -->
+                <div class="col-span-4">
+                  <p class="text-sm font-semibold leading-snug"
+                     :class="q.confidence==='low' ? 'line-through' : ''"
+                     :style="q.confidence==='low' ? 'color:#AAAAAA;' : 'color:#1A1A1A;'"
+                     x-text="q.name"></p>
+                  <div class="flex flex-wrap gap-1 mt-1">
+                    <template x-for="cond in q.conditions" :key="cond.label">
+                      <span class="text-xs px-1.5 py-0.5 rounded" style="background:#F0F0F0;color:#888;"
+                            x-text="cond.label + ': ' + cond.value"></span>
+                    </template>
+                  </div>
+                </div>
+                <!-- New route name -->
+                <div class="col-span-4">
+                  <template x-if="q.mappedRoute">
+                    <p class="text-sm font-semibold" style="color:#004A57;" x-text="q.mappedRoute.name"></p>
+                  </template>
+                  <template x-if="!q.mappedRoute">
+                    <p class="text-sm font-semibold" style="color:#FB3F3F;">— غير قابل للتحويل —</p>
+                  </template>
+                </div>
+                <!-- Confidence badge -->
+                <div class="col-span-2 text-center">
+                  <span x-show="q.confidence==='high'" class="text-lg">✅</span>
+                  <span x-show="q.confidence==='medium'" class="text-lg">🟡</span>
+                  <span x-show="q.confidence==='low'" class="text-lg">⚠️</span>
+                </div>
+                <!-- Conditions count + chevron -->
+                <div class="col-span-2 flex items-center justify-center gap-2">
+                  <span class="text-sm font-bold" style="color:#007A8A;"
+                        x-text="q.mappedRoute ? q.mappedRoute.conditions.length : '—'"></span>
+                  <span class="text-gray-400 text-xs transition-transform"
+                        :class="expandedRows.includes(q.id) ? 'rotate-180' : ''"
+                        x-show="q.confidence!=='high'">▼</span>
+                </div>
+              </div>
+
+              <!-- Expanded detail panel -->
+              <div x-show="expandedRows.includes(q.id)"
+                   x-transition:enter="transition ease-out duration-200"
+                   x-transition:enter-start="opacity-0 -translate-y-2"
+                   x-transition:enter-end="opacity-100 translate-y-0"
+                   class="px-4 pb-4 pt-0 border-t"
+                   :style="q.confidence==='medium' ? 'border-color:#FFE082;background:#FFFBF0;' : 'border-color:#FFCDD2;background:#FFF5F5;'">
+                <div class="mt-3 rounded-xl px-4 py-3"
+                     :style="q.confidence==='medium' ? 'background:#FFF3DA;' : 'background:#FFE3E3;'">
+                  <p class="text-sm font-bold mb-1"
+                     :style="q.confidence==='medium' ? 'color:#B47900;' : 'color:#FB3F3F;'">
+                    <span x-text="q.confidence==='medium' ? '🟡 تحذير' : '⚠️ لا يمكن التحويل التلقائي'"></span>
+                  </p>
+                  <p class="text-sm" style="color:#444;" x-text="q.warning"></p>
+                  <template x-if="q.confidence==='low'">
+                    <p class="text-xs mt-2 font-semibold" style="color:#FB3F3F;">
+                      لن يُحوَّل هذا القيد تلقائياً — يجب الإعداد اليدوي بعد اكتمال التحويل
+                    </p>
+                  </template>
+                  <template x-if="q.confidence==='medium' && q.mappedRoute">
+                    <div class="mt-2">
+                      <p class="text-xs font-semibold mb-1" style="color:#666;">شروط المسار المُنشأ:</p>
+                      <div class="flex flex-wrap gap-1">
+                        <template x-for="cond in q.mappedRoute.conditions" :key="cond">
+                          <span class="text-xs px-2 py-0.5 rounded-full" style="background:#FFF;color:#666;border:1px solid #FFB223;" x-text="cond"></span>
+                        </template>
+                      </div>
+                    </div>
+                  </template>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </template>
+
+        <!-- Medium confidence callout -->
+        <div class="rounded-xl px-4 py-3 flex items-start gap-3" style="background:#FFFBF0;border:1px solid #FFE082;">
+          <span class="text-base mt-0.5 flex-shrink-0">🟡</span>
+          <p class="text-sm" style="color:#666;">
+            <strong style="color:#B47900;">مسار واحد يحتاج مراجعة بسيطة بعد التحويل</strong> — سنُنبّهك في صفحة النتائج
+          </p>
+        </div>
+
+        <!-- Low confidence callout -->
+        <div class="rounded-xl px-4 py-3 flex items-start gap-3" style="background:#FFF5F5;border:1px solid #FFCDD2;">
+          <span class="text-base mt-0.5 flex-shrink-0">⚠️</span>
+          <p class="text-sm" style="color:#666;">
+            <strong style="color:#FB3F3F;">قيد 1 يحتاج إعداداً يدوياً</strong> — لن يُحوَّل تلقائياً. ستجد التفاصيل في صفحة النتائج
+          </p>
+        </div>
+
+      </div>
+
+      <!-- MODAL FOOTER -->
+      <div class="px-6 py-4 border-t border-gray-100 flex items-center justify-between gap-3 flex-shrink-0">
+        <button @click="closeModal()"
+                class="text-sm font-bold px-5 py-2.5 rounded-xl transition"
+                style="border:1.5px solid #004A57;color:#004A57;background:transparent;"
+                onmouseover="this.style.background='#E5F5F0';"
+                onmouseout="this.style.background='transparent';">
+          ← تعديل يدوي
+        </button>
+        <button @click="runConversion()"
+                class="text-sm font-black text-white px-7 py-2.5 rounded-xl hover:opacity-90 transition flex items-center gap-2"
+                style="background:#004A57;">
+          <span>✅</span>
+          <span>تأكيد التحويل — <span x-text="convertibleQioud"></span> مسارات</span>
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+<script>
+function wizardApp() {
+  return {
+    wizardStep: 'entry',
+    showBanner: true,
+    showPreviewModal: false,
+    converting: false,
+    conversionProgress: 0,
+    conversionStep: 'تحليل القيود...',
+    expandedRows: [],
+    createdRoutes: [],
+
+    qioudData: [
+      {
+        id: 'Q1',
+        name: 'شحن مبرد — الرياض فقط',
+        type: 'product_category',
+        conditions: [
+          { label: 'الفئة', value: 'مبردات ومجمدات' },
+          { label: 'المنطقة', value: 'الرياض' },
+        ],
+        confidence: 'high',
+        mappedRoute: {
+          name: 'مسار: شحن مبرد — الرياض',
+          conditions: ['المنتجات: فئة مبردات', 'المنطقة: الرياض'],
+          carriers: ['أرامكس', 'ناقل'],
+        },
+        warning: null,
+      },
+      {
+        id: 'Q2',
+        name: 'شحن ثقيل — وزن أكثر من 20 كجم',
+        type: 'weight',
+        conditions: [
+          { label: 'الوزن', value: 'أكثر من 20 كجم' },
+        ],
+        confidence: 'high',
+        mappedRoute: {
+          name: 'مسار: شحن ثقيل',
+          conditions: ['وزن الطلب: > 20 كجم'],
+          carriers: ['DHL', 'SMSA'],
+        },
+        warning: null,
+      },
+      {
+        id: 'Q3',
+        name: 'تشحيل فقط — خارج الرياض',
+        type: 'geo_or',
+        conditions: [
+          { label: 'المنطقة', value: 'جدة أو مكة أو الطائف' },
+          { label: 'طريقة الدفع', value: 'الدفع عند الاستلام' },
+        ],
+        confidence: 'medium',
+        mappedRoute: {
+          name: 'مسار: خارج الرياض COD',
+          conditions: ['المنطقة: جدة / مكة / الطائف', 'الدفع: عند الاستلام'],
+          carriers: ['سمسا', 'أرامكس'],
+        },
+        warning: 'هذا القيد يستخدم منطق OR — تم تحويله إلى مسار واحد. راجع الشروط بعد التحويل.',
+      },
+      {
+        id: 'Q4',
+        name: 'قيد مركّب متعدد المتاجر',
+        type: 'multi_store',
+        conditions: [
+          { label: 'الفروع', value: 'جميع الفروع' },
+          { label: 'المنتج', value: 'كل المنتجات' },
+        ],
+        confidence: 'low',
+        mappedRoute: null,
+        warning: 'هذا القيد مرتبط بإعداد متعدد الفروع ولا يمكن تحويله تلقائياً. يجب الإعداد اليدوي.',
+      },
+    ],
+
+    totalQioud: 4,
+    convertibleQioud: 3,
+    highConfidence: 2,
+    mediumConfidence: 1,
+    lowConfidence: 1,
+
+    toggleRow(id) {
+      if (this.expandedRows.includes(id)) {
+        this.expandedRows = this.expandedRows.filter(r => r !== id);
+      } else {
+        this.expandedRows.push(id);
+      }
+    },
+
+    closeModal() {
+      this.showPreviewModal = false;
+      this.wizardStep = 'entry';
+    },
+
+    startProgress() {
+      this.conversionProgress = 0;
+      const steps = ['تحليل القيود...', 'إنشاء المسارات...', 'ضبط الأولويات...', 'جاري الحفظ...'];
+      const interval = setInterval(() => {
+        this.conversionProgress += Math.random() * 14 + 3;
+        if (this.conversionProgress >= 100) {
+          this.conversionProgress = 100;
+          clearInterval(interval);
+        }
+        this.conversionStep = steps[Math.min(Math.floor(this.conversionProgress / 25), 3)];
+      }, 180);
+    },
+
+    async runConversion() {
+      this.showPreviewModal = false;
+      this.wizardStep = 'converting';
+      this.converting = true;
+      this.startProgress();
+      await new Promise(resolve => setTimeout(resolve, 2200));
+      this.converting = false;
+      this.createdRoutes = this.qioudData
+        .filter(q => q.confidence !== 'low')
+        .map(q => ({
+          id: q.id,
+          name: q.mappedRoute.name,
+          conditions: q.mappedRoute.conditions,
+          carriers: q.mappedRoute.carriers,
+          needsReview: q.confidence === 'medium',
+          warning: q.warning ?? null,
+        }));
+      this.wizardStep = 'success';
+    },
+  };
+}
+</script>
+</body>
+</html>
