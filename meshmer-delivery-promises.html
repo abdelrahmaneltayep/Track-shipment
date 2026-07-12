@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>وعود التوصيل من مشمر — لوحة تحكم سلة</title>
+
+  <!-- ═══ Merchant Storybook Design System — real runtime ═══ -->
+  <link rel="stylesheet" href="https://dashboard-ui-components.pages.dev/styles.css" />
+  <script type="module" src="https://dashboard-ui-components.pages.dev/admin-ui.esm.js"></script>
+  <script nomodule src="https://dashboard-ui-components.pages.dev/admin-ui.js"></script>
+  <!-- Fonts + icon sets -->
+  <link rel="stylesheet" href="https://cdn.salla.network/fonts/pingarlt.css" />
+  <link rel="stylesheet" href="https://cdn.salla.network/fonts/hugeicons-font.min.css" />
+  <link rel="stylesheet" href="https://cdn.salla.network/fonts/sallaicons-light.min.css" />
+
+  <style>
+    :root {
+      --teal:        #004956;
+      --teal-deep:   #005C6A;   /* rgb(0,92,106) */
+      --teal-ink:    #004956;
+      --mint:        #A3FFE5;
+      --cyan:        rgb(146,240,255);
+      --cyan-bg:     rgb(237,248,251);
+      --toggle-on:   #0B4650;
+      --page-bg:     #E9EBEE;
+      --panel-bg:    #F4F4F4;
+      --line:        #EEEEEE;
+      --muted:       #737373;
+      --ink:         #333333;
+      --meshmer-ring: conic-gradient(from 47.673deg at 50% 50%,
+                       rgb(255,232,149) 58.85deg, rgb(255,175,131) 152.31deg,
+                       rgb(228,188,143) 186.92deg, rgb(44,242,199) 270deg,
+                       rgb(146,240,255) 360deg);
+      --meshmer-sparkle: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%2024%2024%27%20fill%3D%27%23000%27%3E%3Cpath%20d%3D%27M12%201c.62%207.2%203.8%2010.38%2011%2011-7.2.62-10.38%203.8-11%2011-.62-7.2-3.8-10.38-11-11%207.2-.62%2010.38-3.8%2011-11Z%27/%3E%3Cpath%20d%3D%27M19.5%202.2c.2%202.1.9%202.8%203%203-2.1.2-2.8.9-3%203-.2-2.1-.9-2.8-3-3%202.1-.2%202.8-.9%203-3Z%27/%3E%3C/svg%3E");
+    }
+
+    * , *::before, *::after { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--page-bg);
+      font-family: "PingARLT", "IBM Plex Sans Arabic", "Tajawal", sans-serif;
+      color: var(--ink);
+    }
+
+    /* ── Sparkle brand mark ────────────────────────────────── */
+    .msh-mark {
+      flex-shrink: 0; display: inline-flex; align-items: center; justify-content: center;
+      border-radius: 9999px; background: var(--meshmer-ring);
+    }
+    .msh-mark i {
+      display: inline-block;
+      background: var(--teal);
+      -webkit-mask: var(--meshmer-sparkle) center/contain no-repeat;
+              mask: var(--meshmer-sparkle) center/contain no-repeat;
+    }
+    .msh-inline {
+      display: inline-block; background: currentColor;
+      -webkit-mask: var(--meshmer-sparkle) center/contain no-repeat;
+              mask: var(--meshmer-sparkle) center/contain no-repeat;
+    }
+    /* "مشمر" pill used across touchpoints */
+    .msh-pill {
+      display: inline-flex; align-items: center; gap: 4px; border-radius: 140px;
+      background: var(--cyan); padding: 2px 8px; font-size: 11px; color: rgb(0,73,86);
+      white-space: nowrap;
+    }
+
+    /* ── App chrome (dashboard shell) ──────────────────────── */
+    .app { width: 1440px; max-width: 100%; margin: 24px auto; background: var(--panel-bg);
+           border-radius: 8px; overflow: hidden; box-shadow: 0 4px 16px rgba(18,18,23,.08); }
+    .chrome {
+      background: var(--teal); height: 72px; display: flex; align-items: center;
+      justify-content: space-between; padding: 0 24px; color: #fff;
+    }
+    .chrome nav { display: flex; align-items: center; gap: 22px; }
+    .chrome nav span { display: flex; align-items: center; gap: 7px; font-size: 14px; opacity: .92; }
+    .chrome .actions { display: flex; align-items: center; gap: 18px; }
+    .chrome .actions > i { font-size: 19px; opacity: .92; }
+    .avatar {
+      width: 40px; height: 40px; border-radius: 999px; display: inline-flex;
+      align-items: center; justify-content: center; font-weight: 700; font-size: 15px;
+      color: var(--teal); background: var(--mint); border: 2px solid rgba(255,255,255,.25);
+    }
+
+    .tabs {
+      background: #fff; display: flex; align-items: center; justify-content: space-between;
+      padding: 0 32px; border-bottom: 1px solid var(--line);
+    }
+    .tabs .set { display: flex; gap: 26px; }
+    .tabs .set span { padding: 16px 0 13px; font-size: 14px; color: #666; cursor: pointer; }
+    .tabs .set span.active { color: var(--teal); font-weight: 700; border-bottom: 3px solid var(--teal); }
+    .help-pill {
+      display: inline-flex; align-items: center; gap: 6px; font-size: 13px; color: var(--teal);
+      border: 1px solid var(--mint); border-radius: 999px; padding: 5px 14px;
+    }
+    .crumb { padding: 16px 32px 0; font-size: 13px; color: var(--muted); }
+
+    .content { display: flex; flex-direction: column; gap: 24px; padding: 24px 32px; }
+    .card { background: #fff; border-radius: 8px; overflow: hidden; }
+
+    /* ── Meshmer hero control ──────────────────────────────── */
+    .msh-hero {
+      border-radius: 16px; padding: 16px; display: flex; flex-direction: column; gap: 14px;
+      background: var(--cyan-bg); outline: 1px dashed var(--cyan); outline-offset: -1px;
+      transition: background .2s, outline-color .2s;
+    }
+    .msh-hero.is-off { background: #FAFAFA; outline-color: #DDD; }
+    .msh-hero-top { display: flex; justify-content: space-between; align-items: center; gap: 16px; }
+    .msh-hero-id { display: flex; align-items: center; gap: 12px; min-width: 0; }
+    .msh-title { font-size: 18px; font-weight: 500; line-height: 28px; color: var(--teal-deep); }
+    .msh-hero.is-off .msh-title { color: #444; }
+    .msh-desc { font-size: 14px; line-height: 20px; color: var(--teal-deep); }
+    .msh-hero.is-off .msh-desc { color: var(--muted); }
+    .msh-hero-divider { border-top: 1px dashed var(--cyan); }
+    .msh-hero.is-off .msh-hero-divider { border-top-color: #DDD; }
+    .msh-hero-foot {
+      display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap;
+    }
+    .msh-hero-status { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; color: var(--teal-deep); }
+    .msh-hero-meta { font-size: 12px; color: #5B838D; }
+
+    /* ── Delivery-promise table ────────────────────────────── */
+    .dp-head { display: flex; flex-direction: column; gap: 16px; padding: 20px 26px; }
+    .dp-title-row { display: flex; flex-direction: column; gap: 4px; }
+    .dp-title { font-size: 18px; font-weight: 700; color: var(--ink); }
+    .dp-lock-hint { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; color: var(--muted); }
+
+    .dp-grid {
+      display: grid; grid-template-columns: 400px 1fr 1fr 220px; align-items: center;
+      padding: 0 26px 0 16px;
+    }
+    .dp-colhead { height: 48px; font-size: 13px; color: #666; border-bottom: 1px solid var(--line); }
+    .dp-row { height: 72px; border-bottom: 1px solid var(--line); }
+    .dp-row:last-child { border-bottom: 0; }
+    .dp-promise { display: flex; align-items: center; gap: 10px; }
+    .dp-ic { display: inline-flex; width: 40px; height: 40px; border-radius: 9999px; align-items: center; justify-content: center; }
+    .dp-ic i { font-size: 20px; }
+    .dp-promise b { font-size: 14px; font-weight: 500; color: rgb(0,73,86); }
+    .dp-promise small { font-size: 12px; color: var(--muted); }
+    .dp-city { text-align: center; font-size: 14px; color: #444; }
+    .dp-dur { text-align: center; }
+    .dp-actions { display: flex; align-items: center; gap: 10px; justify-content: flex-end; }
+    /* manual controls locked while Meshmer runs */
+    .dp-actions.locked { opacity: .4; pointer-events: none; }
+
+    .icon-btn {
+      display: inline-flex; width: 36px; height: 36px; border-radius: 999px; border: 1px solid var(--line);
+      align-items: center; justify-content: center; background: #fff; cursor: pointer;
+    }
+    .icon-btn i { font-size: 16px; color: #666; }
+
+    /* fallback pill switch (used before the runtime hydrates s-toggle) */
+    .switch { width: 44px; height: 24px; border-radius: 999px; background: #DDD; position: relative; cursor: pointer; flex-shrink: 0; transition: background .18s; }
+    .switch > span { position: absolute; top: 2px; right: 2px; width: 20px; height: 20px; border-radius: 999px; background: #fff; transition: right .18s, left .18s; }
+    .switch.on { background: var(--toggle-on); }
+    .switch.on > span { right: auto; left: 2px; }
+
+    /* ── Modal ─────────────────────────────────────────────── */
+    .overlay {
+      position: fixed; inset: 0; background: rgba(68,68,68,.55); display: none;
+      align-items: center; justify-content: center; z-index: 200; padding: 24px;
+    }
+    .overlay.open { display: flex; }
+    .modal {
+      width: 500px; max-width: 100%; background: #fff; border-radius: 8px;
+      box-shadow: 0 4px 6px -1px rgba(18,18,23,.08), 0 2px 4px -1px rgba(18,18,23,.06);
+      display: flex; flex-direction: column; gap: 20px; padding: 26px; align-items: center;
+    }
+    .modal-ic { display: inline-flex; width: 70px; height: 70px; border-radius: 999px; background: #FDEEEE; align-items: center; justify-content: center; }
+    .modal-ic i { font-size: 36px; color: rgb(245,81,87); }
+    .modal-affected { display: flex; align-items: center; gap: 10px; padding: 10px 14px; border: 1px solid var(--line); border-radius: 8px; font-size: 14px; color: #444; align-self: stretch; }
+    .modal-affected i { font-size: 18px; color: var(--teal); }
+
+    a { color: var(--teal); }
+  </style>
+</head>
+<body>
+
+  <div class="app">
+    <!-- top chrome -->
+    <header class="chrome">
+      <nav>
+        <span style="color:var(--mint);"><i class="sicon-light-salla" style="font-size:30px;"></i><span style="font-size:15px; font-weight:700;">سلة</span></span>
+        <span><i class="hgi-stroke hgi-menu-01" style="font-size:17px;"></i>الكل</span>
+        <span><i class="hgi-stroke hgi-home-01" style="font-size:17px;"></i>الرئيسية</span>
+        <span><i class="hgi-stroke hgi-archive-02" style="font-size:17px;"></i>الطلبات</span>
+        <span><i class="hgi-stroke hgi-shirt-01" style="font-size:17px;"></i>المنتجات</span>
+        <span><i class="hgi-stroke hgi-megaphone-02" style="font-size:17px;"></i>التسويق</span>
+        <span><i class="hgi-stroke hgi-store-01" style="font-size:17px;"></i>المتجر وقنوات البيع</span>
+        <span><i class="hgi-stroke hgi-chart-line-data-01" style="font-size:17px;"></i>التقارير</span>
+      </nav>
+      <div class="actions">
+        <i class="hgi-stroke hgi-search-01"></i>
+        <i class="hgi-stroke hgi-message-01"></i>
+        <i class="hgi-stroke hgi-notification-01"></i>
+        <div style="display:flex; align-items:center; gap:10px;">
+          <span class="avatar">ع</span>
+          <div style="display:flex; flex-direction:column; align-items:flex-start; gap:2px;">
+            <span style="font-size:13px;">عبدالله</span>
+            <span style="font-size:10px; padding:1px 8px; border-radius:999px; border:1px solid var(--mint); color:var(--mint);">سبيشل</span>
+          </div>
+          <i class="hgi-stroke hgi-arrow-down-01" style="font-size:14px; opacity:.8;"></i>
+        </div>
+      </div>
+    </header>
+
+    <!-- section tabs -->
+    <div class="tabs">
+      <div class="set">
+        <span>ملفات الشحن</span>
+        <span class="active">وعود التوصيل</span>
+        <span>مواد التغليف</span>
+        <span>التقارير</span>
+        <span>ارشيف البوليصات</span>
+        <span>الاعدادات</span>
+      </div>
+      <span class="help-pill"><i class="hgi-stroke hgi-help-circle" style="font-size:15px;"></i>مركز المساعدة</span>
+    </div>
+    <div class="crumb">وعود التوصيل</div>
+
+    <!-- main content -->
+    <main class="content">
+      <div class="card">
+
+        <div class="dp-head">
+          <!-- Meshmer hero control -->
+          <section class="msh-hero" id="mshHero">
+            <div class="msh-hero-top">
+              <div class="msh-hero-id">
+                <span class="msh-mark" id="mshMark" style="width:40px; height:40px;">
+                  <i style="width:22px; height:22px;"></i>
+                </span>
+                <div style="display:flex; flex-direction:column; gap:2px; min-width:0;">
+                  <div style="display:flex; align-items:center; gap:8px;">
+                    <span class="msh-title">وعود التوصيل من مشمر</span>
+                    <s-tag id="mshStatus" theme="success" size="sm" class="s-tag s-tag--success whitespace-nowrap sm">مفعّل</s-tag>
+                  </div>
+                  <span class="msh-desc" id="mshDesc">تقديرات توصيل ذكية مبنية على بيانات شحناتك الفعلية وشبكة سلة — تتحدّث تلقائيًا. عند التفعيل، تُعطَّل جميع الوعود اليدوية تلقائيًا.</span>
+                </div>
+              </div>
+              <s-toggle id="mshToggle" checked size="md" layout="start" label="" class="s-toggle start md active"></s-toggle>
+            </div>
+
+            <div class="msh-hero-divider"></div>
+
+            <!-- enabled: status strip -->
+            <div class="msh-hero-foot" id="mshFootOn">
+              <span class="msh-hero-status">
+                <span class="msh-inline" style="width:14px; height:14px; color:var(--teal-deep);"></span>
+                التقديرات مفعّلة وتظهر تلقائيًا في مسارات الشحن وشركات الشحن
+              </span>
+              <span class="msh-hero-meta">آخر تحديث: قبل ٣ أيام · ٤ مسارات مغطاة · ١ بانتظار البيانات</span>
+            </div>
+
+            <!-- disabled: warning alert -->
+            <div id="mshFootOff" style="display:none;">
+              <s-alert-box theme="warning" layout="default" class="s-alert-box s-alert-box--warning default">
+                <i slot="icon" class="hgi-stroke hgi-alert-02"></i>
+                <article slot="desc">
+                  <p style="margin:0;">تقديرات مشمر متوقفة ووعودك اليدوية جميعها غير مفعّلة — لن يرى عملاؤك أي تقدير للتوصيل. فعّل وعودك اليدوية من الجدول أدناه، أو أعد تفعيل مشمر.</p>
+                </article>
+              </s-alert-box>
+            </div>
+          </section>
+
+          <!-- table title -->
+          <div class="dp-title-row">
+            <span class="dp-title">وعود التوصيل</span>
+            <span class="dp-lock-hint" id="dpHint">
+              <i class="hgi-stroke hgi-square-lock-02" style="font-size:14px;"></i>
+              الوعود اليدوية معطّلة تلقائيًا أثناء تفعيل مشمر — أوقف مشمر لتفعيلها.
+            </span>
+          </div>
+        </div>
+
+        <!-- table -->
+        <div class="dp-grid dp-colhead">
+          <span>الوعد</span>
+          <span style="text-align:center;">المدينة</span>
+          <span style="text-align:center;">مدة التوصيل</span>
+          <span style="text-align:left; padding-left:10px;">إجراءات</span>
+        </div>
+
+        <div id="dpBody"><!-- rows injected by JS --></div>
+      </div>
+    </main>
+  </div>
+
+  <!-- ═══ Pause confirmation modal (1f) ═══ -->
+  <div class="overlay" id="pauseOverlay">
+    <div class="modal">
+      <span class="modal-ic"><i class="hgi-stroke hgi-alert-02"></i></span>
+      <div style="display:flex; flex-direction:column; gap:10px; align-self:stretch; text-align:center;">
+        <span style="font-size:20px; font-weight:500; line-height:28px; color:#444;">إيقاف تقديرات مشمر؟</span>
+        <span style="font-size:15px; line-height:24px; color:var(--muted);">سيتم إزالة تقديرات التوصيل من <b style="color:#444;">٣ أماكن</b>:</span>
+      </div>
+      <div style="display:flex; flex-direction:column; gap:8px; align-self:stretch;">
+        <span class="modal-affected"><i class="hgi-stroke hgi-delivery-box-01"></i>وعود التوصيل — إيقاف تقديرات مشمر لمتجرك</span>
+        <span class="modal-affected"><i class="hgi-stroke hgi-route-02"></i>مسارات الشحن</span>
+        <span class="modal-affected"><i class="hgi-stroke hgi-truck-delivery"></i>شركات الشحن</span>
+      </div>
+      <s-alert-box theme="warning" layout="default" class="s-alert-box s-alert-box--warning default" style="align-self:stretch;">
+        <i slot="icon" class="hgi-stroke hgi-alert-02"></i>
+        <article slot="desc">
+          <p style="margin:0;">وعودك اليدوية جميعها غير مفعّلة حاليًا — بعد الإيقاف لن يرى عملاؤك أي تقدير للتوصيل حتى تقوم بإعداد وتفعيل وعودك اليدوية.</p>
+        </article>
+      </s-alert-box>
+      <div style="display:flex; flex-direction:column; gap:10px; align-self:stretch;">
+        <s-button id="btnPauseGo" theme="primary" size="md" wide class="s-btn s-btn--primary primary md" style="width:100%; justify-content:center;">إيقاف والانتقال للوعود اليدوية</s-button>
+        <div style="display:flex; gap:10px;">
+          <s-button id="btnPauseOnly" theme="danger" outlined size="md" class="s-btn s-btn--danger danger md outlined" style="flex:1; justify-content:center;">إيقاف فقط</s-button>
+          <s-button id="btnPauseCancel" theme="white" size="md" class="s-btn s-btn--white white md" style="flex:1; justify-content:center;">إلغاء</s-button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    /* ── Data model ─────────────────────────────────────────── */
+    const PROMISES = [
+      { name: "توصيل سريع",  desc: "توصيل فائق السرعة خلال ساعات قليلة.", city: "الرياض، جدة",  dur: "٢-٤ ساعات", icon: "hgi-flash",          color: "#EE7A3B", bg: "rgb(253,242,236)" },
+      { name: "نفس اليوم",   desc: "توصيل الطلب في نفس يوم الشراء.",       city: "جدة",          dur: "٤-٦ ساعات", icon: "hgi-sun-03",         color: "#22A06B", bg: "rgb(239,251,246)" },
+      { name: "اليوم التالي", desc: "توصيل الطلب في اليوم التالي للشراء.",  city: "مكة المكرمة",  dur: "١-٢ يوم",   icon: "hgi-calendar-03",    color: "#4A72F5", bg: "rgb(236,243,254)" },
+      { name: "توصيل عادي",  desc: "خيار اقتصادي للطلبات غير العاجلة.",    city: "كل المدن",     dur: "٢-٥ يوم",   icon: "hgi-truck-delivery", color: "#667085", bg: "rgb(244,244,244)" },
+      { name: "توصيل دولي",  desc: "للطلبات التي تُشحن إلى خارج الدولة.",  city: "كل المدن",     dur: "٢-٥ يوم",   icon: "hgi-airplane-02",    color: "#667085", bg: "rgb(244,244,244)" },
+    ];
+
+    /* one authoritative flag; each manual promise remembers its own on/off */
+    let meshmerOn = true;
+    const manualEnabled = PROMISES.map(() => false);
+
+    const $ = (id) => document.getElementById(id);
+
+    /* ── Render table rows ──────────────────────────────────── */
+    function renderRows() {
+      const locked = meshmerOn;
+      $("dpBody").innerHTML = PROMISES.map((p, i) => `
+        <div class="dp-grid dp-row">
+          <div class="dp-promise">
+            <span class="dp-ic" style="background:${p.bg};"><i class="hgi-stroke ${p.icon}" style="color:${p.color};"></i></span>
+            <span style="display:flex; flex-direction:column;"><b>${p.name}</b><small>${p.desc}</small></span>
+          </div>
+          <span class="dp-city">${p.city}</span>
+          <span class="dp-dur"><s-tag theme="white" size="sm" class="s-tag s-tag--white whitespace-nowrap sm">${p.dur}</s-tag></span>
+          <div class="dp-actions${locked ? " locked" : ""}">
+            <div class="switch${manualEnabled[i] ? " on" : ""}" data-row="${i}" role="switch" aria-checked="${manualEnabled[i]}"><span></span></div>
+            <button class="icon-btn" type="button" aria-label="تعديل"><i class="hgi-stroke hgi-pencil-edit-02"></i></button>
+            <button class="icon-btn" type="button" aria-label="حذف"><i class="hgi-stroke hgi-delete-02"></i></button>
+          </div>
+        </div>`).join("");
+
+      // wire manual row switches (active only when Meshmer is off)
+      $("dpBody").querySelectorAll(".switch").forEach((sw) => {
+        sw.addEventListener("click", () => {
+          if (meshmerOn) return;
+          const i = +sw.dataset.row;
+          manualEnabled[i] = !manualEnabled[i];
+          renderRows();
+        });
+      });
+    }
+
+    /* ── Reflect the Meshmer flag across the page ───────────── */
+    function renderMeshmer() {
+      const hero = $("mshHero");
+      hero.classList.toggle("is-off", !meshmerOn);
+
+      // sparkle mark greys out when off
+      const markInner = $("mshMark").querySelector("i");
+      $("mshMark").style.background = meshmerOn ? "" : "#EEEEEE";
+      markInner.style.background = meshmerOn ? "" : "#999999";
+
+      // status tag
+      const status = $("mshStatus");
+      status.textContent = meshmerOn ? "مفعّل" : "متوقف";
+      status.setAttribute("theme", meshmerOn ? "success" : "secondary");
+      status.className = "s-tag s-tag--" + (meshmerOn ? "success" : "secondary") + " whitespace-nowrap sm";
+
+      // description
+      $("mshDesc").textContent = meshmerOn
+        ? "تقديرات توصيل ذكية مبنية على بيانات شحناتك الفعلية وشبكة سلة — تتحدّث تلقائيًا. عند التفعيل، تُعطَّل جميع الوعود اليدوية تلقائيًا."
+        : "فعّل مشمر لتُحسب مدد التوصيل تلقائيًا من بيانات شحناتك وشبكة سلة، وتنعكس في مسارات الشحن وشركات الشحن.";
+
+      // footer: status strip vs. warning alert
+      $("mshFootOn").style.display  = meshmerOn ? "" : "none";
+      $("mshFootOff").style.display = meshmerOn ? "none" : "";
+      $("mshHero").querySelector(".msh-hero-divider").style.display = meshmerOn ? "" : "none";
+
+      // table lock hint
+      $("dpHint").innerHTML = meshmerOn
+        ? '<i class="hgi-stroke hgi-square-lock-02" style="font-size:14px;"></i>الوعود اليدوية معطّلة تلقائيًا أثناء تفعيل مشمر — أوقف مشمر لتفعيلها.'
+        : 'تقديرات مشمر متوقفة — فعّل وعودك اليدوية لتظهر تقديرات التوصيل لعملائك.';
+
+      // keep the real s-toggle in sync
+      syncToggle();
+      renderRows();
+    }
+
+    /* ── The main Meshmer switch (real <s-toggle>) ──────────── */
+    const toggle = $("mshToggle");
+
+    function syncToggle() {
+      if (meshmerOn) { toggle.setAttribute("checked", ""); toggle.classList.add("active"); }
+      else           { toggle.removeAttribute("checked");   toggle.classList.remove("active"); }
+    }
+
+    // s-toggle emits its own change/click. We intercept, then decide.
+    function onToggleIntent() {
+      // read the component's desired next state; fall back to inverting current
+      const desired = toggle.hasAttribute("checked") ? toggle.checked !== false : !meshmerOn;
+      const next = (typeof toggle.checked === "boolean") ? toggle.checked : desired;
+
+      if (next && !meshmerOn) {          // turning ON
+        meshmerOn = true;
+        renderMeshmer();
+      } else if (!next && meshmerOn) {   // turning OFF → confirm first
+        // revert visual until confirmed
+        meshmerOn = true; syncToggle();
+        openModal();
+      }
+    }
+    toggle.addEventListener("change", onToggleIntent);
+    toggle.addEventListener("click",  () => setTimeout(onToggleIntent, 0));
+
+    /* ── Pause modal ────────────────────────────────────────── */
+    function openModal()  { $("pauseOverlay").classList.add("open"); }
+    function closeModal() { $("pauseOverlay").classList.remove("open"); syncToggle(); }
+
+    function pauseMeshmer() { meshmerOn = false; renderMeshmer(); closeModal(); }
+
+    $("btnPauseOnly").addEventListener("click", pauseMeshmer);
+    $("btnPauseGo").addEventListener("click", () => {
+      pauseMeshmer();
+      // focus the table where manual promises now live
+      $("dpBody").scrollIntoView({ behavior: "smooth", block: "center" });
+    });
+    $("btnPauseCancel").addEventListener("click", closeModal);
+    $("pauseOverlay").addEventListener("click", (e) => { if (e.target === $("pauseOverlay")) closeModal(); });
+
+    /* ── init ───────────────────────────────────────────────── */
+    renderMeshmer();
+  </script>
+</body>
+</html>
