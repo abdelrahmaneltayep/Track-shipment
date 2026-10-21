@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Route Coverage Concepts</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --salla-teal:    #004D5A;
+    --salla-teal-lt: #E8F4F7;
+    --salla-mint:    #BAF3E6;
+    --salla-green:   #1A8F5A;
+    --salla-green-lt:#E7F6EE;
+    --salla-amber:   #B7791F;
+    --salla-amber-lt:#FEF6E4;
+    --salla-red:     #DC2626;
+    --salla-red-lt:  #FDECEC;
+    --salla-grey:    #F7F8FA;
+    --salla-text:    #1A202C;
+    --salla-muted:   #6B7280;
+    --surface:       #FFFFFF;
+    --border:        #E2E8F0;
+    --card-radius:   12px;
+    --card-shadow:   0 2px 12px rgba(0,0,0,0.06);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --salla-teal-lt: #12323A; --salla-mint: #2C6B60; --salla-green-lt: #12301F;
+      --salla-amber-lt:#352A12; --salla-red-lt: #3A1717; --salla-grey: #0F1418;
+      --salla-text: #E6EAED; --salla-muted: #9AA4AE; --surface: #182026; --border: #2A343C;
+      --salla-teal: #5FC3B0; --card-shadow: none;
+    }
+  }
+  :root[data-theme="dark"] {
+    --salla-teal-lt: #12323A; --salla-mint: #2C6B60; --salla-green-lt: #12301F;
+    --salla-amber-lt:#352A12; --salla-red-lt: #3A1717; --salla-grey: #0F1418;
+    --salla-text: #E6EAED; --salla-muted: #9AA4AE; --surface: #182026; --border: #2A343C;
+    --salla-teal: #5FC3B0; --card-shadow: none;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: 'Tajawal', sans-serif; background: var(--salla-grey); color: var(--salla-text); font-size: 14px; line-height: 1.6; }
+  header { background: #004D5A; color: #fff; padding: 16px; }
+  header h1 { margin: 0; font-size: 18px; }
+  header p { margin: 4px 0 0; font-size: 13px; opacity: .85; }
+  nav { display: flex; gap: 4px; overflow-x: auto; padding: 8px 16px; background: var(--surface); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 5; }
+  nav button { white-space: nowrap; border: 1px solid var(--border); background: var(--surface); color: var(--salla-text); padding: 6px 12px; border-radius: 999px; font: inherit; cursor: pointer; }
+  nav button[aria-selected="true"] { background: var(--salla-teal); color: #fff; border-color: var(--salla-teal); }
+  main { max-width: 1180px; margin: 0 auto; padding: 16px; }
+  section[hidden] { display: none; }
+  .lens { background: var(--salla-teal-lt); border-radius: var(--card-radius); padding: 12px 16px; margin-bottom: 16px; }
+  .lens b { color: var(--salla-teal); }
+  .layout { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 16px; align-items: start; }
+  @media (max-width: 860px) { .layout { grid-template-columns: 1fr; } }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--card-radius); box-shadow: var(--card-shadow); padding: 16px; margin-bottom: 16px; }
+  .card h3 { margin: 0 0 12px; font-size: 15px; }
+  .card h3 small { color: var(--salla-muted); font-weight: 400; }
+  label.f { display: block; font-weight: 500; margin: 12px 0 6px; }
+  .input { width: 100%; border: 1px solid var(--border); border-radius: 8px; padding: 8px 12px; font: inherit; background: var(--surface); color: var(--salla-text); }
+  .input[disabled] { background: var(--salla-grey); color: var(--salla-muted); cursor: not-allowed; }
+  .hint { color: var(--salla-muted); font-size: 12px; margin-top: 4px; }
+  .seg { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  @media (max-width: 560px) { .seg { grid-template-columns: 1fr; } }
+  .seg button { text-align: start; border: 1px solid var(--border); background: var(--surface); color: var(--salla-text); border-radius: 8px; padding: 8px 12px; font: inherit; cursor: pointer; }
+  .seg button[aria-pressed="true"] { border-color: var(--salla-teal); box-shadow: inset 0 0 0 1px var(--salla-teal); }
+  .seg small { display: block; color: var(--salla-muted); font-size: 12px; }
+  .carriers { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 8px; }
+  .carrier { display: flex; gap: 8px; align-items: flex-start; border: 1px solid var(--border); border-radius: 8px; padding: 8px 12px; cursor: pointer; background: var(--surface); }
+  .carrier.on { border-color: var(--salla-teal); background: var(--salla-teal-lt); }
+  .carrier input { margin-top: 4px; accent-color: var(--salla-teal); }
+  .carrier .meta { font-size: 12px; color: var(--salla-muted); }
+  .carrier .warn { font-size: 12px; color: var(--salla-amber); }
+  .dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; vertical-align: middle; margin-inline-end: 4px; }
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; }
+  .chip { display: inline-flex; align-items: center; gap: 4px; padding: 2px 10px; border-radius: 999px; background: var(--salla-teal-lt); font-size: 13px; border: 1px solid transparent; }
+  .chip.bad { background: var(--salla-red-lt); border-color: var(--salla-red); color: var(--salla-red); }
+  .chip button { border: 0; background: none; cursor: pointer; color: inherit; font-size: 14px; padding: 0; line-height: 1; }
+  .picker { position: relative; }
+  .picker .list { border: 1px solid var(--border); border-radius: 8px; margin-top: 4px; max-height: 260px; overflow: auto; background: var(--surface); }
+  .opt { display: flex; align-items: center; gap: 8px; padding: 6px 12px; cursor: pointer; border-bottom: 1px solid var(--border); }
+  .opt:last-child { border-bottom: 0; }
+  .opt input { accent-color: var(--salla-teal); }
+  .opt.off { color: var(--salla-muted); cursor: not-allowed; }
+  .opt .why { margin-inline-start: auto; font-size: 12px; color: var(--salla-muted); }
+  .opt .reg { color: var(--salla-muted); font-size: 12px; }
+  .empty { padding: 12px; color: var(--salla-muted); text-align: center; }
+  .alert { border-radius: 8px; padding: 10px 12px; margin: 12px 0; font-size: 13px; display: flex; gap: 8px; align-items: flex-start; }
+  .alert .grow { flex: 1; }
+  .alert.info { background: var(--salla-teal-lt); }
+  .alert.warn { background: var(--salla-amber-lt); color: var(--salla-text); border-inline-start: 3px solid var(--salla-amber); }
+  .alert.err { background: var(--salla-red-lt); border-inline-start: 3px solid var(--salla-red); }
+  .alert.ok { background: var(--salla-green-lt); border-inline-start: 3px solid var(--salla-green); }
+  .btn { border: 1px solid var(--salla-teal); background: var(--salla-teal); color: #fff; border-radius: 8px; padding: 8px 16px; font: inherit; cursor: pointer; }
+  .btn.ghost { background: transparent; color: var(--salla-teal); }
+  .btn.sm { padding: 4px 10px; font-size: 13px; }
+  .btn.link { border: 0; background: none; color: var(--salla-teal); padding: 0; text-decoration: underline; }
+  .row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+  .toggle { display: flex; align-items: center; gap: 8px; cursor: pointer; margin: 8px 0; }
+  .toggle input { accent-color: var(--salla-teal); width: 16px; height: 16px; }
+  .summary .big { font-size: 28px; font-weight: 700; color: var(--salla-teal); }
+  .bar { height: 8px; border-radius: 4px; background: var(--salla-red-lt); overflow: hidden; margin: 8px 0; }
+  .bar span { display: block; height: 100%; background: var(--salla-green); }
+  .group { margin-top: 8px; }
+  .group h4 { margin: 8px 0 4px; font-size: 13px; color: var(--salla-muted); font-weight: 500; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th, td { border-bottom: 1px solid var(--border); padding: 8px; text-align: start; }
+  th { color: var(--salla-muted); font-weight: 500; }
+  .scroll { overflow-x: auto; }
+  td.y { color: var(--salla-green); font-weight: 700; text-align: center; }
+  td.n { color: var(--salla-muted); text-align: center; }
+  tr.bad td:first-child { color: var(--salla-red); font-weight: 500; }
+  th.carrier-h { text-align: center; cursor: pointer; }
+  th.carrier-h:hover { background: var(--salla-red-lt); }
+  .tag { display: inline-block; font-size: 12px; padding: 0 8px; border-radius: 999px; }
+  .tag.bad { background: var(--salla-red-lt); color: var(--salla-red); }
+  .tag.ok { background: var(--salla-green-lt); color: var(--salla-green); }
+  .tag.mute { background: var(--salla-grey); color: var(--salla-muted); border: 1px solid var(--border); }
+  .phone { border: 1px solid var(--border); border-radius: 24px; padding: 16px; background: var(--surface); max-width: 340px; }
+  .ship-opt { border: 1px solid var(--border); border-radius: 8px; padding: 10px 12px; margin-top: 8px; display: flex; justify-content: space-between; }
+  .dead { text-align: center; padding: 24px 12px; color: var(--salla-red); }
+  .score td, .score th { text-align: center; }
+  .score td:first-child, .score th:first-child, .score td:last-child { text-align: start; }
+  .keep { color: var(--salla-green); font-weight: 700; }
+  .kill { color: var(--salla-muted); text-decoration: line-through; }
+  .toast { position: fixed; inset-inline: 16px; bottom: 16px; max-width: 420px; margin-inline-start: auto; background: var(--salla-text); color: var(--surface); padding: 10px 14px; border-radius: 8px; font-size: 13px; z-index: 10; }
+  .muted { color: var(--salla-muted); }
+</style>
+</head>
+<body>
+<header>
+  <h1>مسارات الشحن · الوجهات حسب تغطية شركات الشحن</h1>
+  <p>PDV2-839 · SI-381 · مجموعة مفاهيم للنقاش — قبل اجتماع البداية لم تُحسم بعد أسئلة النطاق والمؤشر</p>
+</header>
+<nav role="tablist" id="tabs"></nav>
+<main id="app"></main>
+<div id="toast" class="toast" hidden></div>
+
+<script>
+/* ---------- Data (illustrative, not real pricing) ---------- */
+const CITIES = [
+  ['ruh','الرياض','الرياض'],['dir','الدرعية','الرياض'],['jed','جدة','مكة المكرمة'],['mak','مكة','مكة المكرمة'],
+  ['taif','الطائف','مكة المكرمة'],['med','المدينة المنورة','المدينة المنورة'],['ynb','ينبع','المدينة المنورة'],
+  ['dmm','الدمام','الشرقية'],['khb','الخبر','الشرقية'],['ahs','الأحساء','الشرقية'],['qat','القطيف','الشرقية'],
+  ['jub','الجبيل','الشرقية'],['hfb','حفر الباطن','الشرقية'],['bur','بريدة','القصيم'],['una','عنيزة','القصيم'],
+  ['hai','حائل','حائل'],['tbk','تبوك','تبوك'],['abh','أبها','عسير'],['khm','خميس مشيط','عسير'],
+  ['jaz','جازان','جازان'],['njr','نجران','نجران'],['bah','الباحة','الباحة'],['arr','عرعر','الحدود الشمالية'],['skk','سكاكا','الجوف']
+].map(([id,name,region]) => ({id,name,region}));
+const CITY = Object.fromEntries(CITIES.map(c => [c.id, c]));
+const ALL = CITIES.map(c => c.id);
+
+const CARRIERS = [
+  {id:'redbox', name:'ريدبوكس', color:'#D9363E', cities:['ruh','jed','dmm','khb','mak','med']},
+  {id:'aymakan', name:'أي مكان', color:'#1F1F1F', cities:['ruh','dir','jed','mak','taif','med','dmm','khb','ahs','qat','jub','bur','una','abh','khm','tbk']},
+  {id:'jt', name:'جي آند تي إكسبريس', color:'#E5484D', cities:['ruh','dir','jed','mak','taif','med','ynb','dmm','khb','ahs','qat','jub','hfb','bur','una','hai','tbk','abh','khm','jaz']},
+  {id:'imile', name:'iMile', color:'#2E5BFF', cities:['ruh','jed','dmm','njr','bah','arr','skk','jaz','hai']},
+  {id:'prolo', name:'Prolo', color:'#1E3A8A', cities:[]}
+];
+const CAR = Object.fromEntries(CARRIERS.map(c => [c.id, c]));
+
+/* ---------- Helpers ---------- */
+const $ = s => document.querySelector(s);
+const bn = s => `<bdi>${esc(s)}</bdi>`;
+const esc = s => String(s).replace(/[&<>"]/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[ch]));
+function nCities(n) {
+  if (n === 0) return 'لا مدن';
+  if (n === 1) return 'مدينة واحدة';
+  if (n === 2) return 'مدينتان';
+  if (n <= 10) return `${n} مدن`;
+  return `${n} مدينة`;
+}
+function nCitiesG(n) { return n === 2 ? 'مدينتين' : nCities(n); }
+function nRoutes(n) {
+  if (n === 1) return 'مسار واحد';
+  if (n === 2) return 'مساران';
+  if (n <= 10) return `${n} مسارات`;
+  return `${n} مسارًا`;
+}
+function namesList(ids, max = 5) {
+  const names = ids.map(id => CITY[id].name);
+  if (names.length <= max) return names.join('، ');
+  const rest = names.length - max;
+  return names.slice(0, max).join('، ') + ` و${rest === 1 ? 'مدينة أخرى' : rest === 2 ? 'مدينتان أخريان' : ' ' + nCities(rest) + ' أخرى'}`;
+}
+function coverage(carrierIds) {
+  const s = new Set();
+  carrierIds.forEach(id => CAR[id].cities.forEach(c => s.add(c)));
+  return s;
+}
+function coveredBy(city, carrierIds) { return carrierIds.filter(id => CAR[id].cities.includes(city)); }
+function toast(msg) {
+  const t = $('#toast'); t.textContent = msg; t.hidden = false;
+  clearTimeout(toast._t); toast._t = setTimeout(() => t.hidden = true, 2600);
+}
+function byRegion(ids) {
+  const g = {};
+  ids.forEach(id => { (g[CITY[id].region] ||= []).push(id); });
+  return g;
+}
+function newState(extra = {}) {
+  return Object.assign({ type: 'pick', carriers: [], regionOn: true, cities: [], excluded: [], q: '', open: true,
+    removed: {}, notice: null, saveMsg: null, preview: null }, extra);
+}
+
+/* ---------- Shared form pieces ---------- */
+function typeSeg(k, st) {
+  const opts = [['pick','تحديد الشركات','العميل يختار من شركات محددة'],['auto','تعيين تلقائي','سلة تختار الشركة المناسبة'],['custom','تسمية خاصة','أسماء مخصصة — لا تخضع للتصفية']];
+  return `<label class="f">نوع المسار</label><div class="seg">${opts.map(([v,t,s]) =>
+    `<button aria-pressed="${st.type===v}" data-act="type" data-k="${k}" data-v="${v}">${t}<small>${s}</small></button>`).join('')}</div>`;
+}
+function carrierCards(k, st) {
+  return `<label class="f">شركات الشحن *</label><div class="carriers">${CARRIERS.map(c => {
+    const on = st.carriers.includes(c.id);
+    const meta = c.cities.length ? `تغطي ${nCitiesG(c.cities.length)} في السعودية` : '';
+    return `<label class="carrier ${on?'on':''}"><input type="checkbox" data-act="carrier" data-k="${k}" data-v="${c.id}" ${on?'checked':''}>
+      <span><span class="dot" style="background:${c.color}"></span>${esc(c.name)}
+      ${meta ? `<div class="meta">${meta}</div>` : `<div class="warn">لا توجد تسعيرة لهذا السوق</div>`}</span></label>`;
+  }).join('')}</div>`;
+}
+/* mode: 'hide' (candidate #0) | 'mark' (uncovered shown disabled with reason) */
+function cityPicker(k, st, mode) {
+  const filtering = st.type !== 'custom';
+  const cov = coverage(st.carriers);
+  if (filtering && st.carriers.length === 0) {
+    return `<input class="input" disabled placeholder="اختر شركة شحن أولاً لعرض المدن المتاحة"><div class="hint">القائمة تعتمد على تغطية شركات الشحن المختارة.</div>`;
+  }
+  const q = st.q.trim();
+  let rows = CITIES.filter(c => !q || c.name.includes(q) || c.region.includes(q));
+  const uncoveredHits = filtering ? rows.filter(c => !cov.has(c.id)) : [];
+  if (mode === 'hide' && filtering) rows = rows.filter(c => cov.has(c.id));
+  const list = rows.map(c => {
+    const ok = !filtering || cov.has(c.id);
+    const on = st.cities.includes(c.id);
+    if (!ok) return `<div class="opt off"><input type="checkbox" disabled> ${esc(c.name)} <span class="reg">· ${esc(c.region)}</span><span class="why">لا توصل لها شركاتك المختارة</span></div>`;
+    return `<label class="opt"><input type="checkbox" data-act="city" data-k="${k}" data-v="${c.id}" ${on?'checked':''}> ${esc(c.name)} <span class="reg">· ${esc(c.region)}</span></label>`;
+  }).join('');
+  let foot = '';
+  if (mode === 'hide' && q && uncoveredHits.length) {
+    foot = `<div class="empty">شركات الشحن المختارة لا توصل إلى ${esc(uncoveredHits.map(c => c.name).join('، '))}</div>`;
+  } else if (!rows.length) foot = `<div class="empty">لا توجد نتائج</div>`;
+  return `<input class="input" data-act="q" data-k="${k}" placeholder="ابحث عن مدينة" value="${esc(st.q)}">
+    <div class="picker"><div class="list">${list}${foot}</div></div>`;
+}
+function selectedChips(k, st, opts = {}) {
+  if (!st.cities.length) return `<div class="hint">لم تُختر مدن بعد.</div>`;
+  const cov = coverage(st.carriers);
+  return `<div class="chips" style="margin-top:8px">${st.cities.map(id => {
+    const bad = st.type !== 'custom' && !cov.has(id);
+    return `<span class="chip ${bad?'bad':''}">${esc(CITY[id].name)}${bad && opts.why ? ' · غير مغطاة' : ''}<button data-act="uncity" data-k="${k}" data-v="${id}" aria-label="إزالة">×</button></span>`;
+  }).join('')}</div>`;
+}
+function noticeBox(st) {
+  let h = '';
+  if (st.notice) h += `<div class="alert ${st.notice.kind}"><span class="grow">${st.notice.html}</span></div>`;
+  if (st.saveMsg) h += `<div class="alert ${st.saveMsg.kind}"><span class="grow">${st.saveMsg.html}</span></div>`;
+  return h;
+}
+function validate(st) {
+  if (!st.carriers.length) return {kind:'err', html:'اختر شركة شحن واحدة على الأقل.'};
+  if (st.regionOn && !st.cities.length) return {kind:'err', html:'أضف وجهة واحدة على الأقل.'};
+  if (st.type !== 'custom' && st.regionOn) {
+    const cov = coverage(st.carriers);
+    const bad = st.cities.filter(c => !cov.has(c));
+    if (bad.length) return {kind:'err', html:`لا يمكن حفظ المسار: ${namesList(bad)} غير مغطاة من شركات الشحن المختارة.`};
+  }
+  return {kind:'ok', html:'تم حفظ المسار.'};
+}
+
+/* ---------- Concept definitions ---------- */
+const S = {
+  p0: newState(),
+  p1: newState({regionOn:false, carriers:['redbox']}),
+  p2: newState({carriers:['redbox','aymakan'], cities:['ruh','jed','dmm','abh','tbk','hai']}),
+  p3: newState({regionOn:false}),
+  p4: newState({carriers:['redbox'], regionOn:false, test:'abh'}),
+  p5: newState({regionOn:false, custom:false}),
+};
+
+const CONCEPTS = [
+  { id:'p0', tab:'0 · المقترح كما ورد', lens:'<b>المقترح #0 (مقترح الـ PM):</b> بعد اختيار الشركات تظهر في القائمة المدن المغطاة فقط (اتحاد التغطية)، وتختفي غير المغطاة. إزالة شركة تُزيل المدن التي كانت تغطيها وحدها مع تنبيه، وإعادتها تُرجع المدن، والحفظ يُمنع عند وجود مدينة غير مغطاة. جرّب: اختر ريدبوكس وأي مكان، أضف أبها، ثم أزل أي مكان.', render: renderP0 },
+  { id:'p1', tab:'1 · نطاق المسار', lens:'<b>عدسة «أظهر النتيجة»:</b> لوحة «الملخص» الموجودة تتحول إلى «نطاق المسار»، وتعرض المدن التي يُطبّق عليها المسار فعلاً، والتي يوصل لها منها والتي لا يوصل. وتعمل حتى عندما <u>لا يوجد شرط مناطق</u> (المسار يُطبّق على كل السوق)، وهي الحالة التي لا يغطيها المقترح. المدن غير المغطاة تظهر معطلة مع السبب بدل إخفائها، اتساقاً مع SHPD-11893.', render: renderP1 },
+  { id:'p2', tab:'2 · مصفوفة التغطية', lens:'<b>عدسة «غيّر التمثيل»:</b> جدول المدن × الشركات يوضح أي شركة تغطي كل مدينة (يجيب سؤال SHPD-12089 عن الـ chips). اضغط على عنوان شركة لترى <u>قبل الإزالة</u> أي مدن ستخرج، ثم أكّد أو تراجع.', render: renderP2 },
+  { id:'p3', tab:'3 · سلة تقترح', lens:'<b>عدسة «اقلب الفاعل»:</b> النظام يقترح والتاجر يوافق. بعد اختيار الشركات يقترح النظام حصر المسار على كل المدن المغطاة بضغطة واحدة، ويقترح الشركة المفعّلة التي تسد أكبر عدد من الفجوات.', render: renderP3 },
+  { id:'p4', tab:'4 · عين العميل', lens:'<b>عدسة «بدّل وجهة النظر»:</b> اختر مدينة لترى ما سيراه العميل في صفحة الدفع بهذا المسار، سواء شركات متاحة أو «لا يوجد شركة شحن متوفرة».', render: renderP4 },
+  { id:'p5', tab:'5 · بلا قائمة وجهات', lens:'<b>عدسة «احذف أصعب مدخل»:</b> لا قائمة وجهات افتراضياً، فنطاق المسار = تغطية شركاته. التاجر يستثني فقط، ولا يمكن الوصول لحالة «غير مغطاة».', render: renderP5 },
+  { id:'p6', tab:'المسارات الحالية', lens:'<b>مشترك بين كل المفاهيم (القصة 3):</b> تنبيه بعدد المسارات غير مكتملة التغطية، ووسم في الجدول، ونموذج إصلاح بلا أي حذف صامت. المسار المعطّل يحمل الوسم لكنه لا يُحسب في التنبيه.', render: renderP6 },
+  { id:'score', tab:'المقارنة والتوصية', lens:'<b>التقارب:</b> كل مفهوم مُقيَّم من 1 إلى 5 على أربعة محاور، ثم استُبعد النصف على الأقل مع سطر يوضح ما تعلمناه منه.', render: renderScore },
+];
+
+/* ---------- p0 ---------- */
+function formCore(k, st, mode) {
+  return `<div class="card"><h3>معلومات مسار الشحن</h3>
+    <label class="f">اسم المسار *</label><input class="input" value="شحن المدن الرئيسية">
+    <label class="f">السوق *</label><select class="input"><option>السعودية</option></select>
+    ${typeSeg(k, st)}
+    ${carrierCards(k, st)}
+  </div>
+  <div class="card"><h3>شروط تطبيق المسار <small>اختياري</small></h3>
+    <label class="toggle"><input type="checkbox" data-act="regionOn" data-k="${k}" ${st.regionOn?'checked':''}> الطلب من مناطق محددة</label>
+    ${st.regionOn ? `<label class="f">مناطق مسموحة · السعودية</label>${cityPicker(k, st, mode)}${selectedChips(k, st)}
+      <div class="hint">المناطق المستثناة لا تخضع للتصفية، فاستثناء مدينة غير مغطاة لا يضر.</div>` :
+      `<div class="hint">بدون هذا الشرط يُطبّق المسار على كل مدن السوق.</div>`}
+  </div>`;
+}
+function renderP0() {
+  const st = S.p0;
+  return `<div class="layout"><div>${formCore('p0', st, 'hide')}${noticeBox(st)}
+    <div class="row"><button class="btn" data-act="save" data-k="p0">حفظ</button></div></div>
+    <aside class="card"><h3>الملخص</h3><p class="muted">في المقترح كما ورد تبقى لوحة الملخص كما هي.</p>
+    <p class="muted">ملاحظة: إذا أوقفت «الطلب من مناطق محددة» يُحفظ المسار حتى لو كانت شركاته لا تغطي إلا 6 مدن من 24، وهذه فجوة لا يعالجها المقترح.</p></aside></div>`;
+}
+
+/* ---------- p1 ---------- */
+function scopePanel(k, st) {
+  const scope = st.regionOn ? st.cities : ALL;
+  if (st.type === 'custom') return `<aside class="card summary"><h3>نطاق المسار</h3><p class="muted">التسمية الخاصة لا تخضع للتغطية، فالتاجر يحدد نطاقه.</p></aside>`;
+  if (!st.carriers.length) return `<aside class="card summary"><h3>نطاق المسار</h3><p class="muted">اختر شركة شحن لترى إلى أين يوصل هذا المسار.</p></aside>`;
+  const cov = coverage(st.carriers);
+  const ok = scope.filter(c => cov.has(c)), bad = scope.filter(c => !cov.has(c));
+  const pct = scope.length ? Math.round(ok.length / scope.length * 100) : 0;
+  const groups = byRegion(bad);
+  const others = CARRIERS.filter(c => !st.carriers.includes(c.id) && c.cities.length);
+  return `<aside class="card summary"><h3>نطاق المسار</h3>
+    ${scope.length ? `<div class="big">${ok.length} / ${scope.length}</div><div class="muted">${st.regionOn ? 'من المدن المختارة' : 'من كل مدن السعودية'} يوصل لها المسار</div>
+    <div class="bar"><span style="width:${pct}%"></span></div>` : `<p class="muted">لم تُختر مدن بعد.</p>`}
+    ${!st.regionOn && bad.length ? `<div class="alert warn"><span class="grow">بدون شرط مناطق يُطبّق المسار على كل المدن، و<b>${nCities(bad.length)}</b> منها لا توصل لها شركاتك. العميل فيها سيرى «لا يوجد شركة شحن متوفرة».
+      <div style="margin-top:6px"><button class="btn sm" data-act="limit" data-k="${k}">حصر المسار على ${nCitiesG(ok.length)} مغطاة</button></div></span></div>` : ''}
+    ${st.regionOn && !bad.length && scope.length ? `<div class="alert ok"><span class="grow">مسارك يوصل لكل المدن التي اخترتها.</span></div>` : ''}
+    ${bad.length ? `<div class="group"><h4>لا يوصل إلى (${bad.length})</h4>${Object.entries(groups).map(([r, ids]) =>
+      `<div style="margin-bottom:6px"><span class="muted">${esc(r)}:</span> ${ids.map(id => {
+        const alt = others.filter(c => c.cities.includes(id))[0];
+        return `<span class="tag bad">${esc(CITY[id].name)}</span>${alt ? ` <span class="muted" style="font-size:12px">(تغطيها ${bn(alt.name)})</span>` : ''}`;
+      }).join(' ')}</div>`).join('')}</div>` : ''}
+  </aside>`;
+}
+function renderP1() {
+  const st = S.p1;
+  return `<div class="layout"><div>${formCore('p1', st, 'mark')}${noticeBox(st)}
+    <div class="row"><button class="btn" data-act="save" data-k="p1">حفظ</button></div></div>${scopePanel('p1', st)}</div>`;
+}
+
+/* ---------- p2 ---------- */
+function renderP2() {
+  const st = S.p2;
+  const rows = st.cities;
+  const cov = coverage(st.carriers);
+  let prev = '';
+  if (st.preview) {
+    const rest = st.carriers.filter(c => c !== st.preview);
+    const nc = coverage(rest);
+    const lost = st.cities.filter(c => cov.has(c) && !nc.has(c));
+    prev = `<div class="alert ${lost.length ? 'warn' : 'info'}"><span class="grow">${lost.length
+      ? `إزالة <b>${bn(CAR[st.preview].name)}</b> ستخرج ${nCities(lost.length)} من المسار: ${namesList(lost)}.`
+      : `إزالة <b>${bn(CAR[st.preview].name)}</b> لا تؤثر على أي مدينة مختارة.`}
+      <div class="row" style="margin-top:6px"><button class="btn sm" data-act="p2confirm">إزالة${lost.length ? ' مع المدن' : ''}</button><button class="btn sm ghost" data-act="p2cancel">تراجع</button></div></span></div>`;
+  }
+  return `<div class="card"><h3>الشركات والوجهات</h3>${carrierCards('p2', st)}
+    <label class="f">مناطق مسموحة</label>${cityPicker('p2', st, 'mark')}</div>
+    <div class="card"><h3>مصفوفة التغطية <small>اضغط على عنوان شركة لمعاينة إزالتها</small></h3>${prev}
+    ${!rows.length || !st.carriers.length ? `<p class="muted">اختر شركة ومدينة على الأقل.</p>` : `<div class="scroll"><table>
+      <thead><tr><th>المدينة</th>${st.carriers.map(id => `<th class="carrier-h" data-act="p2preview" data-v="${id}" title="معاينة الإزالة"><span class="dot" style="background:${CAR[id].color}"></span>${esc(CAR[id].name)} ✕</th>`).join('')}<th>الحالة</th></tr></thead>
+      <tbody>${rows.map(id => {
+        const ok = cov.has(id);
+        return `<tr class="${ok?'':'bad'}"><td>${esc(CITY[id].name)} <span class="muted" style="font-size:12px">· ${esc(CITY[id].region)}</span></td>
+        ${st.carriers.map(c => CAR[c].cities.includes(id) ? '<td class="y">✓</td>' : '<td class="n">—</td>').join('')}
+        <td>${ok ? `<span class="tag ok">${coveredBy(id, st.carriers).length === 1 ? 'شركة واحدة' : 'مغطاة'}</span>` : `<span class="tag bad">غير مغطاة</span>`}</td></tr>`;
+      }).join('')}</tbody></table></div>
+      <p class="hint">«شركة واحدة» = مدينة ستخرج إذا أُزيلت هذه الشركة.</p>`}
+    ${noticeBox(st)}<button class="btn" data-act="save" data-k="p2">حفظ</button></div>`;
+}
+
+/* ---------- p3 ---------- */
+function renderP3() {
+  const st = S.p3;
+  const cov = coverage(st.carriers);
+  const covered = ALL.filter(c => cov.has(c));
+  const missing = ALL.filter(c => !cov.has(c));
+  let best = null;
+  CARRIERS.filter(c => !st.carriers.includes(c.id)).forEach(c => {
+    const n = c.cities.filter(x => missing.includes(x)).length;
+    if (n && (!best || n > best.n)) best = {c, n};
+  });
+  let suggest = '';
+  if (st.carriers.length && st.type !== 'custom') {
+    suggest = `<div class="card" style="border-color:var(--salla-teal)"><h3>✦ اقتراح سلة</h3>
+      ${!st.regionOn ? `<p>شركاتك المختارة توصل إلى <b>${nCitiesG(covered.length)}</b> من ${CITIES.length}.</p>
+      <div class="row"><button class="btn" data-act="p3apply">تطبيق المسار على المدن المغطاة</button><button class="btn ghost" data-act="p3manual">سأختار المدن بنفسي</button></div>` :
+      `<p class="muted">تم حصر المسار على ${nCitiesG(st.cities.length)}. يمكنك إزالة ما لا تريده من القائمة.</p>`}
+      ${best ? `<div class="alert info" style="margin-bottom:0"><span class="grow">${nCities(missing.length)} خارج التغطية. إضافة <b>${bn(best.c.name)}</b> (مفعّلة في متجرك) تغطي ${nCitiesG(best.n)} منها.
+        <div style="margin-top:6px"><button class="btn sm ghost" data-act="p3add" data-v="${best.c.id}">إضافة ${bn(best.c.name)}</button></div></span></div>` : (missing.length ? '' : `<div class="alert ok" style="margin-bottom:0"><span class="grow">شركاتك تغطي كل مدن السوق.</span></div>`)}
+    </div>`;
+  }
+  return `<div class="layout"><div><div class="card"><h3>معلومات مسار الشحن</h3>${typeSeg('p3', st)}${carrierCards('p3', st)}</div>
+    ${suggest}
+    ${st.regionOn ? `<div class="card"><h3>مناطق مسموحة</h3>${cityPicker('p3', st, 'mark')}${selectedChips('p3', st)}</div>` : ''}
+    ${noticeBox(st)}<button class="btn" data-act="save" data-k="p3">حفظ</button></div>
+    <aside class="card"><h3>الخطوات</h3><p class="muted">لبناء مسار على المدن المغطاة اليوم: إضافة شرط ← اختيار «مناطق محددة» ← اختيار الدولة ← تأشير كل مدينة على حدة، مع مراجعة تسعيرة كل شركة خارج النموذج.</p>
+    <p><b>هنا:</b> اختيار الشركات ← ضغطة «تطبيق». تعديل الاقتراح يبقى ممكناً.</p></aside></div>`;
+}
+
+/* ---------- p4 ---------- */
+function renderP4() {
+  const st = S.p4;
+  const inRoute = !st.regionOn || st.cities.includes(st.test);
+  const opts = coveredBy(st.test, st.carriers);
+  const price = {redbox:'15 ر.س · 2–3 أيام', aymakan:'22 ر.س · 1–3 أيام', jt:'19 ر.س · 2–4 أيام', imile:'18 ر.س · 3–5 أيام'};
+  let phone;
+  if (!inRoute) phone = `<p class="muted">${esc(CITY[st.test].name)} خارج نطاق هذا المسار، فيُطبّق مسار آخر أو الإعداد الافتراضي.</p>`;
+  else if (!opts.length) phone = `<div class="dead"><b>لا يوجد شركة شحن متوفرة</b><div class="muted" style="margin-top:6px">هذا ما سيراه عميلك في ${esc(CITY[st.test].name)}، ويغادر غالباً.</div></div>`;
+  else phone = opts.map(id => `<div class="ship-opt"><span><span class="dot" style="background:${CAR[id].color}"></span>${esc(CAR[id].name)}</span><span class="muted">${price[id] || ''}</span></div>`).join('');
+  return `<div class="layout"><div><div class="card"><h3>المسار</h3>${carrierCards('p4', st)}
+    <label class="toggle"><input type="checkbox" data-act="regionOn" data-k="p4" ${st.regionOn?'checked':''}> الطلب من مناطق محددة</label>
+    ${st.regionOn ? `${cityPicker('p4', st, 'mark')}${selectedChips('p4', st)}` : '<div class="hint">بدون شرط: يُطبّق على كل المدن.</div>'}</div></div>
+    <aside><div class="phone"><b>جرّب كعميل</b><label class="f">مدينة التوصيل</label>
+    <select class="input" data-act="p4test">${CITIES.map(c => `<option value="${c.id}" ${c.id===st.test?'selected':''}>${esc(c.name)}</option>`).join('')}</select>
+    <div style="margin-top:12px"><div class="muted" style="font-size:12px">خطوة شركة الشحن</div>${phone}</div></div></aside></div>`;
+}
+
+/* ---------- p5 ---------- */
+function renderP5() {
+  const st = S.p5;
+  const cov = coverage(st.carriers);
+  const covered = ALL.filter(c => cov.has(c) && !st.excluded.includes(c));
+  const g = byRegion(covered);
+  return `<div class="layout"><div><div class="card"><h3>معلومات مسار الشحن</h3>${carrierCards('p5', st)}</div>
+    <div class="card"><h3>إلى أين يوصل هذا المسار؟</h3>
+    ${!st.carriers.length ? '<p class="muted">اختر شركة شحن، وسيتحدد النطاق من تغطيتها.</p>' : `
+      <p>كل المدن التي تغطيها شركاتك: <b>${nCities(covered.length)}</b></p>
+      ${Object.entries(g).map(([r, ids]) => `<div style="margin-bottom:4px"><span class="muted">${esc(r)}:</span> ${ids.map(id => `<span class="chip">${esc(CITY[id].name)}<button data-act="p5ex" data-v="${id}" aria-label="استثناء">×</button></span>`).join(' ')}</div>`).join('')}
+      ${st.excluded.length ? `<div class="hint">مستثناة: ${st.excluded.map(id => `<button class="btn link" data-act="p5in" data-v="${id}">${esc(CITY[id].name)} ↺</button>`).join('، ')}</div>` : ''}
+      <div class="alert warn"><span class="grow">نقطة ضعف هذا المفهوم: إذا أضافت شركة تسعيرة لمدينة جديدة لاحقاً يتسع المسار تلقائياً، وهذا تغيير صامت يخالف SHPD-12083.</span></div>`}
+    </div>${noticeBox(st)}<button class="btn" data-act="save" data-k="p5">حفظ</button></div>
+    <aside class="card"><h3>الخطوات</h3><p class="muted">لا يوجد شرط مناطق ولا قائمة مدن للتأشير؛ التاجر يستثني فقط.</p></aside></div>`;
+}
+
+/* ---------- p6: existing routes ---------- */
+const ROUTES = [
+  {id:1, name:'المدن الرئيسية', active:true, carriers:['redbox'], cities:['ruh','jed','dmm','abh','tbk']},
+  {id:2, name:'مُرحّل: الشرقية مبرد', active:true, carriers:['redbox','imile'], cities:['dmm','khb','ahs','qat']},
+  {id:3, name:'الجنوب', active:true, carriers:['jt'], cities:['abh','khm','jaz']},
+  {id:4, name:'تجربة قديمة', active:false, carriers:['imile'], cities:['ruh','bur']},
+];
+let P6 = { edit: null, draft: null, addOpen: false, msg: null };
+function uncovered(r) { const cov = coverage(r.carriers); return r.cities.filter(c => !cov.has(c)); }
+function renderP6() {
+  const flagged = ROUTES.filter(r => uncovered(r).length);
+  const counted = flagged.filter(r => r.active);
+  let editor = '';
+  if (P6.edit) {
+    const d = P6.draft, bad = uncovered(d);
+    const fixers = CARRIERS.filter(c => !d.carriers.includes(c.id) && c.cities.some(x => bad.includes(x)));
+    editor = `<div class="card"><h3>تعديل: ${esc(d.name)}</h3>
+      <label class="f">شركات الشحن</label><div class="chips">${d.carriers.map(id => `<span class="chip"><span class="dot" style="background:${CAR[id].color}"></span>${esc(CAR[id].name)}</span>`).join('')}</div>
+      <label class="f">مناطق مسموحة</label><div class="chips">${d.cities.map(id => {
+        const b = bad.includes(id);
+        return `<span class="chip ${b?'bad':''}">${esc(CITY[id].name)}${b ? ' · لا توصل لها شركاتك' : ''}</span>`;
+      }).join('')}</div>
+      ${bad.length ? `<div class="alert warn"><span class="grow">${nCities(bad.length)} في هذا المسار لا توصل لها شركات الشحن المختارة.</span></div>
+      <div class="row"><button class="btn ghost sm" data-act="p6strip">إزالة المدن غير المغطاة</button><button class="btn ghost sm" data-act="p6addopen">إضافة شركة شحن</button></div>
+      ${P6.addOpen ? `<div class="list" style="border:1px solid var(--border);border-radius:8px;margin-top:8px">${fixers.length ? fixers.map(c => {
+        const n = c.cities.filter(x => bad.includes(x)).length;
+        return `<div class="opt" data-act="p6add" data-v="${c.id}"><span class="dot" style="background:${c.color}"></span>${esc(c.name)}<span class="why">تغطي ${n} من ${bad.length}</span></div>`;
+      }).join('') : '<div class="empty">لا توجد شركة مفعّلة تغطي هذه المدن.</div>'}</div>` : ''}` :
+      `<div class="alert ok"><span class="grow">كل المدن مغطاة الآن. التغيير لا يُحفظ قبل الضغط على «حفظ».</span></div>`}
+      ${P6.msg ? `<div class="alert ${P6.msg.kind}"><span class="grow">${P6.msg.html}</span></div>` : ''}
+      <div class="row" style="margin-top:12px"><button class="btn" data-act="p6save">حفظ</button><button class="btn ghost" data-act="p6cancel">إلغاء</button></div></div>`;
+  }
+  return `${counted.length ? `<div class="alert warn"><span class="grow"><b>${nRoutes(counted.length)}</b> ${counted.length === 1 ? 'فيه' : counted.length === 2 ? 'فيهما' : 'فيها'} مدن لا توصل لها شركات الشحن المختارة. راجعها لتجنب فشل الطلبات.</span></div>` :
+    `<div class="alert ok"><span class="grow">كل مساراتك النشطة مكتملة التغطية.</span></div>`}
+    <div class="card"><h3>مسارات الشحن</h3><div class="scroll"><table><thead><tr><th>المسار</th><th>الشركات</th><th>المدن</th><th>الحالة</th><th></th></tr></thead><tbody>
+    ${ROUTES.map(r => { const b = uncovered(r);
+      return `<tr><td>${esc(r.name)}</td><td>${r.carriers.map(id => esc(CAR[id].name)).join('، ')}</td><td>${r.cities.length}</td>
+      <td>${r.active ? '' : '<span class="tag mute">معطّل</span> '}${b.length ? `<span class="tag bad">مدن غير مغطاة · ${b.length}</span>` : '<span class="tag ok">مكتمل</span>'}</td>
+      <td><button class="btn sm ghost" data-act="p6edit" data-v="${r.id}">تعديل</button></td></tr>`; }).join('')}
+    </tbody></table></div></div>${editor}`;
+}
+
+/* ---------- score ---------- */
+function renderScore() {
+  const rows = [
+    ['0 · المقترح كما ورد', 3,4,3,3,'تحكّم','يصلح القائمة لكنه لا يرى المسارات بلا شرط مناطق، والإخفاء يناقض SHPD-11893.'],
+    ['1 · نطاق المسار', 4,5,3,4,'يبقى','الوحيد الذي يكشف المسارات المطبّقة على كل السوق، ويعيد استخدام لوحة الملخص.'],
+    ['2 · مصفوفة التغطية', 3,4,2,3,'يُستبعد','ثقيل مع 200 مدينة. ما نأخذه منه: <b>معاينة قبل الإزالة</b> بدل الإزالة الصامتة.'],
+    ['3 · سلة تقترح', 4,5,5,4,'يبقى','يحوّل تأشير المدن واحدة واحدة إلى ضغطة واحدة ويقترح الشركة التي تسد الفجوة.'],
+    ['4 · عين العميل', 3,3,2,5,'يُستبعد','أداة تشخيص لا تمنع الخطأ. ما نأخذه منه: صياغة النتيجة بلغة العميل («لا يوجد شركة شحن متوفرة»).'],
+    ['5 · بلا قائمة وجهات', 4,5,5,2,'يُستبعد','يتسع المسار تلقائياً عند تغير التسعيرة، وهذا تغيير صامت. ما نأخذه منه: افتراض «النطاق = التغطية» كاقتراح لا كقاعدة.'],
+  ];
+  return `<div class="card score"><h3>التقييم <small>1 = ضعيف · 5 = قوي · «كلفة الخطأ» 5 = منخفضة</small></h3><div class="scroll"><table>
+    <thead><tr><th>المفهوم</th><th>الأدلة</th><th>ملاءمة المؤشر</th><th>تقليل الخطوات</th><th>كلفة الخطأ</th><th>القرار</th><th>ما تعلمناه</th></tr></thead>
+    <tbody>${rows.map(r => `<tr><td>${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td><td>${r[3]}</td><td>${r[4]}</td>
+      <td class="${r[5]==='يبقى'?'keep':r[5]==='يُستبعد'?'kill':''}">${r[5]}</td><td>${r[6]}</td></tr>`).join('')}</tbody></table></div></div>
+  <div class="card"><h3>التوصية: 1 + 3، مع المعاينة من 2</h3>
+    <ol>
+      <li>لوحة <b>«نطاق المسار»</b> مكان «الملخص»، وتعمل مع شرط المناطق وبدونه.</li>
+      <li>بعد اختيار الشركات: <b>«تطبيق المسار على المدن المغطاة»</b> بضغطة واحدة، مع اقتراح الشركة التي تسد الفجوات.</li>
+      <li>المدن غير المغطاة <b>تظهر معطلة مع السبب</b> ولا تُخفى، اتساقاً مع SHPD-11893.</li>
+      <li>إزالة شركة تعرض <b>معاينة</b> بالمدن التي ستخرج قبل التنفيذ.</li>
+      <li>المسارات الحالية: التنبيه والوسم ونموذج الإصلاح كما في تبويب «المسارات الحالية».</li>
+    </ol>
+    <p class="muted">القصة: بصفتي تاجراً أبني مسار شحن، أريد أن أرى إلى أين يوصل مساري فعلاً قبل الحفظ، حتى لا يصل عميل إلى «لا يوجد شركة شحن متوفرة» في مدينة أظن أني أخدمها.</p>
+    <p class="muted">⚠️ هذه التوصية مشروطة بإجابة السؤال 1 (هل المسارات بدون شرط مناطق داخل النطاق) وبخط الأساس من SHPD-12087.</p></div>`;
+}
+
+/* ---------- Render + events ---------- */
+let current = 'p0';
+function render() {
+  $('#tabs').innerHTML = CONCEPTS.map(c => `<button role="tab" aria-selected="${c.id===current}" data-tab="${c.id}">${c.tab}</button>`).join('');
+  const c = CONCEPTS.find(x => x.id === current);
+  const focus = document.activeElement && document.activeElement.dataset.act === 'q' ? document.activeElement.dataset.k : null;
+  $('#app').innerHTML = `<div class="lens">${c.lens}</div>${c.render()}`;
+  if (focus) { const el = document.querySelector(`[data-act="q"][data-k="${focus}"]`); if (el) { el.focus(); el.setSelectionRange(el.value.length, el.value.length); } }
+}
+function setCarrier(st, id, on) {
+  st.notice = null; st.saveMsg = null;
+  if (on) {
+    st.carriers.push(id);
+    const back = (st.removed[id] || []).filter(c => !st.cities.includes(c));
+    if (back.length) { st.cities.push(...back); st.notice = {kind:'info', html:`أُعيدت ${nCities(back.length)}: ${namesList(back)}.`}; }
+    delete st.removed[id];
+    return;
+  }
+  st.carriers = st.carriers.filter(c => c !== id);
+  if (st.type === 'custom' || !st.regionOn) return;
+  const before = coverage([...st.carriers, id]);
+  const cov = coverage(st.carriers);
+  const lost = st.cities.filter(c => before.has(c) && !cov.has(c));
+  if (lost.length) {
+    st.cities = st.cities.filter(c => !lost.includes(c));
+    st.removed[id] = lost;
+    st.notice = {kind:'warn', html:`أُزيلت ${nCities(lost.length)} لأن شركات الشحن المختارة لا توصل لها: ${namesList(lost)}`};
+  }
+}
+document.addEventListener('click', e => {
+  const t = e.target.closest('[data-tab],[data-act]');
+  if (!t) return;
+  if (t.dataset.tab) { current = t.dataset.tab; render(); return; }
+  const act = t.dataset.act, st = S[t.dataset.k], v = t.dataset.v;
+  if (['carrier','city','regionOn','q'].includes(act) && t.tagName === 'INPUT' && t.type !== 'checkbox') return;
+  switch (act) {
+    case 'type': st.type = v; st.saveMsg = null; break;
+    case 'uncity': st.cities = st.cities.filter(c => c !== v); break;
+    case 'save': st.saveMsg = validate(st); if (st.saveMsg.kind === 'ok') toast('تم حفظ المسار'); break;
+    case 'limit': { const cov = coverage(st.carriers); st.regionOn = true; st.cities = ALL.filter(c => cov.has(c)); st.notice = {kind:'ok', html:`تم حصر المسار على ${nCitiesG(st.cities.length)}.`}; break; }
+    case 'p2preview': S.p2.preview = v; break;
+    case 'p2cancel': S.p2.preview = null; break;
+    case 'p2confirm': { const id = S.p2.preview; S.p2.preview = null; setCarrier(S.p2, id, false); break; }
+    case 'p3apply': { const s = S.p3, cov = coverage(s.carriers); s.regionOn = true; s.cities = ALL.filter(c => cov.has(c)); s.q = ''; break; }
+    case 'p3manual': S.p3.regionOn = true; break;
+    case 'p3add': setCarrier(S.p3, v, true); if (S.p3.regionOn) { /* widen list only, never auto-add */ } break;
+    case 'p5ex': S.p5.excluded.push(v); break;
+    case 'p5in': S.p5.excluded = S.p5.excluded.filter(c => c !== v); break;
+    case 'p6edit': { const r = ROUTES.find(x => x.id === +v); P6 = {edit: r.id, draft: {...r, carriers:[...r.carriers], cities:[...r.cities]}, addOpen:false, msg:null}; break; }
+    case 'p6cancel': P6 = {edit:null, draft:null, addOpen:false, msg:null}; break;
+    case 'p6strip': { const bad = uncovered(P6.draft); P6.draft.cities = P6.draft.cities.filter(c => !bad.includes(c)); P6.msg = null; break; }
+    case 'p6addopen': P6.addOpen = !P6.addOpen; break;
+    case 'p6add': P6.draft.carriers.push(v); P6.addOpen = false; P6.msg = null; break;
+    case 'p6save': {
+      const d = P6.draft;
+      if (!d.cities.length) { P6.msg = {kind:'err', html:'المسار بلا وجهات. أضف شركة شحن تغطي مدنه، أو احذف المسار.'}; break; }
+      const bad = uncovered(d);
+      if (bad.length) { P6.msg = {kind:'err', html:`لا يمكن حفظ المسار: ${namesList(bad)} غير مغطاة من شركات الشحن المختارة.`}; break; }
+      Object.assign(ROUTES.find(x => x.id === d.id), d);
+      P6 = {edit:null, draft:null, addOpen:false, msg:null}; toast('تم حفظ المسار'); break;
+    }
+    default: return;
+  }
+  render();
+});
+document.addEventListener('change', e => {
+  const t = e.target, act = t.dataset.act, st = S[t.dataset.k], v = t.dataset.v;
+  if (act === 'carrier') { setCarrier(st, v, t.checked); if (st === S.p2) st.preview = null; }
+  else if (act === 'city') { st.saveMsg = null; st.cities = t.checked ? [...st.cities, v] : st.cities.filter(c => c !== v); }
+  else if (act === 'regionOn') { st.regionOn = t.checked; st.saveMsg = null; st.notice = null; }
+  else if (act === 'p4test') S.p4.test = t.value;
+  else return;
+  render();
+});
+document.addEventListener('input', e => {
+  const t = e.target;
+  if (t.dataset.act === 'q') { S[t.dataset.k].q = t.value; render(); }
+});
+render();
+</script>
+</body>
+</html>
