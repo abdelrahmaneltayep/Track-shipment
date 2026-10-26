@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>الفروع والمستودعات + مستودعات سلة — نموذج تفاعلي</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet" />
+<style>
+/* ───────── Salla tokens (sampled from Figma + s.salla.sa) ───────── */
+:root{
+  --primary:#BAF3E6; --primary-h:#8FE9D3; --primary-dark:#004956; --primary-text:#004956;
+  --teal:#1E6C71; --teal-soft:#E6F6F4; --teal-line:#BFE5DF;
+  --bg:#F4F4F4; --card:#FFFFFF; --line:#E5E7EB; --line-strong:#D1D5DB;
+  --text:#2B2B2B; --text-2:#666666; --text-3:#9A9A9A;
+  --success:#008C56; --success-bg:#EFFBF6; --success-line:#B7E5D1;
+  --warn:#D18F36; --warn-bg:#FFF9EB; --warn-line:#F2DFB3;
+  --danger:#CA4146; --danger-bg:#FDEEEE; --danger-line:#F3C1C3;
+  --muted-bg:#EEEEEE; --muted-line:#DDDDDD;
+  --r:8px; --r-lg:12px; --shadow:0 1px 2px rgba(0,0,0,.05);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{font-family:'Tajawal','PingARLT',system-ui,sans-serif;font-size:14px;line-height:1.6;color:var(--text);background:var(--bg)}
+button{font:inherit;color:inherit;cursor:pointer;background:none;border:0}
+input{font:inherit}
+a{color:inherit;text-decoration:none}
+svg{display:block;flex:none}
+.hide{display:none!important}
+
+/* ───────── Prototype toolbar (not part of the product) ───────── */
+.proto{position:fixed;bottom:16px;left:50%;transform:translateX(-50%);z-index:200;background:#111;color:#fff;border-radius:999px;padding:6px 8px;display:flex;gap:4px;align-items:center;box-shadow:0 8px 30px rgba(0,0,0,.3);font-size:13px}
+.proto span{padding:0 8px;color:#aaa}
+.proto button{padding:6px 12px;border-radius:999px;color:#ddd}
+.proto button.on{background:var(--primary);color:var(--primary-dark);font-weight:700}
+
+/* ───────── App shell ───────── */
+.topbar{height:76px;background:var(--primary-dark);color:#fff;display:flex;align-items:center;padding:0 40px;gap:28px}
+.topbar .logo{font-weight:700;font-size:22px;display:flex;align-items:center;gap:8px}
+.topbar .logo i{width:40px;height:40px;border-radius:50%;background:#fff;display:inline-flex;align-items:center;justify-content:center;color:var(--primary-dark);font-weight:700}
+.topbar nav{display:flex;gap:6px;flex:1}
+.topbar nav a{padding:8px 14px;border-radius:var(--r);display:flex;align-items:center;gap:8px;font-size:15px;opacity:.95}
+.topbar nav a.active{background:var(--primary);color:var(--primary-dark);font-weight:700}
+.topbar .user{display:flex;align-items:center;gap:12px;font-size:13px}
+.topbar .avatar{width:40px;height:40px;border-radius:50%;background:#c9d6d8}
+.topbar .plan{background:rgba(255,255,255,.15);border-radius:999px;padding:1px 10px;font-size:11px}
+.subnav{height:60px;background:#fff;border-bottom:1px solid var(--line);display:flex;align-items:center;padding:0 40px;gap:28px}
+.subnav .tabs{display:flex;gap:24px;flex:1}
+.subnav .tabs a{padding:18px 0;color:var(--text-2);font-size:15px;border-bottom:2px solid transparent}
+.subnav .tabs a.active{color:var(--primary-dark);font-weight:700;border-color:var(--primary-dark)}
+.subnav .actions{display:flex;gap:10px}
+.crumbs{padding:16px 40px 0;color:var(--text-2);font-size:13px;display:flex;gap:10px;align-items:center}
+.crumbs b{color:var(--primary-dark);font-weight:500}
+.page{padding:16px 40px 120px;max-width:1500px;margin:0 auto}
+
+/* ───────── Buttons ───────── */
+.btn{display:inline-flex;align-items:center;gap:8px;height:40px;padding:0 16px;border-radius:var(--r);font-size:14px;font-weight:500;border:1px solid transparent;white-space:nowrap;transition:.15s}
+.btn.primary{background:var(--primary);color:var(--primary-dark)}
+.btn.primary:hover{background:var(--primary-h)}
+.btn.ghost{background:#fff;border-color:var(--line-strong);color:var(--text)}
+.btn.ghost:hover{border-color:var(--primary-dark)}
+.btn.soft{background:var(--teal-soft);color:var(--primary-dark);border-color:var(--teal-line)}
+.btn.link{color:var(--primary-dark);padding:0;height:auto;text-decoration:underline;text-underline-offset:4px}
+.btn.sm{height:32px;padding:0 10px;font-size:13px}
+.btn.icon{width:40px;padding:0;justify-content:center}
+.btn.icon.sm{width:32px}
+.btn[disabled]{opacity:.5;cursor:not-allowed}
+.btn.block{width:100%;justify-content:center;height:48px;font-size:15px;font-weight:700}
+
+/* ───────── Hero / banner ───────── */
+.banner{background:#fff;border-radius:var(--r-lg);box-shadow:var(--shadow);padding:20px 24px;display:flex;gap:28px;align-items:center;position:relative;margin-bottom:20px;overflow:hidden}
+.banner .close{position:absolute;left:16px;top:16px;width:32px;height:32px;border:1px solid var(--line);border-radius:var(--r);display:flex;align-items:center;justify-content:center;color:var(--text-2);background:#fff}
+.banner .art{width:270px;height:150px;border-radius:var(--r-lg);background:var(--primary);flex:none;position:relative;overflow:hidden}
+.banner .art .pin{position:absolute;background:#fff;border-radius:6px;padding:3px 8px;font-size:11px;font-weight:700;color:var(--primary-dark);box-shadow:0 2px 6px rgba(0,0,0,.12);display:flex;gap:6px;align-items:center}
+.banner .art .pin small{display:block;font-weight:400;color:var(--text-2);font-size:10px;line-height:1.2}
+.banner .body{flex:1;min-width:0}
+.banner .kicker{display:flex;align-items:center;gap:10px;color:var(--text-2);font-size:13px;margin-bottom:4px}
+.banner h2{font-size:20px;color:var(--primary-dark);font-weight:700;margin-bottom:6px}
+.banner p{color:var(--text-2);max-width:760px}
+.banner .cta{display:flex;gap:10px;margin-top:14px}
+.banner.compact .art{width:200px;height:120px}
+.chip{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:2px 10px;font-size:12px;border:1px solid var(--teal-line);background:var(--teal-soft);color:var(--primary-dark);font-weight:500}
+.chip.warn{background:var(--warn-bg);border-color:var(--warn-line);color:var(--warn)}
+.chip.ok{background:var(--success-bg);border-color:var(--success-line);color:var(--success)}
+
+/* ───────── Page header ───────── */
+.ph{display:flex;align-items:center;justify-content:space-between;margin:8px 0 16px}
+.ph h1{font-size:24px;font-weight:700;color:var(--primary-dark)}
+.ph .actions{display:flex;gap:10px}
+
+/* ───────── Card + table ───────── */
+.card{background:#fff;border-radius:var(--r-lg);box-shadow:var(--shadow);overflow:hidden}
+.card .head{padding:16px 20px 0;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.card .head h3{font-size:16px;font-weight:700}
+.filtertabs{display:flex;gap:4px;border-bottom:1px solid var(--line);padding:0 20px;margin-top:8px}
+.filtertabs button{padding:12px 14px;color:var(--text-2);border-bottom:2px solid transparent;display:flex;gap:8px;align-items:center;font-size:14px}
+.filtertabs button .n{background:var(--muted-bg);border-radius:999px;padding:0 8px;font-size:12px;color:var(--text-2)}
+.filtertabs button.on{color:var(--primary-dark);font-weight:700;border-color:var(--primary-dark)}
+.filtertabs button.on .n{background:var(--primary);color:var(--primary-dark)}
+.toolbar{display:flex;gap:10px;padding:14px 20px;align-items:center}
+.search{flex:1;height:40px;border:1px solid var(--line);border-radius:var(--r);display:flex;align-items:center;gap:8px;padding:0 12px;color:var(--text-3)}
+.search input{border:0;outline:0;flex:1;background:transparent;color:var(--text)}
+.legend{margin:0 20px 12px;padding:10px 14px;border-radius:var(--r);background:#FAFAFA;border:1px dashed var(--line-strong);display:flex;gap:28px;align-items:center;font-size:13px;color:var(--text-2);flex-wrap:wrap}
+.legend b{color:var(--text);font-weight:500}
+table{width:100%;border-collapse:collapse}
+th{background:#F8F8F8;color:var(--text-2);font-weight:500;font-size:13px;text-align:right;padding:12px 14px;white-space:nowrap;border-bottom:1px solid var(--line)}
+td{padding:12px 14px;border-bottom:1px solid var(--line);vertical-align:middle;font-size:14px}
+tr:last-child td{border-bottom:0}
+tr.salla td{background:#FBFEFD}
+td .name{color:var(--primary-dark);font-weight:700}
+td .sub{display:flex;align-items:center;gap:6px;color:var(--text-3);font-size:12px;margin-top:2px}
+.type{display:inline-flex;align-items:center;gap:5px;border-radius:999px;padding:0 8px;font-size:11px;font-weight:700;height:20px}
+.type.priv{background:var(--muted-bg);color:var(--text-2)}
+.type.salla{background:var(--primary);color:var(--primary-dark)}
+.tag{display:inline-flex;align-items:center;gap:6px;height:28px;padding:0 10px;border-radius:999px;font-size:13px;border:1px solid}
+.tag i{width:8px;height:8px;border-radius:50%;background:currentColor;display:inline-block}
+.tag.on{background:var(--success-bg);border-color:var(--success-line);color:var(--success)}
+.tag.off{background:var(--muted-bg);border-color:var(--muted-line);color:var(--text-3)}
+.tag.closed{background:var(--danger-bg);border-color:var(--danger-line);color:var(--danger)}
+.tag.wait{background:var(--warn-bg);border-color:var(--warn-line);color:var(--warn)}
+.tag.na{background:transparent;border-color:transparent;color:var(--text-3);padding:0}
+.tag.info{background:var(--teal-soft);border-color:var(--teal-line);color:var(--primary-dark)}
+.tag .chev{opacity:.6}
+.row-actions{display:flex;gap:8px;align-items:center;justify-content:flex-start}
+.menu{position:absolute;background:#fff;border:1px solid var(--line);border-radius:var(--r);box-shadow:0 10px 30px rgba(0,0,0,.12);min-width:190px;padding:6px;z-index:50}
+.menu button{width:100%;display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:6px;text-align:right}
+.menu button:hover{background:#F6F6F6}
+.menu button.danger{color:var(--danger)}
+.tfoot{display:flex;align-items:center;justify-content:space-between;padding:12px 20px;color:var(--text-2);font-size:13px}
+.pager{display:flex;gap:6px}
+.pager button{width:32px;height:32px;border:1px solid var(--line);border-radius:6px;display:flex;align-items:center;justify-content:center;color:var(--text-2)}
+.empty{padding:56px 20px;text-align:center;color:var(--text-2)}
+.empty .ico{width:72px;height:72px;border-radius:50%;background:var(--teal-soft);display:flex;align-items:center;justify-content:center;margin:0 auto 14px;color:var(--primary-dark)}
+
+/* ───────── Salla warehouses browse (inside page) ───────── */
+.hero{background:var(--primary);border-radius:var(--r-lg);padding:28px 32px;display:flex;gap:24px;align-items:center;margin-bottom:24px;position:relative;overflow:hidden}
+.hero h2{font-size:26px;color:var(--primary-dark);font-weight:700;margin-bottom:8px}
+.hero p{color:#234F57;font-size:15px;max-width:720px}
+.hero .map{width:300px;height:190px;flex:none;position:relative}
+.hero .map .k{position:absolute;background:#fff;border-radius:8px;padding:6px 10px;font-size:11px;color:var(--text-2);box-shadow:0 2px 8px rgba(0,0,0,.1)}
+.hero .map .k b{display:block;font-size:14px;color:var(--primary-dark)}
+.sec-title{display:flex;align-items:flex-end;justify-content:space-between;margin:6px 0 12px}
+.sec-title h2{font-size:22px;color:var(--primary-dark);font-weight:700}
+.sec-title p{color:var(--text-2)}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:16px}
+.wcard{background:#fff;border:1px solid var(--line);border-radius:var(--r-lg);padding:18px}
+.wcard .top{display:flex;justify-content:space-between;align-items:flex-start}
+.wcard .city{display:flex;gap:6px;align-items:center;font-weight:700;font-size:16px;color:var(--text)}
+.wcard .city svg{color:var(--primary-dark)}
+.wcard .nm{color:var(--text-2);margin:4px 0 10px}
+.wcard .tags{display:flex;gap:6px;flex-wrap:wrap}
+.wcard .tags span{background:#F3F4F6;border-radius:999px;padding:1px 10px;font-size:12px;color:var(--text-2)}
+.wcard .op{display:flex;align-items:center;gap:8px;color:var(--text-2);font-size:13px;margin:12px 0;padding-bottom:12px;border-bottom:1px solid var(--line)}
+.wcard .op i{width:18px;height:18px;border-radius:4px;background:#E2231A;display:inline-block}
+.wcard .price{font-size:13px;color:var(--text-2)}
+.wcard .price b{font-size:16px;color:var(--text)}
+.wcard .btns{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+
+/* ───────── Modal / drawer / toast ───────── */
+.overlay{position:fixed;inset:0;background:rgba(0,73,86,.55);z-index:100;display:flex;align-items:center;justify-content:center;padding:20px}
+.modal{background:#fff;border-radius:16px;width:min(760px,100%);padding:28px;position:relative;max-height:92vh;overflow:auto}
+.modal.sm{width:min(500px,100%);text-align:center}
+.modal h3{font-size:20px;font-weight:700;color:var(--text);margin-bottom:6px}
+.modal .desc{color:var(--text-2);margin-bottom:18px}
+.modal .x{position:absolute;left:20px;top:20px;width:36px;height:36px;border:1px solid var(--line);border-radius:8px;display:flex;align-items:center;justify-content:center;color:var(--text-2)}
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.opt{border:2px solid var(--line);border-radius:12px;padding:18px;cursor:pointer;position:relative;transition:.15s}
+.opt:hover{border-color:var(--teal-line)}
+.opt.on{border-color:var(--primary-dark);background:#F7FDFB}
+.opt .ic{width:48px;height:48px;border-radius:12px;background:var(--teal-soft);display:flex;align-items:center;justify-content:center;color:var(--primary-dark);margin-bottom:12px}
+.opt h4{font-size:16px;font-weight:700;margin-bottom:4px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.opt p{color:var(--text-2);font-size:13px}
+.opt .radio{position:absolute;left:14px;top:14px;width:20px;height:20px;border-radius:50%;border:2px solid var(--line-strong)}
+.opt.on .radio{border-color:var(--primary-dark);background:radial-gradient(var(--primary-dark) 45%,#fff 50%)}
+.cmp{width:100%;margin-top:18px;border:1px solid var(--line);border-radius:10px;overflow:hidden;font-size:13px}
+.cmp th{background:#F8F8F8;padding:10px 14px}
+.cmp td{padding:9px 14px}
+.cmp td:first-child{color:var(--text-2)}
+.cmp .y{color:var(--success);font-weight:700}
+.cmp .n{color:var(--text-3)}
+.modal .foot{display:flex;gap:10px;justify-content:flex-start;margin-top:20px}
+.modal.sm .foot{display:grid;grid-template-columns:1fr 1fr}
+.modal .mark{width:60px;height:60px;border-radius:50%;border:3px solid #3B82F6;color:#3B82F6;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;font-size:28px;font-weight:700}
+.drawer{position:fixed;top:0;bottom:0;left:0;width:min(620px,100%);background:#fff;z-index:110;box-shadow:-10px 0 40px rgba(0,0,0,.2);display:flex;flex-direction:column}
+.drawer .dh{display:flex;align-items:center;justify-content:space-between;padding:20px 24px;border-bottom:1px solid var(--line)}
+.drawer .dh h3{font-size:18px;font-weight:700}
+.drawer .db{padding:20px 24px;overflow:auto;flex:1}
+.drawer .df{padding:16px 24px;border-top:1px solid var(--line)}
+.route{display:flex;align-items:center;justify-content:space-between;padding:16px;border:1px solid var(--line);border-radius:10px;margin-bottom:10px}
+.route .l{display:flex;gap:12px;align-items:center}
+.route .ic{width:40px;height:40px;border-radius:10px;background:var(--teal-soft);display:flex;align-items:center;justify-content:center;color:var(--primary-dark)}
+.route h4{font-weight:700;font-size:15px;display:flex;gap:8px;align-items:baseline}
+.route h4 small{font-weight:400;color:var(--text-2);font-size:12px}
+.route p{font-size:12px;color:var(--text-2)}
+.route p b{color:var(--text);font-weight:500}
+.switch{width:40px;height:22px;border-radius:999px;background:var(--primary-dark);position:relative;flex:none}
+.switch::after{content:"";position:absolute;top:3px;left:3px;width:16px;height:16px;border-radius:50%;background:#fff}
+.switch.off{background:#CFCFCF}.switch.off::after{left:auto;right:3px}
+.toast{position:fixed;top:96px;left:40px;background:#fff;border-radius:10px;box-shadow:0 10px 30px rgba(0,0,0,.15);padding:14px 18px;display:flex;align-items:center;gap:12px;z-index:150;min-width:360px;overflow:hidden;animation:pop .25s ease}
+.toast::after{content:"";position:absolute;bottom:0;right:0;height:4px;width:45%;background:#56CFA1}
+.toast .ok{width:28px;height:28px;border-radius:50%;background:var(--primary-dark);color:#fff;display:flex;align-items:center;justify-content:center}
+.toast b{font-size:15px}
+.toast .x{margin-right:auto;color:var(--text-3)}
+@keyframes pop{from{transform:translateY(-8px);opacity:0}to{transform:none;opacity:1}}
+
+/* ───────── Form (private branch — existing flow) ───────── */
+.form .fcard{background:#fff;border-radius:var(--r-lg);box-shadow:var(--shadow);padding:20px 24px;margin-bottom:16px}
+.form .fcard h3{font-size:16px;font-weight:700;margin-bottom:16px}
+.field{margin-bottom:14px}
+.field label{display:block;margin-bottom:6px;font-size:14px}
+.field label b{color:var(--danger)}
+.field .in{height:44px;border:1px solid var(--line);border-radius:var(--r);display:flex;align-items:center;justify-content:space-between;padding:0 12px;color:var(--text-3)}
+.mapph{height:200px;border-radius:var(--r);background:#E7E5E0;display:flex;align-items:center;justify-content:center;color:var(--text-3)}
+
+/* ───────── Shipping page bits ───────── */
+.shiplist{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.ship{background:#fff;border:1px solid var(--line);border-radius:var(--r-lg);padding:16px;display:flex;flex-direction:column;gap:8px}
+.ship .lg{height:44px;border-radius:8px;background:#F3F4F6;display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--text-2)}
+.ship h4{font-weight:700}
+.ship p{font-size:12px;color:var(--text-2)}
+
+/* ───────── Notes panel ───────── */
+.notes{position:fixed;right:0;top:0;bottom:0;width:380px;background:#fff;z-index:180;box-shadow:-10px 0 40px rgba(0,0,0,.2);padding:24px;overflow:auto;font-size:13px}
+.notes h3{font-size:16px;margin-bottom:10px;color:var(--primary-dark)}
+.notes ol,.notes ul{padding-right:18px;margin-bottom:14px}
+.notes li{margin-bottom:6px}
+.notes .x{position:absolute;left:16px;top:16px}
+</style>
+</head>
+<body>
+
+<!-- ═══════════ App shell ═══════════ -->
+<header class="topbar">
+  <div class="logo"><i>س</i> سلة</div>
+  <nav>
+    <a href="#"><span>☰</span> الكل</a>
+    <a href="#">الرئيسية</a>
+    <a href="#">الطلبات</a>
+    <a href="#" id="nav-products" class="active">المنتجات</a>
+    <a href="#">التسويق</a>
+    <a href="#">المتجر وقنوات البيع</a>
+    <a href="#">التقارير</a>
+  </nav>
+  <div class="user"><div><div>Shipping</div><span class="plan">برو</span></div><div class="avatar"></div></div>
+</header>
+
+<div class="subnav" id="subnav-products">
+  <div class="tabs">
+    <a href="#">إدارة المنتجات</a><a href="#">إعدادات المنتجات</a><a href="#">التصنيفات والخيارات</a><a href="#">محرر المنتجات</a><a href="#">إدارة المخزون</a><a href="#">نقل المخزون</a><a href="#" class="active">••• المزيد</a>
+  </div>
+  <div class="actions">
+    <button class="btn primary" id="btn-new" onclick="openChooser()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 5v14M5 12h14"/></svg>
+      فرع أو مستودع جديد
+    </button>
+    <button class="btn ghost"><span>✦</span> مشمر</button>
+  </div>
+</div>
+<div class="subnav hide" id="subnav-shipping">
+  <div class="tabs">
+    <a href="#" class="active">الشحن والتوصيل</a><a href="#">إدارة التشغيل</a><a href="#">مواد التغليف</a><a href="#">أرشيف البوليصات</a><a href="#">••• المزيد</a>
+  </div>
+  <div class="actions"><button class="btn ghost">؟ مركز المساعدة</button></div>
+</div>
+
+<!-- ═══════════ PAGE 1 · الفروع والمستودعات ═══════════ -->
+<section id="page-branches">
+  <div class="crumbs" id="crumbs-list">المنتجات <span>‹</span> <b>الفروع والمستودعات</b></div>
+
+  <!-- ── VIEW: list ── -->
+  <div class="page" id="view-list">
+
+    <!-- Banner: Salla Warehouses feature -->
+    <div class="banner" id="banner-salla">
+      <button class="close" title="إخفاء" onclick="document.getElementById('banner-salla').classList.add('hide')">✕</button>
+      <div class="art">
+        <svg viewBox="0 0 270 150" width="270" height="150" fill="none" style="position:absolute;inset:0">
+          <path d="M60 25 L150 15 L220 40 L235 85 L200 125 L120 135 L60 105 L45 60 Z" fill="#8FE9D3"/>
+          <circle cx="150" cy="60" r="4" fill="#004956"/><circle cx="110" cy="95" r="4" fill="#004956"/><circle cx="190" cy="50" r="4" fill="#004956"/><circle cx="120" cy="50" r="4" fill="#004956"/>
+        </svg>
+        <span class="pin" style="top:14px;right:14px">▣ <span>+15 مستودعاً<small>في المملكة</small></span></span>
+        <span class="pin" style="bottom:14px;left:14px">⏱ <span>24 ساعة<small>متوسط وقت التوصيل</small></span></span>
+      </div>
+      <div class="body">
+        <div class="kicker">مستودعات سلة <span class="chip">متاحة في باقتك</span></div>
+        <h2>خزّن مخزونك في مستودعات سلة وخلّنا نجهّز ونشحن عنك</h2>
+        <p>أضف مستودعاً من مستودعات سلة كأنه فرع من فروعك: نستلم مخزونك، نجهّز الطلبات ونشحنها عبر شركاء سلة خلال الساعة نفسها لكل طلب مؤهل، وبتكلفة تبدأ من 6 ر.س للطلب.</p>
+        <div class="cta">
+          <button class="btn primary" onclick="goBrowse()">تصفح مستودعات سلة</button>
+          <button class="btn ghost">اعرف أكثر</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="ph">
+      <h1>الفروع والمستودعات</h1>
+      <div class="actions"><button class="btn ghost">⊞ إدارة المستودعات المتعددة</button></div>
+    </div>
+
+    <div class="card">
+      <div class="head"><h3>الفروع والمستودعات</h3></div>
+      <div class="filtertabs" id="ftabs">
+        <button class="on" data-f="all" onclick="setFilter('all')">الكل <span class="n" id="n-all"></span></button>
+        <button data-f="private" onclick="setFilter('private')">فروعي ومستودعاتي الخاصة <span class="n" id="n-private"></span></button>
+        <button data-f="salla" onclick="setFilter('salla')">مستودعات سلة <span class="n" id="n-salla"></span></button>
+      </div>
+      <div class="toolbar">
+        <div class="search">🔍 <input placeholder="ابحث باسم الفرع أو المستودع" id="q" oninput="render()"></div>
+        <button class="btn ghost">⊟ تخصيص الأعمدة</button>
+        <button class="btn ghost">⚲ تصفية</button>
+      </div>
+      <div class="legend" id="legend">
+        <span><span class="type priv">خاص</span> <b>فرع / مستودع خاص:</b> تملكه وتديره بنفسك — استلام وتوصيل من الفرع ومخزون تديره أنت.</span>
+        <span><span class="type salla">مستودع سلة</span> <b>مستودع سلة:</b> سلة تخزّن وتجهّز وتشحن عبر شركائها. الاستلام من الفرع غير متاح، والتوصيل عبر مسارات شحن سلة.</span>
+      </div>
+      <div style="overflow:auto">
+      <table>
+        <thead><tr>
+          <th style="width:36px"><input type="checkbox"></th>
+          <th>الفروع والمستودعات</th><th>الدولة</th><th>المدينة</th><th>الحي</th><th>نطاق التغطية</th><th>الاستلام من الفرع</th><th>التوصيل</th><th>الحالة ⓘ</th><th style="width:150px">الإجراءات</th>
+        </tr></thead>
+        <tbody id="rows"></tbody>
+      </table>
+      </div>
+      <div class="empty hide" id="empty-salla">
+        <div class="ico"><svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 9l9-5 9 5v11H3z"/><path d="M8 20v-7h8v7"/></svg></div>
+        <h3 style="margin-bottom:6px">ما عندك مستودعات سلة بعد</h3>
+        <p>احجز أول مستودع من مراكز تخزين سلة ويظهر هنا جنب فروعك ومستودعاتك.</p>
+        <button class="btn primary" style="margin-top:14px" onclick="goBrowse()">تصفح مستودعات سلة</button>
+      </div>
+      <div class="tfoot">
+        <div>عدد العناصر في الصفحة <b>15</b></div>
+        <div style="display:flex;gap:10px;align-items:center"><span>صفحة 1 من 1</span><div class="pager"><button>⇥</button><button>→</button><button>←</button><button>⇤</button></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── VIEW: browse Salla warehouses ── -->
+  <div class="page hide" id="view-browse">
+    <div class="hero">
+      <div style="flex:1">
+        <h2>تحكّم كامل في مخزونك مع مستودعات سلة</h2>
+        <p>خزّن منتجاتك وجهّزها واشحنها عبر شبكة شركاء سلة — وفعّل توصيل <b style="color:#B45309">محلي إكسبريس</b> خلال الساعة نفسها لكل طلب مؤهل. المستودع المحجوز يظهر مباشرة في جدول الفروع والمستودعات.</p>
+        <button class="btn ghost" style="margin-top:14px">← اعرف أكثر</button>
+      </div>
+      <div class="map">
+        <svg viewBox="0 0 300 190" width="300" height="190" fill="none" style="position:absolute;inset:0"><path d="M70 30 L170 18 L250 45 L265 100 L225 150 L130 165 L65 125 L45 70 Z" fill="#8FE9D3"/><circle cx="165" cy="70" r="4" fill="#004956"/><circle cx="120" cy="110" r="4" fill="#004956"/><circle cx="215" cy="60" r="4" fill="#004956"/><circle cx="135" cy="60" r="4" fill="#004956"/><circle cx="150" cy="140" r="4" fill="#004956"/></svg>
+        <span class="k" style="top:8px;right:8px"><b>+15</b>مستودع في المملكة</span>
+        <span class="k" style="top:90px;left:8px"><b>24 ساعة</b>متوسط وقت التوصيل</span>
+        <span class="k" style="bottom:8px;right:40px"><b>+50 ألف</b>تاجر يستخدم الخدمة</span>
+      </div>
+    </div>
+
+    <div class="sec-title">
+      <div><h2>مراكز تخزين سلة</h2><p>ثبّت شريكاً معتمداً أو أكثر — كل شريك يصبح مستودعاً في جدول الفروع والمستودعات.</p></div>
+      <button class="btn ghost" onclick="goList()">→ الرجوع للفروع والمستودعات</button>
+    </div>
+    <div class="search" style="background:#fff">🔍 <input placeholder="ابحث عن مدينة أو شريك"></div>
+
+    <div class="grid" id="wgrid"></div>
+  </div>
+
+  <!-- ── VIEW: private branch form (existing flow, abbreviated) ── -->
+  <div class="page form hide" id="view-form">
+    <div class="banner compact">
+      <div class="art" style="background:var(--teal-soft);display:flex;align-items:center;justify-content:center;color:var(--primary-dark);font-size:40px">🧺</div>
+      <div class="body"><div class="kicker">الاستلام من الفروع <span class="chip">متاحة في باقتك</span></div><h2>حوّل طلبات الأونلاين إلى زيارات لفرعك</h2><p>عند تفعيل الاستلام من الفرع، يقدر عميلك يطلب أونلاين ويجي يستلم من محلك خلال دقائق.</p></div>
+    </div>
+    <div class="fcard"><h3>المعلومات الأساسية</h3>
+      <div class="field"><label>النوع <b>*</b></label><div class="in"><span style="color:var(--text)">فرع</span><span>⌄</span></div></div>
+      <div class="field"><label>الاسم <b>*</b></label><div class="in"><span>الاسم</span><span class="chip">AR ⌄</span></div></div>
+    </div>
+    <div class="fcard"><h3>عنوان الفرع</h3>
+      <div class="field"><label>الموقع على الخريطة</label><div class="mapph">📍 خريطة</div></div>
+      <div class="field"><label>الدولة <b>*</b></label><div class="in"><span>الدولة</span><span>⌄</span></div></div>
+    </div>
+    <div style="display:flex;gap:10px"><button class="btn primary" onclick="goList()">حفظ</button><button class="btn ghost" onclick="goList()">إلغاء</button></div>
+  </div>
+</section>
+
+<!-- ═══════════ PAGE 2 · الشحن والتوصيل ═══════════ -->
+<section id="page-shipping" class="hide">
+  <div class="crumbs">الرئيسية <span>‹</span> <b>الشحن والتوصيل</b></div>
+  <div class="page">
+    <div class="banner" id="banner-ship">
+      <button class="close" onclick="document.getElementById('banner-ship').classList.add('hide')">✕</button>
+      <div class="art">
+        <svg viewBox="0 0 270 150" width="270" height="150" fill="none" style="position:absolute;inset:0"><path d="M60 25 L150 15 L220 40 L235 85 L200 125 L120 135 L60 105 L45 60 Z" fill="#8FE9D3"/><circle cx="150" cy="60" r="4" fill="#004956"/><circle cx="110" cy="95" r="4" fill="#004956"/><circle cx="190" cy="50" r="4" fill="#004956"/></svg>
+        <span class="pin" style="top:14px;right:14px">▣ <span>+15 مستودعاً<small>في المملكة</small></span></span>
+        <span class="pin" style="bottom:14px;left:14px">⏱ <span>24 ساعة<small>متوسط وقت التوصيل</small></span></span>
+      </div>
+      <div class="body">
+        <div class="kicker">مستودعات سلة <span class="chip">متاحة في باقتك</span></div>
+        <h2>اشحن من مستودعات سلة بدل ما تشحن من عندك</h2>
+        <p>خزّن منتجاتك في أقرب مستودع سلة وتتولى سلة التجهيز والشحن عبر شركائها بمسارات شحن جاهزة (سريع، عادي، اقتصادي). تدير مستودعات سلة من صفحة الفروع والمستودعات.</p>
+        <div class="cta">
+          <button class="btn primary" onclick="goShippingToSalla()">استعرض مستودعات سلة</button>
+          <button class="btn ghost">اعرف أكثر</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="ph"><h1>شركات الشحن</h1><div class="actions"><button class="btn ghost">⊞ إعدادات الشحن</button><button class="btn primary">+ إضافة شركة شحن</button></div></div>
+    <div class="shiplist">
+      <div class="ship"><div class="lg">أرامكس</div><h4>أرامكس</h4><p>مفعّل · 3 مسارات</p><span class="tag on"><i></i>مفعل</span></div>
+      <div class="ship"><div class="lg">SMSA</div><h4>سمسا</h4><p>مفعّل · مسار واحد</p><span class="tag on"><i></i>مفعل</span></div>
+      <div class="ship"><div class="lg">DHL</div><h4>دي إتش إل</h4><p>غير مفعّل</p><span class="tag off"><i></i>معطل</span></div>
+      <div class="ship"><div class="lg">J&T</div><h4>جي آند تي</h4><p>غير مفعّل</p><span class="tag off"><i></i>معطل</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ Chooser modal ═══════════ -->
+<div class="overlay hide" id="m-chooser" onclick="if(event.target===this)closeChooser()">
+  <div class="modal">
+    <button class="x" onclick="closeChooser()">✕</button>
+    <h3>فرع أو مستودع جديد</h3>
+    <p class="desc">اختر نوع الموقع اللي تبي تضيفه لمتجرك.</p>
+    <div class="opts">
+      <div class="opt on" id="opt-private" onclick="pick('private')">
+        <span class="radio"></span>
+        <div class="ic"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 9l1.5-5h15L21 9"/><path d="M3 9h18v11H3z"/><path d="M9 20v-6h6v6"/></svg></div>
+        <h4>فرع أو مستودع خاص</h4>
+        <p>موقع تملكه وتديره بنفسك: استلام من الفرع، توصيل من الفرع، ومخزون تديره أنت.</p>
+      </div>
+      <div class="opt" id="opt-salla" onclick="pick('salla')">
+        <span class="radio"></span>
+        <div class="ic"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 9l9-5 9 5v11H3z"/><path d="M7 20v-8h10v8"/><path d="M10 16h4"/></svg></div>
+        <h4>مستودع من مستودعات سلة <span class="chip">متاحة في باقتك</span></h4>
+        <p>احجز مستودعاً من مراكز تخزين سلة، وتتولى سلة التخزين والتجهيز والشحن عبر شركائها.</p>
+      </div>
+    </div>
+    <table class="cmp">
+      <thead><tr><th style="width:36%">المقارنة</th><th>فرع / مستودع خاص</th><th>مستودع سلة</th></tr></thead>
+      <tbody>
+        <tr><td>من يخزّن ويجهّز الطلبات؟</td><td>أنت وفريقك</td><td><span class="y">سلة وشركاؤها</span></td></tr>
+        <tr><td>الشحن</td><td>شركات الشحن المفعّلة في متجرك</td><td><span class="y">مسارات شحن جاهزة (سريع، عادي، اقتصادي)</span></td></tr>
+        <tr><td>الاستلام من الفرع</td><td><span class="y">متاح</span></td><td><span class="n">غير متاح</span></td></tr>
+        <tr><td>المخزون</td><td>تضيفه وتحدّثه بنفسك</td><td>تنقله مرة واحدة وسلة تتابعه</td></tr>
+        <tr><td>التكلفة</td><td>—</td><td>تبدأ من 6 ر.س / طلب (شامل التخزين والتجهيز والتوصيل)</td></tr>
+        <tr><td>الوقت حتى يصير جاهزاً</td><td>فوراً بعد الحفظ</td><td>بعد تأكيد وصول المخزون</td></tr>
+      </tbody>
+    </table>
+    <div class="foot">
+      <button class="btn primary" id="btn-continue" onclick="continueChooser()">متابعة — إضافة فرع أو مستودع خاص</button>
+      <button class="btn ghost" onclick="closeChooser()">إلغاء</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ Confirm booking modal ═══════════ -->
+<div class="overlay hide" id="m-confirm" onclick="if(event.target===this)closeConfirm()">
+  <div class="modal sm">
+    <div class="mark">!</div>
+    <h3 id="confirm-title">تأكيد حجز مستودع سلة – حي الفيصلية</h3>
+    <p class="desc">سيُضاف المستودع إلى جدول الفروع والمستودعات بحالة <b>بانتظار نقل المخزون</b>. يمكنك <b>تحديد نطاق التغطية والتسعيرة الخاصة بكل نوع شحن</b> من إعدادات المستودع بعد الحجز.</p>
+    <div class="foot"><button class="btn primary" onclick="confirmBooking()">تأكيد</button><button class="btn ghost" onclick="closeConfirm()">تراجع</button></div>
+  </div>
+</div>
+
+<!-- ═══════════ Settings drawer (Salla warehouse) ═══════════ -->
+<div class="overlay hide" id="d-settings" onclick="if(event.target===this)closeSettings()">
+  <div class="drawer">
+    <div class="dh"><h3 id="settings-title">إعدادات مستودع سلة</h3><button class="btn icon ghost" onclick="closeSettings()">✕</button></div>
+    <div class="db">
+      <div style="display:flex;gap:12px;align-items:center;margin-bottom:20px"><div class="route" style="margin:0;flex:1"><div class="l"><div class="ic">▣</div><div><h4 id="settings-name">مستودع سلة حي الفيصلية</h4><p id="settings-sub">الدمام – أرامكس</p></div></div><button class="btn ghost sm">تفاصيل المستودع</button></div></div>
+      <h4 style="font-weight:700;margin-bottom:4px">تحديد نطاق التغطية وتسعيرة الشحن</h4>
+      <p style="color:var(--text-2);margin-bottom:12px;font-size:13px">تم إنشاء 3 مسارات شحن تلقائياً لهذا المستودع. لكل مسار نطاق تغطية وتسعيرة خاصة به.</p>
+      <div class="route"><div class="l"><div class="ic">🚚</div><div><h4>شحن اقتصادي <small>3 – 5 أيام</small></h4><p>التغطية: <b>كامل الدولة</b> · السعر: <b>لم يحدد بعد</b></p></div></div><div style="display:flex;gap:10px;align-items:center"><span class="switch"></span><button class="btn ghost sm">تخصيص</button></div></div>
+      <div class="route"><div class="l"><div class="ic">🚚</div><div><h4>شحن عادي <small>2 – 3 أيام</small></h4><p>التغطية: <b>كامل الدولة</b> · السعر: <b>لم يحدد بعد</b></p></div></div><div style="display:flex;gap:10px;align-items:center"><span class="switch"></span><button class="btn ghost sm">تخصيص</button></div></div>
+      <div class="route"><div class="l"><div class="ic">⚡</div><div><h4>شحن سريع <small>2 – 4 ساعات</small></h4><p>التغطية: <b>نفس المدينة</b> · السعر: <b>لم يحدد بعد</b></p></div></div><div style="display:flex;gap:10px;align-items:center"><span class="switch"></span><button class="btn ghost sm">تخصيص</button></div></div>
+      <div class="legend" style="margin:16px 0 0"><span>ℹ️ <b>الاستلام من الفرع</b> غير متاح لمستودعات سلة — التجهيز والتسليم يتم عبر شركاء سلة فقط.</span></div>
+    </div>
+    <div class="df"><button class="btn primary block" onclick="closeSettings()">حفظ</button></div>
+  </div>
+</div>
+
+<!-- ═══════════ Toast ═══════════ -->
+<div class="toast hide" id="toast"><div class="ok">✓</div><b id="toast-text">تم حجز المستودع بنجاح</b><button class="x" onclick="hideToast()">✕</button></div>
+
+<!-- ═══════════ Notes (design rationale) ═══════════ -->
+<div class="notes hide" id="notes">
+  <button class="btn icon ghost sm x" onclick="toggleNotes()">✕</button>
+  <h3>ملاحظات التصميم</h3>
+  <ol>
+    <li><b>مستودعات سلة = صف في نفس الجدول.</b> المستودع المحجوز يظهر جنب الفروع الخاصة بنفس الأعمدة، مع وسم نوع ووسوم حالة مختلفة. ما في صفحة منفصلة للإدارة.</li>
+    <li><b>الفرق يظهر في الجدول نفسه:</b> وسم (خاص / مستودع سلة)، الاستلام من الفرع = «غير متاح» لمستودعات سلة، التوصيل = «عبر مسارات شحن سلة»، والحالة = جاهز / بانتظار نقل المخزون بدل مفتوح / مغلق.</li>
+    <li><b>تبويبات تصفية</b> (الكل / الخاصة / مستودعات سلة) بدل تبويب منفصل — عشان يقدر يشوف الكل بنظرة ويصفّي وقت الحاجة. الرابط من صفحة الشحن يفتح الصفحة على تبويب «مستودعات سلة».</li>
+    <li><b>زر «فرع أو مستودع جديد»</b> يفتح اختيار النوع مع جدول مقارنة مختصر. «خاص» يكمل للنموذج الحالي كما هو. «مستودع سلة» يفتح تصفح مراكز التخزين داخل نفس الصفحة.</li>
+    <li><b>الحجز</b> = تأكيد واحد → توست → صف جديد في الجدول بزر «نقل المخزون». الإعدادات (المسارات الثلاثة) من قائمة الصف.</li>
+    <li><b>البانر</b> واحد فقط في الصفحة (مستودعات سلة). بانر الاستلام من الفروع الحالي يُنقل إلى نموذج إنشاء الفرع الخاص حتى لا يتكدس بانران فوق الجدول.</li>
+  </ol>
+  <h3>أسئلة مفتوحة</h3>
+  <ul>
+    <li>هل مستودع سلة يحتاج «نطاق تغطية» على مستوى الصف، أم التغطية تُقرأ من مسارات الشحن الثلاثة فقط؟</li>
+    <li>هل نسمح بحذف مستودع سلة من قائمة الصف مباشرة أم عبر تعطيل أولاً (كما في ملف Fulfillment)؟</li>
+    <li>بانر الاستلام من الفروع — هل نلغيه من الصفحة أم نعرض البانرين بالتناوب؟</li>
+    <li>هل يظهر بانر الشحن لكل التجار أم فقط لمن باقته تتيح مستودعات سلة؟</li>
+  </ul>
+</div>
+
+<!-- ═══════════ Prototype toolbar ═══════════ -->
+<div class="proto">
+  <span>النموذج</span>
+  <button class="on" id="pt-branches" onclick="showPage('branches')">الفروع والمستودعات</button>
+  <button id="pt-shipping" onclick="showPage('shipping')">الشحن والتوصيل</button>
+  <span>|</span>
+  <button onclick="resetAll()">إعادة ضبط</button>
+  <button onclick="toggleNotes()">ملاحظات</button>
+</div>
+
+<script>
+/* ───────── Data ───────── */
+const seed = () => ([
+  {id:1,type:'private',kind:'مستودع',name:'جدة',country:'السعودية',city:'مكة المكرمة - منطقة مكة المكرمة',hood:'الكعكية',cov:'كامل الدولة',pickup:false,delivery:false,status:'closed'},
+  {id:2,type:'private',kind:'مستودع',name:'فارس',country:'السعودية',city:'مكة المكرمة - منطقة مكة المكرمة',hood:'النزهة',cov:'مخصص',pickup:false,delivery:true,status:'open'},
+  {id:3,type:'private',kind:'فرع',name:'فرع - انجم جدة',country:'السعودية',city:'جدة - منطقة مكة المكرمة',hood:'الاندلس',cov:'مخصص',pickup:false,delivery:true,status:'open',def:true},
+  {id:4,type:'private',kind:'فرع',name:'فرع - الحجاز مول',country:'السعودية',city:'مكة المكرمة - منطقة مكة المكرمة',hood:'ولي العهد',cov:'كامل الدولة',pickup:true,delivery:true,status:'open'},
+  {id:5,type:'private',kind:'مستودع',name:'Riyadh Depot',country:'السعودية',city:'الرياض - منطقة الرياض',hood:'المعذر الشمالي',cov:'كامل الدولة',pickup:false,delivery:true,status:'open'},
+  {id:6,type:'private',kind:'فرع',name:'uae branch',country:'الامارات',city:'عجمان',hood:'-',cov:'كامل الدولة',pickup:false,delivery:false,status:'closed'},
+  {id:7,type:'salla',kind:'مستودع سلة',name:'مستودعات النخبة',op:'أرامكس',country:'السعودية',city:'الرياض',hood:'حي الياسمين',cov:'كامل الدولة',status:'wait-transfer'},
+  {id:8,type:'salla',kind:'مستودع سلة',name:'مستودعات الصفوة',op:'أرامكس',country:'السعودية',city:'جدة',hood:'حي البنفسج',cov:'مخصص',status:'ready'},
+  {id:9,type:'salla',kind:'مستودع سلة',name:'مستودعات الريادة',op:'سمسا',country:'السعودية',city:'مكة المكرمة',hood:'حي الزيتون',cov:'كامل الدولة',status:'wait-arrival'},
+]);
+const centers = [
+  {id:'c1',city:'الدمام',name:'مستودع سلة - حي الفيصلية',op:'أرامكس',avail:true,tags:['تجهيز','تخزين','توصيل يومي','72 ساعة'],hood:'حي الفيصلية'},
+  {id:'c2',city:'جدة',name:'مستودع سلة - حي الفيصلية',op:'أرامكس',avail:false,tags:['تجهيز','تخزين','توصيل يومي','72 ساعة'],hood:'حي الفيصلية'},
+  {id:'c3',city:'الرياض',name:'مستودع سلة - حي الفيصلية',op:'أرامكس',avail:true,tags:['تجهيز','تخزين','توصيل يومي','72 ساعة'],hood:'حي الفيصلية'},
+];
+let rows = seed(), filter = 'all', pickType = 'private', pendingCenter = null, nextId = 100, openMenu = null;
+
+/* ───────── Render table ───────── */
+const SALLA_STATUS = {
+  'ready':        '<span class="tag on"><i></i>جاهز</span>',
+  'wait-transfer':'<span class="tag wait"><i></i>بانتظار نقل المخزون</span>',
+  'wait-arrival': '<span class="tag wait"><i></i>بانتظار تأكيد وصول المخزون</span>',
+};
+function toggleTag(on, id, key){
+  return `<button class="tag ${on?'on':'off'}" onclick="toggleRow(${id},'${key}')"><i></i>${on?'تفعيل':'تعطيل'} <span class="chev">⌄</span></button>`;
+}
+function render(){
+  const q = (document.getElementById('q').value||'').trim();
+  const list = rows.filter(r => (filter==='all'||r.type===filter) && (!q || r.name.includes(q)));
+  document.getElementById('n-all').textContent = rows.length;
+  document.getElementById('n-private').textContent = rows.filter(r=>r.type==='private').length;
+  document.getElementById('n-salla').textContent = rows.filter(r=>r.type==='salla').length;
+  document.querySelectorAll('#ftabs button').forEach(b=>b.classList.toggle('on', b.dataset.f===filter));
+  const tb = document.getElementById('rows');
+  const emptySalla = filter==='salla' && list.length===0;
+  document.getElementById('empty-salla').classList.toggle('hide', !emptySalla);
+  tb.innerHTML = list.map(r => r.type==='private' ? `
+    <tr>
+      <td><input type="checkbox"></td>
+      <td><div class="name">${r.name} ${r.def?'<span title="الفرع الافتراضي" style="color:var(--primary-dark)">✔</span>':''}</div><div class="sub"><span class="type priv">${r.kind}</span></div></td>
+      <td>${r.country}</td><td>${r.city}</td><td>${r.hood}</td><td>${r.cov}</td>
+      <td>${toggleTag(r.pickup,r.id,'pickup')}</td>
+      <td>${toggleTag(r.delivery,r.id,'delivery')}</td>
+      <td>${r.status==='open'?'<span class="tag on"><i></i>مفتوح ⌄</span>':'<span class="tag closed"><i></i>مغلق ⌄</span>'}</td>
+      <td><div class="row-actions"><button class="btn icon ghost sm" title="تعديل" onclick="goForm()">✎</button><button class="btn icon ghost sm" onclick="menu(event,${r.id})">⋯</button></div></td>
+    </tr>` : `
+    <tr class="salla">
+      <td><input type="checkbox"></td>
+      <td><div class="name">${r.name}</div><div class="sub"><span class="type salla">مستودع سلة</span><span>تشغيل ${r.op}</span></div></td>
+      <td>${r.country}</td><td>${r.city}</td><td>${r.hood}</td><td>${r.cov}</td>
+      <td><span class="tag na" title="الاستلام من الفرع غير متاح لمستودعات سلة">— غير متاح</span></td>
+      <td><span class="tag info" title="التوصيل عبر مسارات شحن سلة الثلاثة">عبر مسارات شحن سلة</span></td>
+      <td>${SALLA_STATUS[r.status]}</td>
+      <td><div class="row-actions">${r.status==='wait-transfer'?'<button class="btn soft sm" onclick="transfer('+r.id+')">نقل المخزون</button>':''}<button class="btn icon ghost sm" onclick="menu(event,${r.id})">⋯</button></div></td>
+    </tr>`).join('');
+}
+function setFilter(f){ filter=f; render(); }
+function toggleRow(id,key){ const r=rows.find(x=>x.id===id); r[key]=!r[key]; render(); }
+function transfer(id){ const r=rows.find(x=>x.id===id); r.status='wait-arrival'; render(); showToast('تم إنشاء طلب نقل المخزون — بانتظار تأكيد وصوله للمستودع'); }
+
+/* ───────── Row menu ───────── */
+function menu(ev,id){
+  ev.stopPropagation(); closeMenu();
+  const r = rows.find(x=>x.id===id);
+  const m = document.createElement('div'); m.className='menu';
+  m.innerHTML = r.type==='salla'
+    ? `<button onclick="openSettings(${id})">⚙ الإعدادات (التغطية والتسعيرة)</button><button onclick="transfer(${id});closeMenu()">⇄ نقل المخزون</button><button onclick="closeMenu()">⏸ تعطيل المستودع</button><button class="danger" onclick="removeRow(${id})">🗑 حذف المستودع</button>`
+    : `<button onclick="goForm()">✎ تعديل</button><button onclick="closeMenu()">★ تعيين كافتراضي</button><button class="danger" onclick="removeRow(${id})">🗑 حذف</button>`;
+  const b = ev.currentTarget.getBoundingClientRect();
+  m.style.top = (b.bottom+window.scrollY+4)+'px'; m.style.left = (b.left+window.scrollX)+'px';
+  document.body.appendChild(m); openMenu=m;
+}
+function closeMenu(){ if(openMenu){openMenu.remove();openMenu=null;} }
+function removeRow(id){ rows=rows.filter(r=>r.id!==id); closeMenu(); render(); showToast('تم حذف المستودع'); }
+document.addEventListener('click', closeMenu);
+
+/* ───────── Views ───────── */
+function view(v){
+  ['list','browse','form'].forEach(x=>document.getElementById('view-'+x).classList.toggle('hide', x!==v));
+  document.getElementById('crumbs-list').innerHTML = v==='list' ? 'المنتجات <span>‹</span> <b>الفروع والمستودعات</b>'
+    : v==='browse' ? 'المنتجات <span>‹</span> الفروع والمستودعات <span>‹</span> <b>مستودعات سلة</b>'
+    : 'المنتجات <span>‹</span> الفروع والمستودعات <span>‹</span> <b>فرع أو مستودع جديد</b>';
+  document.getElementById('btn-new').classList.toggle('hide', v!=='list');
+  window.scrollTo({top:0});
+}
+function goList(){ view('list'); }
+function goBrowse(){ renderCenters(); view('browse'); }
+function goForm(){ closeMenu(); view('form'); }
+function showPage(p){
+  document.getElementById('page-branches').classList.toggle('hide', p!=='branches');
+  document.getElementById('page-shipping').classList.toggle('hide', p!=='shipping');
+  document.getElementById('subnav-products').classList.toggle('hide', p!=='branches');
+  document.getElementById('subnav-shipping').classList.toggle('hide', p!=='shipping');
+  document.getElementById('nav-products').classList.toggle('active', p==='branches');
+  document.getElementById('pt-branches').classList.toggle('on', p==='branches');
+  document.getElementById('pt-shipping').classList.toggle('on', p==='shipping');
+  window.scrollTo({top:0});
+}
+/* Deep link from Shipping page → Branches & Warehouses, filtered to Salla warehouses */
+function goShippingToSalla(){
+  showPage('branches'); view('list'); setFilter('salla');
+  setTimeout(()=>{ document.getElementById('ftabs').scrollIntoView({behavior:'smooth',block:'start'}); }, 50);
+}
+
+/* ───────── Chooser ───────── */
+function openChooser(){ pick('private'); document.getElementById('m-chooser').classList.remove('hide'); }
+function closeChooser(){ document.getElementById('m-chooser').classList.add('hide'); }
+function pick(t){
+  pickType=t;
+  document.getElementById('opt-private').classList.toggle('on', t==='private');
+  document.getElementById('opt-salla').classList.toggle('on', t==='salla');
+  document.getElementById('btn-continue').textContent = t==='private' ? 'متابعة — إضافة فرع أو مستودع خاص' : 'متابعة — تصفح مستودعات سلة';
+}
+function continueChooser(){ closeChooser(); pickType==='private' ? goForm() : goBrowse(); }
+
+/* ───────── Browse centers + booking ───────── */
+function renderCenters(){
+  document.getElementById('wgrid').innerHTML = centers.map(c=>`
+    <div class="wcard">
+      <div class="top"><div><div class="city">${c.city} <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s7-7 7-12a7 7 0 0 0-14 0c0 5 7 12 7 12z"/><circle cx="12" cy="10" r="2.5"/></svg></div><div class="nm">${c.name}</div></div>
+        ${c.booked?'<span class="chip ok">محجوز</span>':c.avail?'<span class="chip">متاح للحجز</span>':'<span class="chip warn">ممتلئ</span>'}</div>
+      <div class="tags">${c.tags.map(t=>`<span>${t}</span>`).join('')}</div>
+      <div class="op"><i></i> الشركة المشغلة: ${c.op}</div>
+      <div class="price">يبدأ من <b>6 ر.س</b> / طلب <span style="font-size:11px">( شامل التخزين والتجهيز والتوصيل )</span></div>
+      <div class="btns"><button class="btn primary" ${(!c.avail||c.booked)?'disabled':''} onclick="book('${c.id}')">${c.booked?'تم الحجز':'حجز'}</button><button class="btn ghost">التفاصيل</button></div>
+    </div>`).join('');
+}
+function book(id){ pendingCenter=centers.find(c=>c.id===id); document.getElementById('confirm-title').textContent=`تأكيد حجز ${pendingCenter.name} – ${pendingCenter.city}`; document.getElementById('m-confirm').classList.remove('hide'); }
+function closeConfirm(){ document.getElementById('m-confirm').classList.add('hide'); }
+function confirmBooking(){
+  const c=pendingCenter; c.booked=true; closeConfirm();
+  rows.unshift({id:nextId++,type:'salla',kind:'مستودع سلة',name:`${c.name} (${c.city})`,op:c.op,country:'السعودية',city:c.city,hood:c.hood,cov:'كامل الدولة',status:'wait-transfer',isNew:true});
+  view('list'); setFilter('salla'); showToast('تم حجز المستودع بنجاح — أضفناه إلى جدول الفروع والمستودعات');
+}
+
+/* ───────── Settings drawer ───────── */
+function openSettings(id){ const r=rows.find(x=>x.id===id); closeMenu(); document.getElementById('settings-name').textContent=r.name; document.getElementById('settings-sub').textContent=`${r.city} – ${r.op}`; document.getElementById('d-settings').classList.remove('hide'); }
+function closeSettings(){ document.getElementById('d-settings').classList.add('hide'); }
+
+/* ───────── Toast / notes / reset ───────── */
+let toastT;
+function showToast(t){ document.getElementById('toast-text').textContent=t; document.getElementById('toast').classList.remove('hide'); clearTimeout(toastT); toastT=setTimeout(hideToast,4500); }
+function hideToast(){ document.getElementById('toast').classList.add('hide'); }
+function toggleNotes(){ document.getElementById('notes').classList.toggle('hide'); }
+function resetAll(){ rows=seed(); centers.forEach(c=>c.booked=false); filter='all'; document.getElementById('q').value=''; document.getElementById('banner-salla').classList.remove('hide'); document.getElementById('banner-ship').classList.remove('hide'); showPage('branches'); view('list'); render(); }
+
+render();
+</script>
+</body>
+</html>
